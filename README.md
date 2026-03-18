@@ -262,6 +262,15 @@ Este projeto está sob a licença que consta no arquivo `LICENSE`.
 
 ---
 
-**Desenvolvido com ❤️ por [Felipe]**
+## 👥 Contribuidores e Desenvolvedores
 
-Última atualização: 16 de Março de 2026
+- Enzo Oliveira D’Onofrio
+- Leonardo Souza Olivieri
+- Arthur Gama Ruiz
+- João Vitor Morimoto Sesma
+- Pedro Wilian Palumbo Bevilacqua
+- Felipe Fazia da Costa
+
+### 👨‍🏫 Orientador
+
+- Professor Rodrigo Bossini Tavares Moreira
