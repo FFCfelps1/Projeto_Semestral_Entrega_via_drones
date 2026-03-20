@@ -34,47 +34,52 @@ const App = () => {
       <div className="row">
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
-          cabecalho="22/03/2025">
+          cabecalho="1. Order">
           <Pedido 
-            data="22/02/2026"
-            icone="camera"
-            titulo="Câmera"
-            descricao="Uma câmera 4K"/>
+            data="Choose items"
+            icone="shopping-cart"
+            titulo="Order"
+            descricao="Choose your items through the SkySwift app and set your delivery point with GPS precision."/>
             {componenteFeedBack}
             </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
-          cabecalho="18/03/2025">
+          cabecalho="2. Flight">
           <Pedido 
-            data="20/02/2026"
-            icone="bicycle"
-            titulo="Bicicleta"
-            descricao="Uma bicicleta nova"/>
+            data="In transit"
+            icone="plane"
+            titulo="Flight"
+            descricao="Our autonomous drones calculate the fastest, safest route to your destination, bypassing ground traffic."/>
             {componenteFeedBack}
           </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
-          cabecalho="16/02/2026">
+          cabecalho="3. Delivery">
           <Pedido
-            data="18/02/2026"
-            icone="hippo"
-            titulo="Hipopotaamo"
-            descricao="Uma hipopotamo"/>
+            data="Landing soon"
+            icone="map-marker"
+            titulo="Delivery"
+            descricao="A precise hovering landing ensures your package arrives safely at your doorstep or backyard."/>
             {componenteFeedBack}
           </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
-          cabecalho="16/05/2025">
+          cabecalho="4. Tracking">
           <Pedido
-            data="16/02/2026"
-            icone="pencil"
-            titulo="Lápis"
-            descricao="Lápis novo"/>
+            data="Real-time"
+            icone="location-arrow"
+            titulo="Tracking"
+            descricao="Monitor your delivery in real-time with live GPS coordinates and estimated arrival time."/>
             {componenteFeedBack}
           </Cartao>
+        </div>
+      </div>
+      <div className="row mt-4">
+        <div className="col-12 text-center">
+          <button className="btn btn-primary btn-lg">Clique para ver mais</button>
         </div>
       </div>
       </div>
