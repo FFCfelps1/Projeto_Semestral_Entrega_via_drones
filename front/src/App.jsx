@@ -4,6 +4,8 @@ import Feedback from "./Feedback.jsx"
 import TopBar from "./TopBar.jsx"
 import Hero from "./Hero.jsx"
 import Advantages from "./Advantages.jsx"
+import CallToAction from "./CallToAction.jsx"
+import Footer from "./Footer.jsx"
 
 
 const App = () => {
@@ -73,7 +75,9 @@ const App = () => {
         </div>
       </div>
       <Advantages />
+      <CallToAction />
       </div>
+      <Footer />
     </>
   )
 }
