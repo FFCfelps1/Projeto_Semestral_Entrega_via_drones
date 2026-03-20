@@ -40,7 +40,7 @@ const App = () => {
             icone="shopping-cart"
             titulo="Order"
             descricao="Choose your items through the SkySwift app and set your delivery point with GPS precision."/>
-            {componenteFeedBack}
+            <button className="btn btn-primary btn-sm w-100 mt-3">Clique para ver mais</button>
             </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
@@ -51,7 +51,7 @@ const App = () => {
             icone="plane"
             titulo="Flight"
             descricao="Our autonomous drones calculate the fastest, safest route to your destination, bypassing ground traffic."/>
-            {componenteFeedBack}
+            <button className="btn btn-primary btn-sm w-100 mt-3">Clique para ver mais</button>
           </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
@@ -62,7 +62,7 @@ const App = () => {
             icone="map-marker"
             titulo="Delivery"
             descricao="A precise hovering landing ensures your package arrives safely at your doorstep or backyard."/>
-            {componenteFeedBack}
+            <button className="btn btn-primary btn-sm w-100 mt-3">Clique para ver mais</button>
           </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
@@ -73,13 +73,8 @@ const App = () => {
             icone="location-arrow"
             titulo="Tracking"
             descricao="Monitor your delivery in real-time with live GPS coordinates and estimated arrival time."/>
-            {componenteFeedBack}
+            <button className="btn btn-primary btn-sm w-100 mt-3">Clique para ver mais</button>
           </Cartao>
-        </div>
-      </div>
-      <div className="row mt-4">
-        <div className="col-12 text-center">
-          <button className="btn btn-primary btn-lg">Clique para ver mais</button>
         </div>
       </div>
       </div>
