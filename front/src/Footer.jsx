@@ -1,10 +1,10 @@
 const Footer = () => {
   return (
-    <footer className="bg-dark text-light py-5">
+    <footer className="bg-dark text-light py-4 py-md-5">
       <div className="container">
         {/* Top Section - Logo & Description */}
-        <div className="row mb-5">
-          <div className="col-md-4 mb-4 mb-md-0">
+        <div className="row mb-4 mb-md-5">
+          <div className="col-12 col-sm-6 col-md-4 mb-4 mb-md-0 text-center text-sm-start">
             <h5 className="fw-bold mb-3">
               <i className="fa fa-paper-plane me-2 text-primary"></i>
               SkySwift
@@ -13,7 +13,7 @@ const Footer = () => {
               Revolutionizing the way the world moves goods through autonomous aerial technology.
             </p>
             {/* Social Icons */}
-            <div className="d-flex gap-3 mt-3">
+            <div className="d-flex gap-3 mt-3 justify-content-center justify-content-sm-start">
               <a href="#" className="text-muted text-decoration-none">
                 <i className="fa fa-globe"></i>
               </a>
@@ -27,7 +27,7 @@ const Footer = () => {
           </div>
 
           {/* Product Column */}
-          <div className="col-md-2 mb-4 mb-md-0">
+          <div className="col-12 col-sm-6 col-md-2 mb-4 mb-md-0 text-center text-sm-start">
             <h6 className="fw-bold mb-3 text-uppercase">Product</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
@@ -49,7 +49,7 @@ const Footer = () => {
           </div>
 
           {/* Company Column */}
-          <div className="col-md-2 mb-4 mb-md-0">
+          <div className="col-12 col-sm-6 col-md-2 mb-4 mb-md-0 text-center text-sm-start">
             <h6 className="fw-bold mb-3 text-uppercase">Company</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
@@ -71,7 +71,7 @@ const Footer = () => {
           </div>
 
           {/* Support Column */}
-          <div className="col-md-2">
+          <div className="col-12 col-sm-6 col-md-2 text-center text-sm-start">
             <h6 className="fw-bold mb-3 text-uppercase">Support</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
