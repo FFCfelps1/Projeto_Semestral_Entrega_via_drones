@@ -11,18 +11,24 @@ const Hero = (props) => {
       <div className="container">
         <div className="row align-items-center">
           <div className="col-lg-8 mx-auto text-center">
-            <h1 className="display-4 fw-bold mb-3">{titulo}</h1>
-            <p className="lead mb-4">{subtitulo}</p>
+            <h1 className="display-4 fw-bold mb-3" style={{ fontSize: 'clamp(1.875rem, 5vw, 3.5rem)' }}>
+              {titulo}
+            </h1>
+            <p className="lead mb-4" style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
+              {subtitulo}
+            </p>
             <div className="d-flex gap-3 justify-content-center flex-wrap">
               <button 
-                className="btn btn-primary btn-lg" 
+                className="btn btn-primary" 
                 onClick={funcao1}
+                style={{ fontSize: 'clamp(0.875rem, 1.5vw, 1rem)' }}
               >
                 {textoBotao1}
               </button>
               <button 
-                className="btn btn-outline-light btn-lg" 
+                className="btn btn-outline-light" 
                 onClick={funcao2}
+                style={{ fontSize: 'clamp(0.875rem, 1.5vw, 1rem)' }}
               >
                 {textoBotao2}
               </button>
