@@ -27,7 +27,7 @@ const App = () => {
 
         <div className="col-12">
           {/* i.fa-solid.fa-hippo */}
-          <i className="fa-solid fa-hippo fa-2x"></i>
+          <i className="fa fa-hippo fa-2x"></i>
         </div>
 
       </div>

@@ -4,7 +4,7 @@ const TopBar = () => {
       <div className="container-fluid">
         {/* Logo/Brand */}
         <a className="navbar-brand fw-bold" href="#home">
-          <i className="fas fa-cube me-2"></i>
+          <i className="fa fa-cube me-2"></i>
           Entrega via Drones
         </a>
 
@@ -26,19 +26,19 @@ const TopBar = () => {
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
               <a className="nav-link active" aria-current="page" href="#home">
-                <i className="fas fa-home me-1"></i>
+                <i className="fa fa-home me-1"></i>
                 Home
               </a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="#pedidos">
-                <i className="fas fa-box me-1"></i>
+                <i className="fa fa-box me-1"></i>
                 Pedidos
               </a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="#contato">
-                <i className="fas fa-envelope me-1"></i>
+                <i className="fa fa-envelope me-1"></i>
                 Contato
               </a>
             </li>
