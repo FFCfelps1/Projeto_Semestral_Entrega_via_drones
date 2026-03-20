@@ -7,7 +7,7 @@ const Pedido = (props) => {
 					<i className={`fa fa-${props.icone} fa-2x`}></i>
 				</div>
 				{/* div>(h4.text-center+p.text-center) */}
-				<div className="border flex-grow-1 rounded p-3">
+				<div className="flex-grow-1 rounded p-3">
 					<h4 className="text-center">{props.titulo}</h4>
 					<p className="text-center">{props.descricao}</p>
 				</div>
