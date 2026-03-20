@@ -42,6 +42,12 @@ const TopBar = () => {
                 Contato
               </a>
             </li>
+            <li className="nav-item">
+              <a className="nav-link" href="#precos">
+                <i className="fa fa-tag me-1"></i>
+                Preços
+              </a>
+            </li>
           </ul>
         </div>
       </div>
