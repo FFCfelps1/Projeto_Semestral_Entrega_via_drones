@@ -4,7 +4,7 @@ const TopBar = () => {
       <div className="container-fluid">
         {/* Logo/Brand */}
         <a className="navbar-brand fw-bold" href="#home">
-          <i className="fas fa-box-open me-2"></i>
+          <i className="fas fa-cube me-2"></i>
           Entrega via Drones
         </a>
 
