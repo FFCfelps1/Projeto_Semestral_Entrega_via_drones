@@ -7,8 +7,32 @@ const Hero = (props) => {
   const funcao2 = props.funcao2 || (() => alert("Visualizando mapa de cobertura..."));
 
   return (
-    <section className="bg-dark text-white py-5">
-      <div className="container">
+    <section 
+      className="text-white py-5 position-relative overflow-hidden"
+      style={{
+        backgroundImage: 'url(https://lh3.googleusercontent.com/aida-public/AB6AXuDyS7yPTxGGENxAQV1hUCCJPLi7u54eZKGRdNPNQpgZ_fN9C_tBnbQ8L3a3VN8qEedIlNypSdL-lfTI3u7eDi5bksNTgoixwXOsNUgQDAedyWm491MaDT5PIjsMC_HydvLdyLljNybR70f5cnul6OAEYfkFOHZFtLOMAS5SDDxRzLtq9fuGuwWpWmyFQll8SIpXuBAgBtcYq0nwV9nYM7nlnR7C5A2h0NO3ZQYsivY44IsXnoDU-XzTlPtiirXDGglcX5kJeC-SLROX)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        minHeight: '400px',
+        display: 'flex',
+        alignItems: 'center'
+      }}
+    >
+      {/* Overlay escuro para melhorar legibilidade */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 1
+        }}
+      />
+      
+      <div className="container position-relative" style={{ zIndex: 2 }}>
         <div className="row align-items-center">
           <div className="col-lg-8 mx-auto text-center">
             <h1 className="display-4 fw-bold mb-3" style={{ fontSize: 'clamp(1.875rem, 5vw, 3.5rem)' }}>
