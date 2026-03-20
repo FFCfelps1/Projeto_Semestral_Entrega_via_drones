@@ -1,8 +1,8 @@
 const CallToAction = (props) => {
-  const titulo = props.titulo || "Ready to take flight with SkySwift?";
-  const subtitulo = props.subtitulo || "Sign up today and get your first delivery completely free. Join the future of autonomous logistics.";
-  const textoBotao1 = props.textoBotao1 || "Get Started Free";
-  const textoBotao2 = props.textoBotao2 || "Contact Sales";
+  const titulo = props.titulo || "Pronto para decolar com SkySwift?";
+  const subtitulo = props.subtitulo || "Cadastre-se hoje e receba sua primeira entrega gratuitamente. Junte-se ao futuro da logística autônoma.";
+  const textoBotao1 = props.textoBotao1 || "Começar Gratuitamente";
+  const textoBotao2 = props.textoBotao2 || "Contatar Vendas";
   const funcao1 = props.funcao1 || (() => alert("Redirecionando para cadastro..."));
   const funcao2 = props.funcao2 || (() => alert("Entrando em contato com vendas..."));
 

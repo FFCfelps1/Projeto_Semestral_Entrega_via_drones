@@ -3,20 +3,20 @@ const Advantages = () => {
     {
       id: 1,
       icon: "fighter-jet",
-      title: "Ultra Fast Shipping",
-      description: "Bypass urban congestion with average delivery times under 15 minutes."
+      title: "Entrega Ultra Rápida",
+      description: "Contorne o congestionamento urbano com tempos de entrega médios em menos de 15 minutos."
     },
     {
       id: 2,
       icon: "leaf",
-      title: "Eco-friendly Operations",
-      description: "DCS securely fleet significantly reduces carbon footprint per mile."
+      title: "Operações Ecológicas",
+      description: "A frota segura reduz significativamente a pegada de carbono por quilômetro."
     },
     {
       id: 3,
       icon: "shield",
-      title: "Bank-Level Security",
-      description: "Encrypted real-time tracking and tamper-proof package compartments."
+      title: "Segurança de Nível Bancário",
+      description: "Rastreamento criptografado em tempo real e compartimentos à prova de violação."
     }
   ];
 
@@ -26,9 +26,9 @@ const Advantages = () => {
         {/* Heading Section */}
         <div className="row mb-5">
           <div className="col-lg-8 mx-auto text-center">
-            <h2 className="display-5 fw-bold mb-3">The SkySwift Advantage</h2>
+            <h2 className="display-5 fw-bold mb-3">A Vantagem SkySwift</h2>
             <p className="lead text-muted">
-              Why thousands of modern businesses and consumers are switching to drone-first logistics.
+              Por que milhares de negócios modernos e consumidores estão migrando para a logística de drones.
             </p>
           </div>
         </div>

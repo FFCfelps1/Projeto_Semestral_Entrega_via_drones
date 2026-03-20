@@ -31,45 +31,45 @@ const App = () => {
       <div className="row g-4">
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
-          cabecalho="1. Order">
+          cabecalho="1. Pedido">
           <Pedido 
-            data="Choose items"
+            data="Escolha itens"
             icone="shopping-cart"
-            titulo="Order"
-            descricao="Choose your items through the SkySwift app and set your delivery point with GPS precision."/>
+            titulo="Pedido"
+            descricao="Escolha seus itens através do aplicativo SkySwift e defina seu ponto de entrega com precisão GPS."/>
             <button className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</button>
             </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
-          cabecalho="2. Flight">
+          cabecalho="2. Voo">
           <Pedido 
-            data="In transit"
+            data="Em trânsito"
             icone="plane"
-            titulo="Flight"
-            descricao="Our autonomous drones calculate the fastest, safest route to your destination, bypassing ground traffic."/>
+            titulo="Voo"
+            descricao="Nossos drones autônomos calculam a rota mais rápida e segura para o seu destino, contornando o tráfego terrestre."/>
             <button className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</button>
           </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
-          cabecalho="3. Delivery">
+          cabecalho="3. Entrega">
           <Pedido
-            data="Landing soon"
+            data="Pouso em breve"
             icone="map-marker"
-            titulo="Delivery"
-            descricao="A precise hovering landing ensures your package arrives safely at your doorstep or backyard."/>
+            titulo="Entrega"
+            descricao="Um pouso preciso garante que seu pacote chegue com segurança na sua porta ou quintal."/>
             <button className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</button>
           </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
-          cabecalho="4. Tracking">
+          cabecalho="4. Rastreamento">
           <Pedido
-            data="Real-time"
+            data="Tempo real"
             icone="location-arrow"
-            titulo="Tracking"
-            descricao="Monitor your delivery in real-time with live GPS coordinates and estimated arrival time."/>
+            titulo="Rastreamento"
+            descricao="Monitore sua entrega em tempo real com coordenadas GPS ao vivo e hora estimada de chegada."/>
             <button className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</button>
           </Cartao>
         </div>

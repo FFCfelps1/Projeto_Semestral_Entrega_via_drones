@@ -10,7 +10,7 @@ const Footer = () => {
               SkySwift
             </h5>
             <p className="text-muted small">
-              Revolutionizing the way the world moves goods through autonomous aerial technology.
+              Revolucionando a forma como o mundo move bens através de tecnologia aérea autônoma.
             </p>
             {/* Social Icons */}
             <div className="d-flex gap-3 mt-3 justify-content-center justify-content-sm-start">
@@ -28,21 +28,21 @@ const Footer = () => {
 
           {/* Product Column */}
           <div className="col-12 col-sm-6 col-md-2 mb-4 mb-md-0 text-center text-sm-start">
-            <h6 className="fw-bold mb-3 text-uppercase">Product</h6>
+            <h6 className="fw-bold mb-3 text-uppercase">Produto</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
                 <a href="#" className="text-muted text-decoration-none small">
-                  How it Works
+                  Como Funciona
                 </a>
               </li>
               <li className="mb-2">
                 <a href="#" className="text-muted text-decoration-none small">
-                  Benefits
+                  Benefícios
                 </a>
               </li>
               <li className="mb-2">
                 <a href="#" className="text-muted text-decoration-none small">
-                  Pricing
+                  Preços
                 </a>
               </li>
             </ul>
@@ -50,21 +50,21 @@ const Footer = () => {
 
           {/* Company Column */}
           <div className="col-12 col-sm-6 col-md-2 mb-4 mb-md-0 text-center text-sm-start">
-            <h6 className="fw-bold mb-3 text-uppercase">Company</h6>
+            <h6 className="fw-bold mb-3 text-uppercase">Empresa</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
                 <a href="#" className="text-muted text-decoration-none small">
-                  About Us
+                  Sobre Nós
                 </a>
               </li>
               <li className="mb-2">
                 <a href="#" className="text-muted text-decoration-none small">
-                  Careers
+                  Carreira
                 </a>
               </li>
               <li className="mb-2">
                 <a href="#" className="text-muted text-decoration-none small">
-                  Safety
+                  Segurança
                 </a>
               </li>
             </ul>
@@ -72,21 +72,21 @@ const Footer = () => {
 
           {/* Support Column */}
           <div className="col-12 col-sm-6 col-md-2 text-center text-sm-start">
-            <h6 className="fw-bold mb-3 text-uppercase">Support</h6>
+            <h6 className="fw-bold mb-3 text-uppercase">Suporte</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
                 <a href="#" className="text-muted text-decoration-none small">
-                  Help Center
+                  Central de Ajuda
                 </a>
               </li>
               <li className="mb-2">
                 <a href="#" className="text-muted text-decoration-none small">
-                  Terms
+                  Termos
                 </a>
               </li>
               <li className="mb-2">
                 <a href="#" className="text-muted text-decoration-none small">
-                  Privacy
+                  Privacidade
                 </a>
               </li>
             </ul>
@@ -100,7 +100,7 @@ const Footer = () => {
         <div className="row">
           <div className="col-12 text-center">
             <p className="text-muted small mb-0">
-              © 2024 SkySwift Technologies Inc. All rights reserved.
+              © 2024 SkySwift Tecnologias Inc. Todos os direitos reservados.
             </p>
           </div>
         </div>
