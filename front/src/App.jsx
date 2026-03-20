@@ -23,15 +23,7 @@ const App = () => {
     <>
       <TopBar />
       <div className="container border mt-4">
-      <div className="row">
-
-        <div className="col-12">
-          {/* i.fa-solid.fa-hippo */}
-          <i className="fa fa-hippo fa-2x"></i>
-        </div>
-
-      </div>
-      <div className="row">
+      <div className="row g-4">
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
           cabecalho="1. Order">
@@ -40,7 +32,7 @@ const App = () => {
             icone="shopping-cart"
             titulo="Order"
             descricao="Choose your items through the SkySwift app and set your delivery point with GPS precision."/>
-            <button className="btn btn-primary btn-sm w-100 mt-3">Clique para ver mais</button>
+            <button className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</button>
             </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
@@ -51,7 +43,7 @@ const App = () => {
             icone="plane"
             titulo="Flight"
             descricao="Our autonomous drones calculate the fastest, safest route to your destination, bypassing ground traffic."/>
-            <button className="btn btn-primary btn-sm w-100 mt-3">Clique para ver mais</button>
+            <button className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</button>
           </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
@@ -62,7 +54,7 @@ const App = () => {
             icone="map-marker"
             titulo="Delivery"
             descricao="A precise hovering landing ensures your package arrives safely at your doorstep or backyard."/>
-            <button className="btn btn-primary btn-sm w-100 mt-3">Clique para ver mais</button>
+            <button className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</button>
           </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
@@ -73,7 +65,7 @@ const App = () => {
             icone="location-arrow"
             titulo="Tracking"
             descricao="Monitor your delivery in real-time with live GPS coordinates and estimated arrival time."/>
-            <button className="btn btn-primary btn-sm w-100 mt-3">Clique para ver mais</button>
+            <button className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</button>
           </Cartao>
         </div>
       </div>
