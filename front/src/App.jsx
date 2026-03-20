@@ -3,6 +3,7 @@ import Cartao from "./Cartao.jsx"
 import Feedback from "./Feedback.jsx"
 import TopBar from "./TopBar.jsx"
 import Hero from "./Hero.jsx"
+import Advantages from "./Advantages.jsx"
 
 
 const App = () => {
@@ -71,6 +72,7 @@ const App = () => {
           </Cartao>
         </div>
       </div>
+      <Advantages />
       </div>
     </>
   )
