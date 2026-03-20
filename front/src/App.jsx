@@ -22,7 +22,7 @@ const App = () => {
   return (
     <>
       <TopBar />
-      <div className="container border">
+      <div className="container border mt-4">
       <div className="row">
 
         <div className="col-12">
