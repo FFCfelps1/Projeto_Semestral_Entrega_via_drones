@@ -2,6 +2,7 @@ import Pedido from "./Pedido.jsx"
 import Cartao from "./Cartao.jsx"
 import Feedback from "./Feedback.jsx"
 import TopBar from "./TopBar.jsx"
+import Hero from "./Hero.jsx"
 
 
 const App = () => {
@@ -22,6 +23,7 @@ const App = () => {
   return (
     <>
       <TopBar />
+      <Hero />
       <div className="container border mt-4">
       <div className="row g-4">
         <div className="col-sm-12 col-md-6 col-xl-3">
