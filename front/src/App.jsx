@@ -77,6 +77,7 @@ const App = () => {
           </Cartao>
         </div>
       </div>
+      </div>
     </>
   )
 }
