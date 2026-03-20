@@ -36,19 +36,23 @@ const Advantages = () => {
         {/* Advantages Cards */}
         <div className="row g-4">
           {advantages.map((advantage) => (
-            <div key={advantage.id} className="col-md-6 col-lg-4">
-              <div className="d-flex gap-3">
+            <div key={advantage.id} className="col-sm-12 col-md-6 col-lg-4">
+              <div className="d-flex gap-3 p-3 h-100" style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
                 {/* Icon */}
                 <div className="flex-shrink-0">
-                  <div className="d-flex align-items-center justify-content-center" style={{ width: '50px', height: '50px' }}>
-                    <i className={`fa fa-${advantage.icon} fa-2x text-primary`}></i>
+                  <div className="d-flex align-items-center justify-content-center" style={{ width: '60px', height: '60px', backgroundColor: '#e7f3ff', borderRadius: '8px' }}>
+                    <i className={`fa fa-${advantage.icon} fa-xl text-primary`}></i>
                   </div>
                 </div>
 
                 {/* Content */}
                 <div className="flex-grow-1">
-                  <h5 className="fw-bold mb-2">{advantage.title}</h5>
-                  <p className="text-muted small">{advantage.description}</p>
+                  <h5 className="fw-bold mb-2" style={{ fontSize: 'clamp(1rem, 2vw, 1.125rem)' }}>
+                    {advantage.title}
+                  </h5>
+                  <p className="text-muted small mb-0" style={{ fontSize: 'clamp(0.875rem, 1.5vw, 0.95rem)' }}>
+                    {advantage.description}
+                  </p>
                 </div>
               </div>
             </div>
