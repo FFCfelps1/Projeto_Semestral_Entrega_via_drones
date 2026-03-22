@@ -1,5 +1,12 @@
 # Projeto Semestral: Entrega via Drones - SkySwift
 
+Nome: Felipe Fazio da Costa 				RA: 23.00055-4
+Nome: Enzo Oliveira D’Onofrio 				RA: 23.01561-6
+Nome: Leonardo Souza Olivieri 				RA: 23.01512-8
+Nome: Arthur Gama Ruiz 					RA: 23.01445-8
+Nome: João Vitor Morimoto Sesma			RA: 23.01516-0
+Nome: Pedro Wilian Palumbo Bevilacqua 		RA: 23.01307-9
+
 Uma aplicação web moderna para gerenciamento de entregas autônomas via drones, construída com React, Vite, Bootstrap e FontAwesome.
 
 ## 🚀 Características
