@@ -95,6 +95,45 @@ const DroneTrackingSection = () => {
     padding: 0,
   };
 
+  // Marcador visual fixo do drone no centro do mapa simulado.
+  const droneMarkerWrapStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "0.45rem",
+    pointerEvents: "none",
+  };
+
+  const droneMarkerIconStyle = {
+    width: "2.35rem",
+    height: "2.35rem",
+    borderRadius: "999px",
+    border: "1px solid rgba(161, 209, 255, 0.6)",
+    backgroundColor: "rgba(20, 48, 85, 0.86)",
+    color: "#d4ebff",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 0 0 6px rgba(98, 155, 233, 0.14)",
+    fontSize: "0.95rem",
+  };
+
+  const droneMarkerLabelStyle = {
+    padding: "0.25rem 0.5rem",
+    borderRadius: "999px",
+    backgroundColor: "rgba(6, 14, 27, 0.86)",
+    border: "1px solid rgba(141, 186, 236, 0.45)",
+    color: "#c9e4ff",
+    fontSize: "0.72rem",
+    letterSpacing: "0.02em",
+    fontWeight: 600,
+    whiteSpace: "nowrap",
+  };
+
   return (
     <section id="drone-tracking-panel" aria-label="Painel de rastreamento por drones">
       <div className="container">
@@ -124,6 +163,13 @@ const DroneTrackingSection = () => {
                 <button type="button" style={zoomButtonStyle} tabIndex={-1}>
                   -
                 </button>
+              </div>
+              {/* Marcador central estatico para representar o drone em rota. */}
+              <div style={droneMarkerWrapStyle} aria-hidden="true">
+                <span style={droneMarkerIconStyle}>
+                  <i className="fa-solid fa-helicopter" />
+                </span>
+                <span style={droneMarkerLabelStyle}>Drone SW-01</span>
               </div>
             </div>
           </div>
