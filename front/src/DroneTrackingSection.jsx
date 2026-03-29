@@ -15,6 +15,11 @@ const DroneTrackingSection = () => {
         <div className="drone-tracking-section-base">
           {/* mock visual da area de mapa (estatico, sem mapa real). */}
           <div className="drone-tracking-main-area">
+            {/* campo de busca fake apenas visual (sem funcionalidade). */}
+            <div className="drone-tracking-map-search" aria-hidden="true">
+              <i className="fa-solid fa-magnifying-glass" />
+              <input type="text" placeholder="Buscar rota simulada" readOnly />
+            </div>
             {/* Camada visual simulada de mapa/logistica para receber elementos futuros. */}
             <div className="drone-tracking-map-mock" />
           </div>
