@@ -342,6 +342,25 @@ const DroneTrackingSection = () => {
     lineHeight: 1.2,
   };
 
+  // Botao visual de ação do painel (sem comportamento real).
+  const detailsActionButtonStyle = {
+    width: "100%",
+    border: "1px solid rgba(128, 186, 245, 0.5)",
+    borderRadius: "0.65rem",
+    background: "linear-gradient(180deg, rgba(30, 94, 163, 0.95) 0%, rgba(16, 67, 121, 0.95) 100%)",
+    color: "#ecf6ff",
+    fontSize: "0.82rem",
+    fontWeight: 700,
+    letterSpacing: "0.02em",
+    padding: "0.62rem 0.75rem",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "0.45rem",
+    cursor: "default",
+    boxShadow: "0 8px 18px rgba(8, 20, 39, 0.35)",
+  };
+
   return (
     <section id="drone-tracking-panel" aria-label="Painel de rastreamento por drones">
       <div className="container">
@@ -450,6 +469,10 @@ const DroneTrackingSection = () => {
                 <p style={telemetryValueStyle}>Em 12 min</p>
               </div>
             </div>
+            <button type="button" style={detailsActionButtonStyle}>
+              <i className="fa-solid fa-radar" />
+              Painel de voo
+            </button>
           </aside>
         </div>
       </div>
