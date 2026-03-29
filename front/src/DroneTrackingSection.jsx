@@ -1,4 +1,8 @@
 const DroneTrackingSection = () => {
+  // Breakpoint simples para adaptar o layout em telas de tablet.
+  const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1280;
+  const isTabletLayout = viewportWidth <= 1024 && viewportWidth > 640;
+
   // Estilos migrados de CSS para JS para manter o componente autocontido.
   const panelBaseStyle = {
     display: "flex",
@@ -14,14 +18,14 @@ const DroneTrackingSection = () => {
   // Grade principal do painel com coluna de mapa e coluna lateral.
   const panelGridStyle = {
     display: "grid",
-    gridTemplateColumns: "minmax(0, 2fr) minmax(260px, 1fr)",
+    gridTemplateColumns: isTabletLayout ? "1fr" : "minmax(0, 2fr) minmax(260px, 1fr)",
     gap: "1rem",
-    minHeight: "280px",
+    minHeight: isTabletLayout ? "auto" : "280px",
   };
 
   // Base compartilhada entre a área principal e a área lateral do painel.
   const panelAreaBaseStyle = {
-    minHeight: "280px",
+    minHeight: isTabletLayout ? "240px" : "280px",
     borderRadius: "14px",
     border: "1px solid rgba(89, 109, 140, 0.35)",
     backgroundColor: "rgba(13, 20, 33, 0.55)",
