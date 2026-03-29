@@ -143,6 +143,36 @@ const DroneTrackingSection = () => {
     pointerEvents: "none",
   };
 
+  // Pontos estáticos para marcar origem e destino no traçado visual.
+  const routePointWrapBaseStyle = {
+    position: "absolute",
+    transform: "translate(-50%, -50%)",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.4rem",
+    pointerEvents: "none",
+  };
+
+  const routePointDotStyle = {
+    width: "0.78rem",
+    height: "0.78rem",
+    borderRadius: "999px",
+    border: "2px solid rgba(9, 19, 34, 0.9)",
+    boxShadow: "0 0 0 3px rgba(167, 213, 255, 0.2)",
+  };
+
+  const routePointLabelStyle = {
+    padding: "0.2rem 0.4rem",
+    borderRadius: "999px",
+    backgroundColor: "rgba(6, 14, 26, 0.82)",
+    border: "1px solid rgba(125, 170, 219, 0.35)",
+    color: "#cfe6ff",
+    fontSize: "0.68rem",
+    fontWeight: 600,
+    letterSpacing: "0.01em",
+    whiteSpace: "nowrap",
+  };
+
   return (
     <section id="drone-tracking-panel" aria-label="Painel de rastreamento por drones">
       <div className="container">
@@ -182,6 +212,15 @@ const DroneTrackingSection = () => {
                   strokeDasharray="2 5"
                 />
               </svg>
+              {/* Pontos estáticos de origem e destino para a rota simulada. */}
+              <div style={{ ...routePointWrapBaseStyle, top: "80%", left: "11%" }} aria-hidden="true">
+                <span style={{ ...routePointDotStyle, backgroundColor: "#67d6ff" }} />
+                <span style={routePointLabelStyle}>Origem</span>
+              </div>
+              <div style={{ ...routePointWrapBaseStyle, top: "20%", left: "88%" }} aria-hidden="true">
+                <span style={{ ...routePointDotStyle, backgroundColor: "#82f0b3" }} />
+                <span style={routePointLabelStyle}>Destino</span>
+              </div>
               {/* Botoes de zoom apenas visuais, sem acao real. */}
               <div style={zoomControlsStyle} aria-hidden="true">
                 <button type="button" style={zoomButtonStyle} tabIndex={-1}>
