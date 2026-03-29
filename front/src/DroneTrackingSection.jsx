@@ -1,15 +1,22 @@
 const DroneTrackingSection = () => {
   // Estilos migrados de CSS para JS para manter o componente autocontido.
   const panelBaseStyle = {
-    display: "grid",
-    gridTemplateColumns: "minmax(0, 2fr) minmax(260px, 1fr)",
-    gap: "1rem",
+    display: "flex",
+    flexDirection: "column",
     minHeight: "340px",
     padding: "1.25rem",
     borderRadius: "18px",
     border: "1px solid #2a3344",
     background: "linear-gradient(160deg, #121826 0%, #0e1522 55%, #0a111d 100%)",
     boxShadow: "0 14px 36px rgba(8, 13, 24, 0.45)",
+  };
+
+  // Grade principal do painel com coluna de mapa e coluna lateral.
+  const panelGridStyle = {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 2fr) minmax(260px, 1fr)",
+    gap: "1rem",
+    minHeight: "280px",
   };
 
   // Base compartilhada entre a área principal e a área lateral do painel.
@@ -361,6 +368,59 @@ const DroneTrackingSection = () => {
     boxShadow: "0 8px 18px rgba(8, 20, 39, 0.35)",
   };
 
+  // Estrutura base da barra inferior de status.
+  const statusBarWrapStyle = {
+    marginTop: "0.85rem",
+    borderRadius: "0.7rem",
+    border: "1px solid rgba(124, 170, 219, 0.35)",
+    backgroundColor: "rgba(8, 16, 30, 0.62)",
+    minHeight: "2.6rem",
+    padding: "0.55rem 0.7rem",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    justifyContent: "center",
+  };
+
+  const statusBarPlaceholderStyle = {
+    flex: 1,
+    height: "0.6rem",
+    borderRadius: "999px",
+    backgroundColor: "rgba(123, 160, 205, 0.22)",
+    overflow: "hidden",
+  };
+
+  const statusProgressFillStyle = {
+    width: "68%",
+    height: "100%",
+    borderRadius: "999px",
+    background: "linear-gradient(90deg, #69b8ff 0%, #9ad7ff 100%)",
+  };
+
+  const statusProgressRowStyle = {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.55rem",
+  };
+
+  const statusProgressValueStyle = {
+    margin: 0,
+    color: "#d6ebff",
+    fontSize: "0.74rem",
+    fontWeight: 700,
+    letterSpacing: "0.02em",
+    whiteSpace: "nowrap",
+  };
+
+  const statusFlightTitleStyle = {
+    margin: "0 0 0.45rem 0",
+    color: "#d8ecff",
+    fontSize: "0.78rem",
+    fontWeight: 700,
+    letterSpacing: "0.03em",
+    textTransform: "uppercase",
+  };
+
   return (
     <section id="drone-tracking-panel" aria-label="Painel de rastreamento por drones">
       <div className="container">
@@ -373,107 +433,118 @@ const DroneTrackingSection = () => {
         </header>
         {/* divisao estrutural do painel em area principal e area lateral. */}
         <div style={panelBaseStyle}>
-          {/* mock visual da area de mapa (estatico, sem mapa real). */}
-          <div style={{ ...panelAreaBaseStyle, ...mainAreaStyle }}>
-            {/* campo de busca fake apenas visual (sem funcionalidade). */}
-            <div style={searchBarStyle} aria-hidden="true">
-              <i className="fa-solid fa-magnifying-glass" style={searchIconStyle} />
-              <input type="text" placeholder="Buscar rota simulada" readOnly style={searchInputStyle} />
+          <div style={panelGridStyle}>
+            {/* mock visual da area de mapa (estatico, sem mapa real). */}
+            <div style={{ ...panelAreaBaseStyle, ...mainAreaStyle }}>
+              {/* campo de busca fake apenas visual (sem funcionalidade). */}
+              <div style={searchBarStyle} aria-hidden="true">
+                <i className="fa-solid fa-magnifying-glass" style={searchIconStyle} />
+                <input type="text" placeholder="Buscar rota simulada" readOnly style={searchInputStyle} />
+              </div>
+              {/* Camada visual simulada de mapa/logistica para receber elementos futuros. */}
+              <div style={mapMockStyle}>
+                {/* Linha de rota pontilhada somente visual. */}
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={routeOverlayStyle} aria-hidden="true">
+                  <path
+                    d="M 11 80 C 26 71, 34 62, 45 52 C 57 41, 69 34, 88 20"
+                    stroke="rgba(160, 209, 255, 0.35)"
+                    strokeWidth="4"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M 11 80 C 26 71, 34 62, 45 52 C 57 41, 69 34, 88 20"
+                    stroke="#a8d6ff"
+                    strokeWidth="1.8"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeDasharray="2 5"
+                  />
+                </svg>
+                {/* Pontos estáticos de origem e destino para a rota simulada. */}
+                <div style={{ ...routePointWrapBaseStyle, top: "80%", left: "11%" }} aria-hidden="true">
+                  <span style={{ ...routePointDotStyle, backgroundColor: "#67d6ff" }} />
+                  <span style={routePointLabelStyle}>Origem</span>
+                </div>
+                <div style={{ ...routePointWrapBaseStyle, top: "20%", left: "88%" }} aria-hidden="true">
+                  <span style={{ ...routePointDotStyle, backgroundColor: "#82f0b3" }} />
+                  <span style={routePointLabelStyle}>Destino</span>
+                </div>
+                {/* Botoes de zoom apenas visuais, sem acao real. */}
+                <div style={zoomControlsStyle} aria-hidden="true">
+                  <button type="button" style={zoomButtonStyle} tabIndex={-1}>
+                    +
+                  </button>
+                  <button type="button" style={zoomButtonStyle} tabIndex={-1}>
+                    -
+                  </button>
+                </div>
+                {/* Marcador central estatico para representar o drone em rota. */}
+                <div style={droneMarkerWrapStyle} aria-hidden="true">
+                  <span style={droneMarkerIconStyle}>
+                    <i className="fa-solid fa-helicopter" />
+                  </span>
+                  <span style={droneMarkerLabelStyle}>Drone SW-01</span>
+                </div>
+              </div>
             </div>
-            {/* Camada visual simulada de mapa/logistica para receber elementos futuros. */}
-            <div style={mapMockStyle}>
-              {/* Linha de rota pontilhada somente visual. */}
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={routeOverlayStyle} aria-hidden="true">
-                <path
-                  d="M 11 80 C 26 71, 34 62, 45 52 C 57 41, 69 34, 88 20"
-                  stroke="rgba(160, 209, 255, 0.35)"
-                  strokeWidth="4"
-                  fill="none"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M 11 80 C 26 71, 34 62, 45 52 C 57 41, 69 34, 88 20"
-                  stroke="#a8d6ff"
-                  strokeWidth="1.8"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeDasharray="2 5"
-                />
-              </svg>
-              {/* Pontos estáticos de origem e destino para a rota simulada. */}
-              <div style={{ ...routePointWrapBaseStyle, top: "80%", left: "11%" }} aria-hidden="true">
-                <span style={{ ...routePointDotStyle, backgroundColor: "#67d6ff" }} />
-                <span style={routePointLabelStyle}>Origem</span>
+            {/* Coluna lateral inicial para os detalhes da entrega. */}
+            <aside style={detailsPanelStyle}>
+              <h3 style={detailsTitleStyle}>Detalhes da Entrega</h3>
+              <hr style={detailsDividerStyle} />
+              <div style={trackingIdCardStyle}>
+                <p style={trackingIdLabelStyle}>Tracking ID</p>
+                <p style={trackingIdValueStyle}>SW-TRK-2039</p>
               </div>
-              <div style={{ ...routePointWrapBaseStyle, top: "20%", left: "88%" }} aria-hidden="true">
-                <span style={{ ...routePointDotStyle, backgroundColor: "#82f0b3" }} />
-                <span style={routePointLabelStyle}>Destino</span>
+              <div style={packageCardStyle}>
+                <p style={packageTitleStyle}>Pacote</p>
+                <p style={packageNameStyle}>Kit de Sensores Aereos</p>
+                <p style={packageMetaStyle}>Peso: 1.2 kg</p>
+                <p style={packageMetaStyle}>Volume: 24 x 18 x 12 cm</p>
               </div>
-              {/* Botoes de zoom apenas visuais, sem acao real. */}
-              <div style={zoomControlsStyle} aria-hidden="true">
-                <button type="button" style={zoomButtonStyle} tabIndex={-1}>
-                  +
-                </button>
-                <button type="button" style={zoomButtonStyle} tabIndex={-1}>
-                  -
-                </button>
+              <div style={routeDetailsCardStyle}>
+                <p style={routeDetailsTitleStyle}>Rota</p>
+                <div>
+                  <p style={routeItemLabelStyle}>Origem</p>
+                  <p style={routeItemValueStyle}>Centro Logistico SkySwift, Bloco B</p>
+                </div>
+                <div>
+                  <p style={routeItemLabelStyle}>Destino</p>
+                  <p style={routeItemValueStyle}>Av. das Palmeiras, 245 - Jardim Aurora</p>
+                </div>
               </div>
-              {/* Marcador central estatico para representar o drone em rota. */}
-              <div style={droneMarkerWrapStyle} aria-hidden="true">
-                <span style={droneMarkerIconStyle}>
-                  <i className="fa-solid fa-helicopter" />
-                </span>
-                <span style={droneMarkerLabelStyle}>Drone SW-01</span>
+              <div style={telemetrySectionStyle}>
+                <div style={telemetryCardStyle}>
+                  <i className="fa-solid fa-battery-three-quarters" style={telemetryIconStyle} />
+                  <p style={telemetryLabelStyle}>Bateria</p>
+                  <p style={telemetryValueStyle}>84%</p>
+                </div>
+                <div style={telemetryCardStyle}>
+                  <i className="fa-solid fa-signal" style={telemetryIconStyle} />
+                  <p style={telemetryLabelStyle}>Sinal</p>
+                  <p style={telemetryValueStyle}>Estavel</p>
+                </div>
+                <div style={telemetryCardStyle}>
+                  <i className="fa-solid fa-clock" style={telemetryIconStyle} />
+                  <p style={telemetryLabelStyle}>Chegada</p>
+                  <p style={telemetryValueStyle}>Em 12 min</p>
+                </div>
               </div>
+              <button type="button" style={detailsActionButtonStyle}>
+                <i className="fa-solid fa-radar" />
+                Painel de voo
+              </button>
+            </aside>
+          </div>
+          <div style={statusBarWrapStyle} aria-hidden="true">
+            <p style={statusFlightTitleStyle}>Em voo</p>
+            <div style={statusProgressRowStyle}>
+              <div style={statusBarPlaceholderStyle}>
+                <div style={statusProgressFillStyle} />
+              </div>
+              <p style={statusProgressValueStyle}>68%</p>
             </div>
           </div>
-          {/* Coluna lateral inicial para os detalhes da entrega. */}
-          <aside style={detailsPanelStyle}>
-            <h3 style={detailsTitleStyle}>Detalhes da Entrega</h3>
-            <hr style={detailsDividerStyle} />
-            <div style={trackingIdCardStyle}>
-              <p style={trackingIdLabelStyle}>Tracking ID</p>
-              <p style={trackingIdValueStyle}>SW-TRK-2039</p>
-            </div>
-            <div style={packageCardStyle}>
-              <p style={packageTitleStyle}>Pacote</p>
-              <p style={packageNameStyle}>Kit de Sensores Aereos</p>
-              <p style={packageMetaStyle}>Peso: 1.2 kg</p>
-              <p style={packageMetaStyle}>Volume: 24 x 18 x 12 cm</p>
-            </div>
-            <div style={routeDetailsCardStyle}>
-              <p style={routeDetailsTitleStyle}>Rota</p>
-              <div>
-                <p style={routeItemLabelStyle}>Origem</p>
-                <p style={routeItemValueStyle}>Centro Logistico SkySwift, Bloco B</p>
-              </div>
-              <div>
-                <p style={routeItemLabelStyle}>Destino</p>
-                <p style={routeItemValueStyle}>Av. das Palmeiras, 245 - Jardim Aurora</p>
-              </div>
-            </div>
-            <div style={telemetrySectionStyle}>
-              <div style={telemetryCardStyle}>
-                <i className="fa-solid fa-battery-three-quarters" style={telemetryIconStyle} />
-                <p style={telemetryLabelStyle}>Bateria</p>
-                <p style={telemetryValueStyle}>84%</p>
-              </div>
-              <div style={telemetryCardStyle}>
-                <i className="fa-solid fa-signal" style={telemetryIconStyle} />
-                <p style={telemetryLabelStyle}>Sinal</p>
-                <p style={telemetryValueStyle}>Estavel</p>
-              </div>
-              <div style={telemetryCardStyle}>
-                <i className="fa-solid fa-clock" style={telemetryIconStyle} />
-                <p style={telemetryLabelStyle}>Chegada</p>
-                <p style={telemetryValueStyle}>Em 12 min</p>
-              </div>
-            </div>
-            <button type="button" style={detailsActionButtonStyle}>
-              <i className="fa-solid fa-radar" />
-              Painel de voo
-            </button>
-          </aside>
         </div>
       </div>
     </section>
