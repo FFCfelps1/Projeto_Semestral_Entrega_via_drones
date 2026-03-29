@@ -412,6 +412,14 @@ const DroneTrackingSection = () => {
     whiteSpace: "nowrap",
   };
 
+  const statusEtaTextStyle = {
+    margin: "0.42rem 0 0 0",
+    color: "#b9d6f4",
+    fontSize: "0.72rem",
+    fontWeight: 600,
+    letterSpacing: "0.01em",
+  };
+
   const statusFlightTitleStyle = {
     margin: "0 0 0.45rem 0",
     color: "#d8ecff",
@@ -544,6 +552,7 @@ const DroneTrackingSection = () => {
               </div>
               <p style={statusProgressValueStyle}>68%</p>
             </div>
+            <p style={statusEtaTextStyle}>Chegada estimada: 19:40</p>
           </div>
         </div>
       </div>
