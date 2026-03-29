@@ -2,6 +2,12 @@ const DroneTrackingSection = () => {
   return (
     <section id="drone-tracking-panel" aria-label="Painel de rastreamento por drones">
       <div className="container">
+        <header className="py-4">
+          <h2 className="h3 mb-2">Painel de Rastreamento Aereo</h2>
+          <p className="text-body-secondary mb-0">
+            Acompanhe uma simulacao visual do fluxo logistico das entregas por drones.
+          </p>
+        </header>
         <div className="drone-tracking-section-base" />
       </div>
     </section>
