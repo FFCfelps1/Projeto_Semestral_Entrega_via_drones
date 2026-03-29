@@ -173,6 +173,37 @@ const DroneTrackingSection = () => {
     whiteSpace: "nowrap",
   };
 
+  // Estrutura inicial do painel lateral de detalhes.
+  const detailsPanelStyle = {
+    ...panelAreaBaseStyle,
+    display: "flex",
+    flexDirection: "column",
+    padding: "0.9rem",
+    gap: "0.85rem",
+  };
+
+  const detailsTitleStyle = {
+    margin: 0,
+    color: "#d9ecff",
+    fontSize: "1rem",
+    fontWeight: 700,
+    letterSpacing: "0.01em",
+  };
+
+  const detailsDividerStyle = {
+    height: "1px",
+    border: 0,
+    margin: 0,
+    backgroundColor: "rgba(124, 159, 204, 0.35)",
+  };
+
+  const detailsPlaceholderStyle = {
+    minHeight: "3.2rem",
+    borderRadius: "0.7rem",
+    border: "1px dashed rgba(126, 171, 220, 0.4)",
+    backgroundColor: "rgba(8, 16, 30, 0.5)",
+  };
+
   return (
     <section id="drone-tracking-panel" aria-label="Painel de rastreamento por drones">
       <div className="container">
@@ -239,8 +270,13 @@ const DroneTrackingSection = () => {
               </div>
             </div>
           </div>
-          {/* Coluna lateral (direita): recebera detalhes mockados de entrega nas proximas etapas. */}
-          <aside style={panelAreaBaseStyle} />
+          {/* Coluna lateral inicial para os detalhes da entrega. */}
+          <aside style={detailsPanelStyle}>
+            <h3 style={detailsTitleStyle}>Detalhes da Entrega</h3>
+            <hr style={detailsDividerStyle} />
+            <div style={detailsPlaceholderStyle} />
+            <div style={detailsPlaceholderStyle} />
+          </aside>
         </div>
       </div>
     </section>
