@@ -312,19 +312,19 @@ const DroneTrackingSection = () => {
   // Indicadores visuais de telemetria com dados mockados.
   const telemetrySectionStyle = {
     display: "grid",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-    gap: "0.5rem",
+    gridTemplateColumns: "repeat(auto-fit, minmax(88px, 1fr))",
+    gap: "0.55rem",
   };
 
   const telemetryCardStyle = {
     borderRadius: "0.65rem",
     border: "1px solid rgba(124, 170, 219, 0.35)",
     backgroundColor: "rgba(8, 16, 30, 0.62)",
-    padding: "0.5rem",
+    padding: "0.55rem",
     display: "flex",
     flexDirection: "column",
-    gap: "0.3rem",
-    minHeight: "4.1rem",
+    gap: "0.34rem",
+    minHeight: "4.25rem",
   };
 
   const telemetryIconStyle = {
@@ -335,7 +335,7 @@ const DroneTrackingSection = () => {
   const telemetryLabelStyle = {
     margin: 0,
     color: "#9bb7d9",
-    fontSize: "0.62rem",
+    fontSize: "0.64rem",
     fontWeight: 600,
     letterSpacing: "0.03em",
     textTransform: "uppercase",
@@ -344,7 +344,7 @@ const DroneTrackingSection = () => {
   const telemetryValueStyle = {
     margin: 0,
     color: "#e5f4ff",
-    fontSize: "0.78rem",
+    fontSize: "0.8rem",
     fontWeight: 700,
     lineHeight: 1.2,
   };
@@ -429,13 +429,32 @@ const DroneTrackingSection = () => {
     textTransform: "uppercase",
   };
 
+  // Ajuste fino de hierarquia do cabeçalho da página de rastreamento.
+  const sectionTitleStyle = {
+    margin: 0,
+    color: "#1f2937",
+    fontSize: "clamp(1.35rem, 2.7vw, 1.75rem)",
+    fontWeight: 800,
+    letterSpacing: "0.01em",
+  };
+
+  const sectionSubtitleStyle = {
+    margin: "0.45rem 0 0 0",
+    color: "#9fb9d7",
+    fontSize: "0.94rem",
+    lineHeight: 1.5,
+    maxWidth: "60ch",
+  };
+
   return (
     <section id="drone-tracking-panel" aria-label="Painel de rastreamento por drones">
       <div className="container">
         {/* Cabecalho inicial da pagina de rastreamento*/}
         <header className="py-4">
-          <h2 className="h3 mb-2">Painel de Rastreamento Aereo</h2>
-          <p className="text-body-secondary mb-0">
+          <h2 className="h3 mb-2" style={sectionTitleStyle}>
+            Painel de Rastreamento Aereo
+          </h2>
+          <p className="mb-0" style={sectionSubtitleStyle}>
             Acompanhe uma simulacao visual do fluxo logistico das entregas por drones.
           </p>
         </header>
