@@ -1,3 +1,5 @@
+import "./DroneTrackingSection.css";
+
 const DroneTrackingSection = () => {
   return (
     <section id="drone-tracking-panel" aria-label="Painel de rastreamento por drones">
@@ -9,7 +11,7 @@ const DroneTrackingSection = () => {
             Acompanhe uma simulacao visual do fluxo logistico das entregas por drones.
           </p>
         </header>
-        {/* Base da area visual do painel: sera preenchida nas proximas microetapas */}
+        {/* container principal escuro do painel (bloco visual base). */}
         <div className="drone-tracking-section-base" />
       </div>
     </section>

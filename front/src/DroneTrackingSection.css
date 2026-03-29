@@ -1,0 +1,9 @@
+/* ETAPA 3: estilo local do container visual escuro do painel. */
+.drone-tracking-section-base {
+  min-height: 340px;
+  padding: 1.25rem;
+  border-radius: 18px;
+  border: 1px solid #2a3344;
+  background: linear-gradient(160deg, #121826 0%, #0e1522 55%, #0a111d 100%);
+  box-shadow: 0 14px 36px rgba(8, 13, 24, 0.45);
+}
