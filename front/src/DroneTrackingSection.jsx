@@ -1,14 +1,15 @@
 const DroneTrackingSection = () => {
-  // Breakpoint simples para adaptar o layout em telas de tablet.
+  // Breakpoints simples para adaptar layout em tablet e mobile.
   const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1280;
   const isTabletLayout = viewportWidth <= 1024 && viewportWidth > 640;
+  const isMobileLayout = viewportWidth <= 640;
 
   // Estilos migrados de CSS para JS para manter o componente autocontido.
   const panelBaseStyle = {
     display: "flex",
     flexDirection: "column",
     minHeight: "340px",
-    padding: "1.25rem",
+    padding: isMobileLayout ? "1rem" : "1.25rem",
     borderRadius: "18px",
     border: "1px solid #2a3344",
     background: "linear-gradient(160deg, #121826 0%, #0e1522 55%, #0a111d 100%)",
@@ -18,14 +19,14 @@ const DroneTrackingSection = () => {
   // Grade principal do painel com coluna de mapa e coluna lateral.
   const panelGridStyle = {
     display: "grid",
-    gridTemplateColumns: isTabletLayout ? "1fr" : "minmax(0, 2fr) minmax(260px, 1fr)",
-    gap: "1rem",
-    minHeight: isTabletLayout ? "auto" : "280px",
+    gridTemplateColumns: isTabletLayout || isMobileLayout ? "1fr" : "minmax(0, 2fr) minmax(260px, 1fr)",
+    gap: isMobileLayout ? "0.75rem" : "1rem",
+    minHeight: isTabletLayout || isMobileLayout ? "auto" : "280px",
   };
 
   // Base compartilhada entre a área principal e a área lateral do painel.
   const panelAreaBaseStyle = {
-    minHeight: isTabletLayout ? "240px" : "280px",
+    minHeight: isMobileLayout ? "220px" : isTabletLayout ? "240px" : "280px",
     borderRadius: "14px",
     border: "1px solid rgba(89, 109, 140, 0.35)",
     backgroundColor: "rgba(13, 20, 33, 0.55)",
@@ -33,10 +34,10 @@ const DroneTrackingSection = () => {
 
   // Área principal configurada em coluna para comportar busca + mapa mock.
   const mainAreaStyle = {
-    padding: "0.75rem",
+    padding: isMobileLayout ? "0.6rem" : "0.75rem",
     display: "flex",
     flexDirection: "column",
-    gap: "0.75rem",
+    gap: isMobileLayout ? "0.6rem" : "0.75rem",
   };
 
   // Campo visual de busca fake (sem funcionalidade real).
@@ -44,7 +45,7 @@ const DroneTrackingSection = () => {
     display: "flex",
     alignItems: "center",
     gap: "0.5rem",
-    padding: "0.55rem 0.75rem",
+    padding: isMobileLayout ? "0.5rem 0.65rem" : "0.55rem 0.75rem",
     borderRadius: "10px",
     border: "1px solid rgba(112, 146, 191, 0.35)",
     backgroundColor: "rgba(8, 15, 29, 0.72)",
@@ -52,7 +53,7 @@ const DroneTrackingSection = () => {
 
   const searchIconStyle = {
     color: "#89acd8",
-    fontSize: "0.85rem",
+    fontSize: isMobileLayout ? "0.8rem" : "0.85rem",
   };
 
   const searchInputStyle = {
@@ -61,14 +62,14 @@ const DroneTrackingSection = () => {
     outline: "none",
     background: "transparent",
     color: "#d6e6ff",
-    fontSize: "0.9rem",
+    fontSize: isMobileLayout ? "0.82rem" : "0.9rem",
   };
 
   // Camada visual simulando "mapa" com gradiente e textura estática.
   const mapMockStyle = {
     width: "100%",
     flex: 1,
-    minHeight: "248px",
+    minHeight: isMobileLayout ? "190px" : "248px",
     position: "relative",
     overflow: "hidden",
     borderRadius: "10px",
@@ -82,21 +83,21 @@ const DroneTrackingSection = () => {
   // Controles decorativos de zoom posicionados sobre o mapa simulado.
   const zoomControlsStyle = {
     position: "absolute",
-    top: "0.75rem",
-    right: "0.75rem",
+    top: isMobileLayout ? "0.55rem" : "0.75rem",
+    right: isMobileLayout ? "0.55rem" : "0.75rem",
     display: "flex",
     flexDirection: "column",
-    gap: "0.45rem",
+    gap: isMobileLayout ? "0.35rem" : "0.45rem",
   };
 
   const zoomButtonStyle = {
-    width: "2rem",
-    height: "2rem",
+    width: isMobileLayout ? "1.75rem" : "2rem",
+    height: isMobileLayout ? "1.75rem" : "2rem",
     border: "1px solid rgba(134, 173, 220, 0.45)",
     borderRadius: "0.5rem",
     backgroundColor: "rgba(6, 14, 26, 0.82)",
     color: "#d5e8ff",
-    fontSize: "1.05rem",
+    fontSize: isMobileLayout ? "0.95rem" : "1.05rem",
     fontWeight: 700,
     lineHeight: 1,
     cursor: "default",
@@ -115,13 +116,13 @@ const DroneTrackingSection = () => {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: "0.45rem",
+    gap: isMobileLayout ? "0.35rem" : "0.45rem",
     pointerEvents: "none",
   };
 
   const droneMarkerIconStyle = {
-    width: "2.35rem",
-    height: "2.35rem",
+    width: isMobileLayout ? "2rem" : "2.35rem",
+    height: isMobileLayout ? "2rem" : "2.35rem",
     borderRadius: "999px",
     border: "1px solid rgba(161, 209, 255, 0.6)",
     backgroundColor: "rgba(20, 48, 85, 0.86)",
@@ -130,11 +131,11 @@ const DroneTrackingSection = () => {
     alignItems: "center",
     justifyContent: "center",
     boxShadow: "0 0 0 6px rgba(98, 155, 233, 0.14)",
-    fontSize: "0.95rem",
+    fontSize: isMobileLayout ? "0.82rem" : "0.95rem",
   };
 
   const droneMarkerLabelStyle = {
-    padding: "0.25rem 0.5rem",
+    padding: isMobileLayout ? "0.2rem 0.45rem" : "0.25rem 0.5rem",
     borderRadius: "999px",
     backgroundColor: "rgba(6, 14, 27, 0.86)",
     border: "1px solid rgba(141, 186, 236, 0.45)",
@@ -165,20 +166,20 @@ const DroneTrackingSection = () => {
   };
 
   const routePointDotStyle = {
-    width: "0.78rem",
-    height: "0.78rem",
+    width: isMobileLayout ? "0.68rem" : "0.78rem",
+    height: isMobileLayout ? "0.68rem" : "0.78rem",
     borderRadius: "999px",
     border: "2px solid rgba(9, 19, 34, 0.9)",
     boxShadow: "0 0 0 3px rgba(167, 213, 255, 0.2)",
   };
 
   const routePointLabelStyle = {
-    padding: "0.2rem 0.4rem",
+    padding: isMobileLayout ? "0.18rem 0.36rem" : "0.2rem 0.4rem",
     borderRadius: "999px",
     backgroundColor: "rgba(6, 14, 26, 0.82)",
     border: "1px solid rgba(125, 170, 219, 0.35)",
     color: "#cfe6ff",
-    fontSize: "0.68rem",
+    fontSize: isMobileLayout ? "0.62rem" : "0.68rem",
     fontWeight: 600,
     letterSpacing: "0.01em",
     whiteSpace: "nowrap",
@@ -189,14 +190,14 @@ const DroneTrackingSection = () => {
     ...panelAreaBaseStyle,
     display: "flex",
     flexDirection: "column",
-    padding: "0.9rem",
-    gap: "0.85rem",
+    padding: isMobileLayout ? "0.7rem" : "0.9rem",
+    gap: isMobileLayout ? "0.75rem" : "0.85rem",
   };
 
   const detailsTitleStyle = {
     margin: 0,
     color: "#d9ecff",
-    fontSize: "1rem",
+    fontSize: isMobileLayout ? "0.92rem" : "1rem",
     fontWeight: 700,
     letterSpacing: "0.01em",
   };
@@ -314,9 +315,10 @@ const DroneTrackingSection = () => {
   };
 
   // Indicadores visuais de telemetria com dados mockados.
+  // Em telas mobile, os cards ficam em duas colunas para preservar legibilidade.
   const telemetrySectionStyle = {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(88px, 1fr))",
+    gridTemplateColumns: isMobileLayout ? "repeat(2, minmax(0, 1fr))" : "repeat(auto-fit, minmax(88px, 1fr))",
     gap: "0.55rem",
   };
 
@@ -324,11 +326,11 @@ const DroneTrackingSection = () => {
     borderRadius: "0.65rem",
     border: "1px solid rgba(124, 170, 219, 0.35)",
     backgroundColor: "rgba(8, 16, 30, 0.62)",
-    padding: "0.55rem",
+    padding: isMobileLayout ? "0.5rem" : "0.55rem",
     display: "flex",
     flexDirection: "column",
     gap: "0.34rem",
-    minHeight: "4.25rem",
+    minHeight: isMobileLayout ? "3.8rem" : "4.25rem",
   };
 
   const telemetryIconStyle = {
@@ -360,10 +362,10 @@ const DroneTrackingSection = () => {
     borderRadius: "0.65rem",
     background: "linear-gradient(180deg, rgba(30, 94, 163, 0.95) 0%, rgba(16, 67, 121, 0.95) 100%)",
     color: "#ecf6ff",
-    fontSize: "0.82rem",
+    fontSize: isMobileLayout ? "0.76rem" : "0.82rem",
     fontWeight: 700,
     letterSpacing: "0.02em",
-    padding: "0.62rem 0.75rem",
+    padding: isMobileLayout ? "0.56rem 0.68rem" : "0.62rem 0.75rem",
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
@@ -373,13 +375,14 @@ const DroneTrackingSection = () => {
   };
 
   // Estrutura base da barra inferior de status.
+  // O bloco de status reduz margens e tipografia no mobile para evitar quebra.
   const statusBarWrapStyle = {
-    marginTop: "0.85rem",
+    marginTop: isMobileLayout ? "0.7rem" : "0.85rem",
     borderRadius: "0.7rem",
     border: "1px solid rgba(124, 170, 219, 0.35)",
     backgroundColor: "rgba(8, 16, 30, 0.62)",
-    minHeight: "2.6rem",
-    padding: "0.55rem 0.7rem",
+    minHeight: isMobileLayout ? "2.45rem" : "2.6rem",
+    padding: isMobileLayout ? "0.5rem 0.6rem" : "0.55rem 0.7rem",
     display: "flex",
     flexDirection: "column",
     alignItems: "stretch",
@@ -404,30 +407,30 @@ const DroneTrackingSection = () => {
   const statusProgressRowStyle = {
     display: "flex",
     alignItems: "center",
-    gap: "0.55rem",
+    gap: isMobileLayout ? "0.45rem" : "0.55rem",
   };
 
   const statusProgressValueStyle = {
     margin: 0,
     color: "#d6ebff",
-    fontSize: "0.74rem",
+    fontSize: isMobileLayout ? "0.68rem" : "0.74rem",
     fontWeight: 700,
     letterSpacing: "0.02em",
     whiteSpace: "nowrap",
   };
 
   const statusEtaTextStyle = {
-    margin: "0.42rem 0 0 0",
+    margin: isMobileLayout ? "0.34rem 0 0 0" : "0.42rem 0 0 0",
     color: "#b9d6f4",
-    fontSize: "0.72rem",
+    fontSize: isMobileLayout ? "0.65rem" : "0.72rem",
     fontWeight: 600,
     letterSpacing: "0.01em",
   };
 
   const statusFlightTitleStyle = {
-    margin: "0 0 0.45rem 0",
+    margin: isMobileLayout ? "0 0 0.35rem 0" : "0 0 0.45rem 0",
     color: "#d8ecff",
-    fontSize: "0.78rem",
+    fontSize: isMobileLayout ? "0.72rem" : "0.78rem",
     fontWeight: 700,
     letterSpacing: "0.03em",
     textTransform: "uppercase",
@@ -445,9 +448,9 @@ const DroneTrackingSection = () => {
   const sectionSubtitleStyle = {
     margin: "0.45rem 0 0 0",
     color: "#9fb9d7",
-    fontSize: "0.94rem",
+    fontSize: isMobileLayout ? "0.86rem" : "0.94rem",
     lineHeight: 1.5,
-    maxWidth: "60ch",
+    maxWidth: isMobileLayout ? "100%" : "60ch",
   };
 
   return (
