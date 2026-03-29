@@ -1,9 +1,53 @@
 /* ETAPA 3: estilo local do container visual escuro do painel. */
 .drone-tracking-section-base {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 1rem;
   min-height: 340px;
   padding: 1.25rem;
   border-radius: 18px;
   border: 1px solid #2a3344;
   background: linear-gradient(160deg, #121826 0%, #0e1522 55%, #0a111d 100%);
   box-shadow: 0 14px 36px rgba(8, 13, 24, 0.45);
+}
+
+/* ETAPA 4: blocos estruturais (sem conteudo detalhado ainda). */
+.drone-tracking-main-area,
+.drone-tracking-side-area {
+  min-height: 280px;
+  border-radius: 14px;
+  border: 1px solid rgba(89, 109, 140, 0.35);
+  background-color: rgba(13, 20, 33, 0.55);
+}
+
+/* ETAPA 5: base visual da area "mapa" com gradiente e textura estatica. */
+.drone-tracking-main-area {
+  padding: 0.75rem;
+}
+
+.drone-tracking-map-mock {
+  width: 100%;
+  height: 100%;
+  min-height: 248px;
+  border-radius: 10px;
+  border: 1px solid rgba(116, 148, 189, 0.25);
+  background-color: #0a1322;
+  background-image:
+    radial-gradient(circle at 20% 22%, rgba(45, 95, 178, 0.25), transparent 45%),
+    radial-gradient(circle at 78% 80%, rgba(28, 126, 132, 0.22), transparent 44%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(111, 148, 196, 0.09) 0,
+      rgba(111, 148, 196, 0.09) 1px,
+      transparent 1px,
+      transparent 42px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(111, 148, 196, 0.07) 0,
+      rgba(111, 148, 196, 0.07) 1px,
+      transparent 1px,
+      transparent 42px
+    );
+  box-shadow: inset 0 0 28px rgba(3, 7, 15, 0.6);
 }
