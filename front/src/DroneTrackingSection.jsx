@@ -204,6 +204,104 @@ const DroneTrackingSection = () => {
     backgroundColor: "rgba(8, 16, 30, 0.5)",
   };
 
+  // Bloco de identificação da entrega (mock estático).
+  const trackingIdCardStyle = {
+    borderRadius: "0.7rem",
+    border: "1px solid rgba(126, 171, 220, 0.35)",
+    backgroundColor: "rgba(8, 16, 30, 0.62)",
+    padding: "0.65rem 0.75rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.3rem",
+  };
+
+  const trackingIdLabelStyle = {
+    margin: 0,
+    color: "#9eb8d8",
+    fontSize: "0.72rem",
+    fontWeight: 600,
+    letterSpacing: "0.04em",
+    textTransform: "uppercase",
+  };
+
+  const trackingIdValueStyle = {
+    margin: 0,
+    color: "#e2f2ff",
+    fontSize: "0.92rem",
+    fontWeight: 700,
+    letterSpacing: "0.02em",
+  };
+
+  // Card com informações estáticas do pacote.
+  const packageCardStyle = {
+    borderRadius: "0.7rem",
+    border: "1px solid rgba(126, 171, 220, 0.35)",
+    backgroundColor: "rgba(8, 16, 30, 0.62)",
+    padding: "0.65rem 0.75rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.45rem",
+  };
+
+  const packageTitleStyle = {
+    margin: 0,
+    color: "#9eb8d8",
+    fontSize: "0.72rem",
+    fontWeight: 600,
+    letterSpacing: "0.04em",
+    textTransform: "uppercase",
+  };
+
+  const packageNameStyle = {
+    margin: 0,
+    color: "#e2f2ff",
+    fontSize: "0.9rem",
+    fontWeight: 700,
+  };
+
+  const packageMetaStyle = {
+    margin: 0,
+    color: "#b8cee8",
+    fontSize: "0.76rem",
+    lineHeight: 1.3,
+  };
+
+  // Bloco estático de origem e destino da entrega.
+  const routeDetailsCardStyle = {
+    borderRadius: "0.7rem",
+    border: "1px solid rgba(126, 171, 220, 0.35)",
+    backgroundColor: "rgba(8, 16, 30, 0.62)",
+    padding: "0.65rem 0.75rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.55rem",
+  };
+
+  const routeDetailsTitleStyle = {
+    margin: 0,
+    color: "#9eb8d8",
+    fontSize: "0.72rem",
+    fontWeight: 600,
+    letterSpacing: "0.04em",
+    textTransform: "uppercase",
+  };
+
+  const routeItemLabelStyle = {
+    margin: 0,
+    color: "#a9c3e2",
+    fontSize: "0.68rem",
+    fontWeight: 600,
+    letterSpacing: "0.03em",
+    textTransform: "uppercase",
+  };
+
+  const routeItemValueStyle = {
+    margin: "0.12rem 0 0 0",
+    color: "#dbeeff",
+    fontSize: "0.78rem",
+    lineHeight: 1.25,
+  };
+
   return (
     <section id="drone-tracking-panel" aria-label="Painel de rastreamento por drones">
       <div className="container">
@@ -274,8 +372,27 @@ const DroneTrackingSection = () => {
           <aside style={detailsPanelStyle}>
             <h3 style={detailsTitleStyle}>Detalhes da Entrega</h3>
             <hr style={detailsDividerStyle} />
-            <div style={detailsPlaceholderStyle} />
-            <div style={detailsPlaceholderStyle} />
+            <div style={trackingIdCardStyle}>
+              <p style={trackingIdLabelStyle}>Tracking ID</p>
+              <p style={trackingIdValueStyle}>SW-TRK-2039</p>
+            </div>
+            <div style={packageCardStyle}>
+              <p style={packageTitleStyle}>Pacote</p>
+              <p style={packageNameStyle}>Kit de Sensores Aereos</p>
+              <p style={packageMetaStyle}>Peso: 1.2 kg</p>
+              <p style={packageMetaStyle}>Volume: 24 x 18 x 12 cm</p>
+            </div>
+            <div style={routeDetailsCardStyle}>
+              <p style={routeDetailsTitleStyle}>Rota</p>
+              <div>
+                <p style={routeItemLabelStyle}>Origem</p>
+                <p style={routeItemValueStyle}>Centro Logistico SkySwift, Bloco B</p>
+              </div>
+              <div>
+                <p style={routeItemLabelStyle}>Destino</p>
+                <p style={routeItemValueStyle}>Av. das Palmeiras, 245 - Jardim Aurora</p>
+              </div>
+            </div>
           </aside>
         </div>
       </div>
