@@ -6,6 +6,7 @@ import Hero from "./Hero.jsx"
 import Advantages from "./Advantages.jsx"
 import CallToAction from "./CallToAction.jsx"
 import Footer from "./Footer.jsx"
+import DroneTrackingSection from "./DroneTrackingSection.jsx"
 
 
 const App = () => {
@@ -77,6 +78,7 @@ const App = () => {
       <Advantages />
       <CallToAction />
       </div>
+      <DroneTrackingSection />
       <Footer />
     </>
   )
