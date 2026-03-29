@@ -10,6 +10,21 @@ import DroneTrackingSection from "./DroneTrackingSection.jsx"
 
 
 const App = () => {
+  // Roteamento simples por URL sem biblioteca extra:
+  // se a rota for "/rastreamento", exibimos a pagina dedicada do painel.
+  const isTrackingPage = window.location.pathname === "/rastreamento"
+
+  if (isTrackingPage) {
+    return (
+      <>
+        <TopBar />
+        <main>
+          <DroneTrackingSection />
+        </main>
+        <Footer />
+      </>
+    )
+  }
 
   const textoOK = 'Já recebi'
   const textoNOK = 'Ainda não recebi'
@@ -71,14 +86,14 @@ const App = () => {
             icone="location-arrow"
             titulo="Rastreamento"
             descricao="Monitore sua entrega em tempo real com coordenadas GPS ao vivo e hora estimada de chegada."/>
-            <button className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</button>
+            {/* CTA da home para abrir a pagina dedicada de rastreamento */}
+            <a href="/rastreamento" className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</a>
           </Cartao>
         </div>
       </div>
       <Advantages />
       <CallToAction />
       </div>
-      <DroneTrackingSection />
       <Footer />
     </>
   )
