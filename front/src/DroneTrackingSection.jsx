@@ -302,6 +302,46 @@ const DroneTrackingSection = () => {
     lineHeight: 1.25,
   };
 
+  // Indicadores visuais de telemetria com dados mockados.
+  const telemetrySectionStyle = {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gap: "0.5rem",
+  };
+
+  const telemetryCardStyle = {
+    borderRadius: "0.65rem",
+    border: "1px solid rgba(124, 170, 219, 0.35)",
+    backgroundColor: "rgba(8, 16, 30, 0.62)",
+    padding: "0.5rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.3rem",
+    minHeight: "4.1rem",
+  };
+
+  const telemetryIconStyle = {
+    color: "#9fd4ff",
+    fontSize: "0.78rem",
+  };
+
+  const telemetryLabelStyle = {
+    margin: 0,
+    color: "#9bb7d9",
+    fontSize: "0.62rem",
+    fontWeight: 600,
+    letterSpacing: "0.03em",
+    textTransform: "uppercase",
+  };
+
+  const telemetryValueStyle = {
+    margin: 0,
+    color: "#e5f4ff",
+    fontSize: "0.78rem",
+    fontWeight: 700,
+    lineHeight: 1.2,
+  };
+
   return (
     <section id="drone-tracking-panel" aria-label="Painel de rastreamento por drones">
       <div className="container">
@@ -391,6 +431,23 @@ const DroneTrackingSection = () => {
               <div>
                 <p style={routeItemLabelStyle}>Destino</p>
                 <p style={routeItemValueStyle}>Av. das Palmeiras, 245 - Jardim Aurora</p>
+              </div>
+            </div>
+            <div style={telemetrySectionStyle}>
+              <div style={telemetryCardStyle}>
+                <i className="fa-solid fa-battery-three-quarters" style={telemetryIconStyle} />
+                <p style={telemetryLabelStyle}>Bateria</p>
+                <p style={telemetryValueStyle}>84%</p>
+              </div>
+              <div style={telemetryCardStyle}>
+                <i className="fa-solid fa-signal" style={telemetryIconStyle} />
+                <p style={telemetryLabelStyle}>Sinal</p>
+                <p style={telemetryValueStyle}>Estavel</p>
+              </div>
+              <div style={telemetryCardStyle}>
+                <i className="fa-solid fa-clock" style={telemetryIconStyle} />
+                <p style={telemetryLabelStyle}>Chegada</p>
+                <p style={telemetryValueStyle}>Em 12 min</p>
               </div>
             </div>
           </aside>
