@@ -253,9 +253,10 @@ const DroneTrackingSection = () => {
     gap: "0.3rem",
   };
 
+  // Refino de contraste nos textos secundarios dos cards para facilitar leitura.
   const trackingIdLabelStyle = {
     margin: 0,
-    color: "#9eb8d8",
+    color: "#b3cbe8",
     fontSize: "0.72rem",
     fontWeight: 600,
     letterSpacing: "0.04em",
@@ -283,7 +284,7 @@ const DroneTrackingSection = () => {
 
   const packageTitleStyle = {
     margin: 0,
-    color: "#9eb8d8",
+    color: "#b3cbe8",
     fontSize: "0.72rem",
     fontWeight: 600,
     letterSpacing: "0.04em",
@@ -299,7 +300,7 @@ const DroneTrackingSection = () => {
 
   const packageMetaStyle = {
     margin: 0,
-    color: "#b8cee8",
+    color: "#c8dcf2",
     fontSize: "0.76rem",
     lineHeight: 1.3,
   };
@@ -317,7 +318,7 @@ const DroneTrackingSection = () => {
 
   const routeDetailsTitleStyle = {
     margin: 0,
-    color: "#9eb8d8",
+    color: "#b3cbe8",
     fontSize: "0.72rem",
     fontWeight: 600,
     letterSpacing: "0.04em",
@@ -326,7 +327,7 @@ const DroneTrackingSection = () => {
 
   const routeItemLabelStyle = {
     margin: 0,
-    color: "#a9c3e2",
+    color: "#bdd4ec",
     fontSize: "0.68rem",
     fontWeight: 600,
     letterSpacing: "0.03em",
@@ -347,7 +348,7 @@ const DroneTrackingSection = () => {
 
   const routeItemValueStyle = {
     margin: "0.12rem 0 0 0",
-    color: "#dbeeff",
+    color: "#e2f1ff",
     fontSize: "0.78rem",
     lineHeight: 1.25,
   };
@@ -378,7 +379,7 @@ const DroneTrackingSection = () => {
 
   const telemetryLabelStyle = {
     margin: 0,
-    color: "#9bb7d9",
+    color: "#b2cce8",
     fontSize: "0.64rem",
     fontWeight: 600,
     letterSpacing: "0.03em",
@@ -459,7 +460,7 @@ const DroneTrackingSection = () => {
 
   const statusEtaTextStyle = {
     margin: 0,
-    color: "#b9d6f4",
+    color: "#c8e0f8",
     fontSize: isMobileLayout ? "0.65rem" : "0.72rem",
     fontWeight: 600,
     letterSpacing: "0.01em",
