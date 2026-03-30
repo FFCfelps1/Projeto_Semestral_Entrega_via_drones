@@ -212,12 +212,13 @@ const DroneTrackingSection = () => {
   };
 
   // Estrutura inicial do painel lateral de detalhes.
+  // Ajuste de ritmo visual: espacamentos verticais mais consistentes entre os blocos.
   const detailsPanelStyle = {
     ...panelAreaBaseStyle,
     display: "flex",
     flexDirection: "column",
-    padding: isMobileLayout ? "0.7rem" : "0.9rem",
-    gap: isMobileLayout ? "0.75rem" : "0.85rem",
+    padding: isMobileLayout ? "0.7rem" : "1rem",
+    gap: isMobileLayout ? "0.75rem" : "0.95rem",
   };
 
   const detailsTitleStyle = {
@@ -231,7 +232,7 @@ const DroneTrackingSection = () => {
   const detailsDividerStyle = {
     height: "1px",
     border: 0,
-    margin: 0,
+    margin: "0.1rem 0 0.15rem 0",
     backgroundColor: "rgba(124, 159, 204, 0.35)",
   };
 
@@ -247,10 +248,10 @@ const DroneTrackingSection = () => {
     borderRadius: "0.7rem",
     border: "1px solid rgba(126, 171, 220, 0.35)",
     backgroundColor: "rgba(8, 16, 30, 0.62)",
-    padding: "0.65rem 0.75rem",
+    padding: isMobileLayout ? "0.62rem 0.72rem" : "0.7rem 0.8rem",
     display: "flex",
     flexDirection: "column",
-    gap: "0.3rem",
+    gap: "0.34rem",
   };
 
   // Refino de contraste nos textos secundarios dos cards para facilitar leitura.
@@ -276,10 +277,10 @@ const DroneTrackingSection = () => {
     borderRadius: "0.7rem",
     border: "1px solid rgba(126, 171, 220, 0.35)",
     backgroundColor: "rgba(8, 16, 30, 0.62)",
-    padding: "0.65rem 0.75rem",
+    padding: isMobileLayout ? "0.62rem 0.72rem" : "0.7rem 0.8rem",
     display: "flex",
     flexDirection: "column",
-    gap: "0.45rem",
+    gap: "0.5rem",
   };
 
   const packageTitleStyle = {
@@ -310,10 +311,10 @@ const DroneTrackingSection = () => {
     borderRadius: "0.7rem",
     border: "1px solid rgba(126, 171, 220, 0.35)",
     backgroundColor: "rgba(8, 16, 30, 0.62)",
-    padding: "0.65rem 0.75rem",
+    padding: isMobileLayout ? "0.62rem 0.72rem" : "0.7rem 0.8rem",
     display: "flex",
     flexDirection: "column",
-    gap: "0.55rem",
+    gap: "0.6rem",
   };
 
   const routeDetailsTitleStyle = {
@@ -358,7 +359,7 @@ const DroneTrackingSection = () => {
   const telemetrySectionStyle = {
     display: "grid",
     gridTemplateColumns: isMobileLayout ? "repeat(2, minmax(0, 1fr))" : "repeat(auto-fit, minmax(88px, 1fr))",
-    gap: "0.55rem",
+    gap: isMobileLayout ? "0.55rem" : "0.6rem",
   };
 
   const telemetryCardStyle = {
@@ -409,6 +410,7 @@ const DroneTrackingSection = () => {
     alignItems: "center",
     justifyContent: "center",
     gap: "0.45rem",
+    marginTop: isMobileLayout ? "0.05rem" : "0.1rem",
     cursor: "default",
     boxShadow: "0 8px 18px rgba(8, 20, 39, 0.35)",
   };
