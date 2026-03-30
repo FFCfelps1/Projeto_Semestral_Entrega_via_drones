@@ -221,11 +221,12 @@ const DroneTrackingSection = () => {
     gap: isMobileLayout ? "0.75rem" : "0.95rem",
   };
 
+  // Refino tipografico: separa melhor titulos, labels e valores na coluna lateral.
   const detailsTitleStyle = {
     margin: 0,
     color: "#d9ecff",
-    fontSize: isMobileLayout ? "0.92rem" : "1rem",
-    fontWeight: 700,
+    fontSize: isMobileLayout ? "0.95rem" : "1.05rem",
+    fontWeight: 800,
     letterSpacing: "0.01em",
   };
 
@@ -258,16 +259,16 @@ const DroneTrackingSection = () => {
   const trackingIdLabelStyle = {
     margin: 0,
     color: "#b3cbe8",
-    fontSize: "0.72rem",
+    fontSize: isMobileLayout ? "0.68rem" : "0.7rem",
     fontWeight: 600,
-    letterSpacing: "0.04em",
+    letterSpacing: "0.05em",
     textTransform: "uppercase",
   };
 
   const trackingIdValueStyle = {
     margin: 0,
     color: "#e2f2ff",
-    fontSize: "0.92rem",
+    fontSize: isMobileLayout ? "0.88rem" : "0.96rem",
     fontWeight: 700,
     letterSpacing: "0.02em",
   };
@@ -286,24 +287,24 @@ const DroneTrackingSection = () => {
   const packageTitleStyle = {
     margin: 0,
     color: "#b3cbe8",
-    fontSize: "0.72rem",
+    fontSize: isMobileLayout ? "0.68rem" : "0.7rem",
     fontWeight: 600,
-    letterSpacing: "0.04em",
+    letterSpacing: "0.05em",
     textTransform: "uppercase",
   };
 
   const packageNameStyle = {
     margin: 0,
     color: "#e2f2ff",
-    fontSize: "0.9rem",
+    fontSize: isMobileLayout ? "0.86rem" : "0.94rem",
     fontWeight: 700,
   };
 
   const packageMetaStyle = {
     margin: 0,
     color: "#c8dcf2",
-    fontSize: "0.76rem",
-    lineHeight: 1.3,
+    fontSize: isMobileLayout ? "0.73rem" : "0.78rem",
+    lineHeight: 1.35,
   };
 
   // Bloco estático de origem e destino da entrega.
@@ -320,16 +321,16 @@ const DroneTrackingSection = () => {
   const routeDetailsTitleStyle = {
     margin: 0,
     color: "#b3cbe8",
-    fontSize: "0.72rem",
+    fontSize: isMobileLayout ? "0.68rem" : "0.7rem",
     fontWeight: 600,
-    letterSpacing: "0.04em",
+    letterSpacing: "0.05em",
     textTransform: "uppercase",
   };
 
   const routeItemLabelStyle = {
     margin: 0,
     color: "#bdd4ec",
-    fontSize: "0.68rem",
+    fontSize: isMobileLayout ? "0.64rem" : "0.66rem",
     fontWeight: 600,
     letterSpacing: "0.03em",
     textTransform: "uppercase",
@@ -350,8 +351,8 @@ const DroneTrackingSection = () => {
   const routeItemValueStyle = {
     margin: "0.12rem 0 0 0",
     color: "#e2f1ff",
-    fontSize: "0.78rem",
-    lineHeight: 1.25,
+    fontSize: isMobileLayout ? "0.74rem" : "0.8rem",
+    lineHeight: 1.3,
   };
 
   // Indicadores visuais de telemetria com dados mockados.
@@ -381,7 +382,7 @@ const DroneTrackingSection = () => {
   const telemetryLabelStyle = {
     margin: 0,
     color: "#b2cce8",
-    fontSize: "0.64rem",
+    fontSize: isMobileLayout ? "0.58rem" : "0.62rem",
     fontWeight: 600,
     letterSpacing: "0.03em",
     textTransform: "uppercase",
@@ -390,7 +391,7 @@ const DroneTrackingSection = () => {
   const telemetryValueStyle = {
     margin: 0,
     color: "#e5f4ff",
-    fontSize: "0.8rem",
+    fontSize: isMobileLayout ? "0.76rem" : "0.84rem",
     fontWeight: 700,
     lineHeight: 1.2,
   };
@@ -454,7 +455,7 @@ const DroneTrackingSection = () => {
   const statusProgressValueStyle = {
     margin: 0,
     color: "#d6ebff",
-    fontSize: isMobileLayout ? "0.68rem" : "0.74rem",
+    fontSize: isMobileLayout ? "0.7rem" : "0.76rem",
     fontWeight: 700,
     letterSpacing: "0.02em",
     whiteSpace: "nowrap",
@@ -463,7 +464,7 @@ const DroneTrackingSection = () => {
   const statusEtaTextStyle = {
     margin: 0,
     color: "#c8e0f8",
-    fontSize: isMobileLayout ? "0.65rem" : "0.72rem",
+    fontSize: isMobileLayout ? "0.64rem" : "0.7rem",
     fontWeight: 600,
     letterSpacing: "0.01em",
   };
@@ -471,8 +472,8 @@ const DroneTrackingSection = () => {
   const statusFlightTitleStyle = {
     margin: 0,
     color: "#d8ecff",
-    fontSize: isMobileLayout ? "0.72rem" : "0.78rem",
-    fontWeight: 700,
+    fontSize: isMobileLayout ? "0.74rem" : "0.82rem",
+    fontWeight: 800,
     letterSpacing: "0.03em",
     textTransform: "uppercase",
   };
