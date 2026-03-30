@@ -14,6 +14,8 @@ const DroneTrackingSection = () => {
     packageName: "Kit de Sensores Aereos",
     packageWeight: "Peso: 1.2 kg",
     packageVolume: "Volume: 24 x 18 x 12 cm",
+    originIconClass: "fa-location-dot",
+    destinationIconClass: "fa-flag-checkered",
     originAddress: "Centro Logistico SkySwift, Bloco B",
     destinationAddress: "Av. das Palmeiras, 245 - Jardim Aurora",
     telemetry: [
@@ -22,7 +24,9 @@ const DroneTrackingSection = () => {
       { iconClass: "fa-clock", label: "Chegada", value: "Em 12 min" },
     ],
     flightStatus: "Em voo",
+    flightStatusIconClass: "fa-plane-departure",
     progressValue: "68%",
+    estimatedArrivalIconClass: "fa-clock",
     estimatedArrivalLabel: "Chegada estimada: 19:40",
   };
 
@@ -329,6 +333,18 @@ const DroneTrackingSection = () => {
     textTransform: "uppercase",
   };
 
+  // Linha de cabecalho dos itens de rota com iconografia auxiliar.
+  const routeItemHeaderStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.35rem",
+  };
+
+  const routeItemIconStyle = {
+    color: "#9fd4ff",
+    fontSize: isMobileLayout ? "0.65rem" : "0.7rem",
+  };
+
   const routeItemValueStyle = {
     margin: "0.12rem 0 0 0",
     color: "#dbeeff",
@@ -442,7 +458,7 @@ const DroneTrackingSection = () => {
   };
 
   const statusEtaTextStyle = {
-    margin: isMobileLayout ? "0.34rem 0 0 0" : "0.42rem 0 0 0",
+    margin: 0,
     color: "#b9d6f4",
     fontSize: isMobileLayout ? "0.65rem" : "0.72rem",
     fontWeight: 600,
@@ -450,12 +466,31 @@ const DroneTrackingSection = () => {
   };
 
   const statusFlightTitleStyle = {
-    margin: isMobileLayout ? "0 0 0.35rem 0" : "0 0 0.45rem 0",
+    margin: 0,
     color: "#d8ecff",
     fontSize: isMobileLayout ? "0.72rem" : "0.78rem",
     fontWeight: 700,
     letterSpacing: "0.03em",
     textTransform: "uppercase",
+  };
+
+  // Linhas com icones no status para reforcar leitura visual dos dados.
+  const statusTitleRowStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.35rem",
+  };
+
+  const statusEtaRowStyle = {
+    marginTop: isMobileLayout ? "0.34rem" : "0.42rem",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.35rem",
+  };
+
+  const statusInlineIconStyle = {
+    color: "#9fd4ff",
+    fontSize: isMobileLayout ? "0.68rem" : "0.72rem",
   };
 
   // Ajuste fino de hierarquia do cabeçalho da página de rastreamento.
@@ -561,11 +596,17 @@ const DroneTrackingSection = () => {
               <div style={routeDetailsCardStyle}>
                 <p style={routeDetailsTitleStyle}>Rota</p>
                 <div>
-                  <p style={routeItemLabelStyle}>{trackingMock.originLabel}</p>
+                  <div style={routeItemHeaderStyle}>
+                    <i className={`fa-solid ${trackingMock.originIconClass}`} style={routeItemIconStyle} />
+                    <p style={routeItemLabelStyle}>{trackingMock.originLabel}</p>
+                  </div>
                   <p style={routeItemValueStyle}>{trackingMock.originAddress}</p>
                 </div>
                 <div>
-                  <p style={routeItemLabelStyle}>{trackingMock.destinationLabel}</p>
+                  <div style={routeItemHeaderStyle}>
+                    <i className={`fa-solid ${trackingMock.destinationIconClass}`} style={routeItemIconStyle} />
+                    <p style={routeItemLabelStyle}>{trackingMock.destinationLabel}</p>
+                  </div>
                   <p style={routeItemValueStyle}>{trackingMock.destinationAddress}</p>
                 </div>
               </div>
@@ -586,14 +627,20 @@ const DroneTrackingSection = () => {
             </aside>
           </div>
           <div style={statusBarWrapStyle} aria-hidden="true">
-            <p style={statusFlightTitleStyle}>{trackingMock.flightStatus}</p>
+            <div style={statusTitleRowStyle}>
+              <i className={`fa-solid ${trackingMock.flightStatusIconClass}`} style={statusInlineIconStyle} />
+              <p style={statusFlightTitleStyle}>{trackingMock.flightStatus}</p>
+            </div>
             <div style={statusProgressRowStyle}>
               <div style={statusBarPlaceholderStyle}>
                 <div style={statusProgressFillStyle} />
               </div>
               <p style={statusProgressValueStyle}>{trackingMock.progressValue}</p>
             </div>
-            <p style={statusEtaTextStyle}>{trackingMock.estimatedArrivalLabel}</p>
+            <div style={statusEtaRowStyle}>
+              <i className={`fa-solid ${trackingMock.estimatedArrivalIconClass}`} style={statusInlineIconStyle} />
+              <p style={statusEtaTextStyle}>{trackingMock.estimatedArrivalLabel}</p>
+            </div>
           </div>
         </div>
       </div>
