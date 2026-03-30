@@ -4,6 +4,28 @@ const DroneTrackingSection = () => {
   const isTabletLayout = viewportWidth <= 1024 && viewportWidth > 640;
   const isMobileLayout = viewportWidth <= 640;
 
+  // Fonte unica de dados mockados para facilitar ajustes sem mexer na estrutura visual.
+  const trackingMock = {
+    searchPlaceholder: "Buscar rota simulada",
+    originLabel: "Origem",
+    destinationLabel: "Destino",
+    droneLabel: "Drone SW-01",
+    trackingId: "SW-TRK-2039",
+    packageName: "Kit de Sensores Aereos",
+    packageWeight: "Peso: 1.2 kg",
+    packageVolume: "Volume: 24 x 18 x 12 cm",
+    originAddress: "Centro Logistico SkySwift, Bloco B",
+    destinationAddress: "Av. das Palmeiras, 245 - Jardim Aurora",
+    telemetry: [
+      { iconClass: "fa-battery-three-quarters", label: "Bateria", value: "84%" },
+      { iconClass: "fa-signal", label: "Sinal", value: "Estavel" },
+      { iconClass: "fa-clock", label: "Chegada", value: "Em 12 min" },
+    ],
+    flightStatus: "Em voo",
+    progressValue: "68%",
+    estimatedArrivalLabel: "Chegada estimada: 19:40",
+  };
+
   // Estilos migrados de CSS para JS para manter o componente autocontido.
   const panelBaseStyle = {
     display: "flex",
@@ -398,7 +420,7 @@ const DroneTrackingSection = () => {
   };
 
   const statusProgressFillStyle = {
-    width: "68%",
+    width: trackingMock.progressValue,
     height: "100%",
     borderRadius: "999px",
     background: "linear-gradient(90deg, #69b8ff 0%, #9ad7ff 100%)",
@@ -473,7 +495,7 @@ const DroneTrackingSection = () => {
               {/* campo de busca fake apenas visual (sem funcionalidade). */}
               <div style={searchBarStyle} aria-hidden="true">
                 <i className="fa-solid fa-magnifying-glass" style={searchIconStyle} />
-                <input type="text" placeholder="Buscar rota simulada" readOnly style={searchInputStyle} />
+                <input type="text" placeholder={trackingMock.searchPlaceholder} readOnly style={searchInputStyle} />
               </div>
               {/* Camada visual simulada de mapa/logistica para receber elementos futuros. */}
               <div style={mapMockStyle}>
@@ -498,11 +520,11 @@ const DroneTrackingSection = () => {
                 {/* Pontos estáticos de origem e destino para a rota simulada. */}
                 <div style={{ ...routePointWrapBaseStyle, top: "80%", left: "11%" }} aria-hidden="true">
                   <span style={{ ...routePointDotStyle, backgroundColor: "#67d6ff" }} />
-                  <span style={routePointLabelStyle}>Origem</span>
+                  <span style={routePointLabelStyle}>{trackingMock.originLabel}</span>
                 </div>
                 <div style={{ ...routePointWrapBaseStyle, top: "20%", left: "88%" }} aria-hidden="true">
                   <span style={{ ...routePointDotStyle, backgroundColor: "#82f0b3" }} />
-                  <span style={routePointLabelStyle}>Destino</span>
+                  <span style={routePointLabelStyle}>{trackingMock.destinationLabel}</span>
                 </div>
                 {/* Botoes de zoom apenas visuais, sem acao real. */}
                 <div style={zoomControlsStyle} aria-hidden="true">
@@ -518,7 +540,7 @@ const DroneTrackingSection = () => {
                   <span style={droneMarkerIconStyle}>
                     <i className="fa-solid fa-helicopter" />
                   </span>
-                  <span style={droneMarkerLabelStyle}>Drone SW-01</span>
+                  <span style={droneMarkerLabelStyle}>{trackingMock.droneLabel}</span>
                 </div>
               </div>
             </div>
@@ -528,41 +550,34 @@ const DroneTrackingSection = () => {
               <hr style={detailsDividerStyle} />
               <div style={trackingIdCardStyle}>
                 <p style={trackingIdLabelStyle}>Tracking ID</p>
-                <p style={trackingIdValueStyle}>SW-TRK-2039</p>
+                <p style={trackingIdValueStyle}>{trackingMock.trackingId}</p>
               </div>
               <div style={packageCardStyle}>
                 <p style={packageTitleStyle}>Pacote</p>
-                <p style={packageNameStyle}>Kit de Sensores Aereos</p>
-                <p style={packageMetaStyle}>Peso: 1.2 kg</p>
-                <p style={packageMetaStyle}>Volume: 24 x 18 x 12 cm</p>
+                <p style={packageNameStyle}>{trackingMock.packageName}</p>
+                <p style={packageMetaStyle}>{trackingMock.packageWeight}</p>
+                <p style={packageMetaStyle}>{trackingMock.packageVolume}</p>
               </div>
               <div style={routeDetailsCardStyle}>
                 <p style={routeDetailsTitleStyle}>Rota</p>
                 <div>
-                  <p style={routeItemLabelStyle}>Origem</p>
-                  <p style={routeItemValueStyle}>Centro Logistico SkySwift, Bloco B</p>
+                  <p style={routeItemLabelStyle}>{trackingMock.originLabel}</p>
+                  <p style={routeItemValueStyle}>{trackingMock.originAddress}</p>
                 </div>
                 <div>
-                  <p style={routeItemLabelStyle}>Destino</p>
-                  <p style={routeItemValueStyle}>Av. das Palmeiras, 245 - Jardim Aurora</p>
+                  <p style={routeItemLabelStyle}>{trackingMock.destinationLabel}</p>
+                  <p style={routeItemValueStyle}>{trackingMock.destinationAddress}</p>
                 </div>
               </div>
               <div style={telemetrySectionStyle}>
-                <div style={telemetryCardStyle}>
-                  <i className="fa-solid fa-battery-three-quarters" style={telemetryIconStyle} />
-                  <p style={telemetryLabelStyle}>Bateria</p>
-                  <p style={telemetryValueStyle}>84%</p>
-                </div>
-                <div style={telemetryCardStyle}>
-                  <i className="fa-solid fa-signal" style={telemetryIconStyle} />
-                  <p style={telemetryLabelStyle}>Sinal</p>
-                  <p style={telemetryValueStyle}>Estavel</p>
-                </div>
-                <div style={telemetryCardStyle}>
-                  <i className="fa-solid fa-clock" style={telemetryIconStyle} />
-                  <p style={telemetryLabelStyle}>Chegada</p>
-                  <p style={telemetryValueStyle}>Em 12 min</p>
-                </div>
+                {/* Renderizacao dos indicadores com base na lista mock centralizada. */}
+                {trackingMock.telemetry.map((metric) => (
+                  <div key={metric.label} style={telemetryCardStyle}>
+                    <i className={`fa-solid ${metric.iconClass}`} style={telemetryIconStyle} />
+                    <p style={telemetryLabelStyle}>{metric.label}</p>
+                    <p style={telemetryValueStyle}>{metric.value}</p>
+                  </div>
+                ))}
               </div>
               <button type="button" style={detailsActionButtonStyle}>
                 <i className="fa-solid fa-radar" />
@@ -571,14 +586,14 @@ const DroneTrackingSection = () => {
             </aside>
           </div>
           <div style={statusBarWrapStyle} aria-hidden="true">
-            <p style={statusFlightTitleStyle}>Em voo</p>
+            <p style={statusFlightTitleStyle}>{trackingMock.flightStatus}</p>
             <div style={statusProgressRowStyle}>
               <div style={statusBarPlaceholderStyle}>
                 <div style={statusProgressFillStyle} />
               </div>
-              <p style={statusProgressValueStyle}>68%</p>
+              <p style={statusProgressValueStyle}>{trackingMock.progressValue}</p>
             </div>
-            <p style={statusEtaTextStyle}>Chegada estimada: 19:40</p>
+            <p style={statusEtaTextStyle}>{trackingMock.estimatedArrivalLabel}</p>
           </div>
         </div>
       </div>
