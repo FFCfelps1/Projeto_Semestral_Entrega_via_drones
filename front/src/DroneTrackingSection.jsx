@@ -588,7 +588,7 @@ const DroneTrackingSection = () => {
               <h3 style={detailsTitleStyle}>Detalhes da Entrega</h3>
               <hr style={detailsDividerStyle} />
               <div style={trackingIdCardStyle}>
-                <p style={trackingIdLabelStyle}>Tracking ID</p>
+                <p style={trackingIdLabelStyle}>Código de rastreio</p>
                 <p style={trackingIdValueStyle}>{trackingMock.trackingId}</p>
               </div>
               <div style={packageCardStyle}>
