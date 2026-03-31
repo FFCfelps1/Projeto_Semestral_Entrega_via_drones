@@ -1,5 +1,7 @@
 const TopBar = ({ themeMode = "light", onToggleTheme }) => {
   const isDarkMode = themeMode === "dark";
+  const isTrackingPage = typeof window !== "undefined" && window.location.pathname === "/rastreamento";
+  const homeHref = isTrackingPage ? "/" : "#home";
 
   // O icone e o texto representam o modo atualmente ativo na interface.
   const themeIconClass = isDarkMode ? "fa-moon" : "fa-sun";
@@ -33,7 +35,7 @@ const TopBar = ({ themeMode = "light", onToggleTheme }) => {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#home">
+              <a className="nav-link active" aria-current="page" href={homeHref}>
                 <i className="fa fa-home me-1"></i>
                 Início
               </a>
