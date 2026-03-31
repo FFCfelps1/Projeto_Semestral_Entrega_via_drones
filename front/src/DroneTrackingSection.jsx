@@ -11,16 +11,16 @@ const DroneTrackingSection = () => {
     destinationLabel: "Destino",
     droneLabel: "Drone SW-01",
     trackingId: "SW-TRK-2039",
-    packageName: "Kit de Sensores Aereos",
+    packageName: "Kit de Sensores Aéreos",
     packageWeight: "Peso: 1.2 kg",
     packageVolume: "Volume: 24 x 18 x 12 cm",
     originIconClass: "fa-location-dot",
     destinationIconClass: "fa-flag-checkered",
-    originAddress: "Centro Logistico SkySwift, Bloco B",
+    originAddress: "Centro Logístico SkySwift, Bloco B",
     destinationAddress: "Av. das Palmeiras, 245 - Jardim Aurora",
     telemetry: [
       { iconClass: "fa-battery-three-quarters", label: "Bateria", value: "84%" },
-      { iconClass: "fa-signal", label: "Sinal", value: "Estavel" },
+      { iconClass: "fa-signal", label: "Sinal", value: "Estável" },
       { iconClass: "fa-clock", label: "Chegada", value: "Em 12 min" },
     ],
     flightStatus: "Em voo",
@@ -520,10 +520,10 @@ const DroneTrackingSection = () => {
         {/* Cabecalho inicial da pagina de rastreamento*/}
         <header className="py-4">
           <h2 className="h3 mb-2" style={sectionTitleStyle}>
-            Painel de Rastreamento Aereo
+            Painel de Rastreamento Aéreo
           </h2>
           <p className="mb-0" style={sectionSubtitleStyle}>
-            Acompanhe uma simulacao visual do fluxo logistico das entregas por drones.
+            Acompanhe uma simulação visual do fluxo logístico das entregas por drones.
           </p>
         </header>
         {/* divisao estrutural do painel em area principal e area lateral. */}
