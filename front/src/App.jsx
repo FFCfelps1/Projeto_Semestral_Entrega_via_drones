@@ -116,7 +116,7 @@ const App = () => {
           </Cartao>
         </div>
       </div>
-      <Advantages />
+      <Advantages themeMode={themeMode} />
       <CallToAction />
       </div>
       <Footer themeMode={themeMode} />
