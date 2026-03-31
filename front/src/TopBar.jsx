@@ -1,6 +1,14 @@
-const TopBar = () => {
+const TopBar = ({ themeMode = "light", onToggleTheme }) => {
+  const isDarkMode = themeMode === "dark";
+
+  // O icone e o texto representam o modo atualmente ativo na interface.
+  const themeIconClass = isDarkMode ? "fa-moon" : "fa-sun";
+  const themeLabel = isDarkMode ? "Modo escuro" : "Modo claro";
+  // Usa base de nav-link para manter altura e alinhamento iguais aos demais itens do menu.
+  const themeToggleButtonClassName = `nav-link border-0 bg-transparent d-inline-flex align-items-center ${isDarkMode ? "text-light" : "text-dark"}`;
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <nav className={`navbar navbar-expand-lg shadow-sm ${isDarkMode ? "navbar-dark bg-dark" : "navbar-light bg-light"}`}>
       <div className="container-fluid">
         {/* Logo/Brand */}
         <a className="navbar-brand fw-bold" href="#home">
@@ -47,6 +55,18 @@ const TopBar = () => {
                 <i className="fa fa-tag me-1"></i>
                 Preços
               </a>
+            </li>
+            <li className="nav-item ms-lg-2">
+              {/* Botao para alternar claro/escuro com icone do modo atual. */}
+              <button
+                type="button"
+                className={themeToggleButtonClassName}
+                onClick={onToggleTheme}
+                aria-label={isDarkMode ? "Trocar para modo claro" : "Trocar para modo escuro"}
+              >
+                <i className={`fa-solid ${themeIconClass} me-1`} aria-hidden="true"></i>
+                {themeLabel}
+              </button>
             </li>
           </ul>
         </div>

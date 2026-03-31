@@ -1,8 +1,9 @@
-const DroneTrackingSection = () => {
+const DroneTrackingSection = ({ themeMode = "light" }) => {
   // Breakpoints simples para adaptar layout em tablet e mobile.
   const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1280;
   const isTabletLayout = viewportWidth <= 1024 && viewportWidth > 640;
   const isMobileLayout = viewportWidth <= 640;
+  const isDarkMode = themeMode === "dark";
 
   // Fonte unica de dados mockados para facilitar ajustes sem mexer na estrutura visual.
   const trackingMock = {
@@ -500,7 +501,7 @@ const DroneTrackingSection = () => {
   // Ajuste fino de hierarquia do cabeçalho da página de rastreamento.
   const sectionTitleStyle = {
     margin: 0,
-    color: "#1f2937",
+    color: isDarkMode ? "#dbeafe" : "#1f2937",
     fontSize: "clamp(1.35rem, 2.7vw, 1.75rem)",
     fontWeight: 800,
     letterSpacing: "0.01em",

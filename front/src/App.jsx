@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import Pedido from "./Pedido.jsx"
 import Cartao from "./Cartao.jsx"
 import Feedback from "./Feedback.jsx"
@@ -10,19 +11,43 @@ import DroneTrackingSection from "./DroneTrackingSection.jsx"
 
 
 const App = () => {
+  // Estado global simples de tema para toda a aplicacao (claro/escuro).
+  const [themeMode, setThemeMode] = useState(() => {
+    if (typeof window === "undefined") return "light"
+    const savedTheme = window.localStorage.getItem("theme-mode")
+    return savedTheme === "dark" ? "dark" : "light"
+  })
+
+  // Sincroniza o tema com Bootstrap e persistencia local.
+  useEffect(() => {
+    document.documentElement.setAttribute("data-bs-theme", themeMode)
+    window.localStorage.setItem("theme-mode", themeMode)
+  }, [themeMode])
+
+  // Acao do botao da barra superior para alternar tema.
+  const handleToggleTheme = () => {
+    setThemeMode((currentTheme) => (currentTheme === "light" ? "dark" : "light"))
+  }
+
+  const appShellStyle = {
+    minHeight: "100vh",
+    backgroundColor: themeMode === "dark" ? "#0b1220" : "#f8f9fa",
+    color: themeMode === "dark" ? "#e6f0ff" : "#212529",
+  }
+
   // Roteamento simples por URL sem biblioteca extra:
   // se a rota for "/rastreamento", exibimos a pagina dedicada do painel.
   const isTrackingPage = window.location.pathname === "/rastreamento"
 
   if (isTrackingPage) {
     return (
-      <>
-        <TopBar />
+      <div style={appShellStyle}>
+        <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
         <main>
-          <DroneTrackingSection />
+          <DroneTrackingSection themeMode={themeMode} />
         </main>
-        <Footer />
-      </>
+        <Footer themeMode={themeMode} />
+      </div>
     )
   }
 
@@ -40,10 +65,10 @@ const App = () => {
   )
 
   return (
-    <>
-      <TopBar />
+    <div style={appShellStyle}>
+      <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
       <Hero />
-      <div className="container border mt-4">
+      <div className={`container border mt-4 ${themeMode === "dark" ? "border-secondary" : ""}`}>
       <div className="row g-4">
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
@@ -94,8 +119,8 @@ const App = () => {
       <Advantages />
       <CallToAction />
       </div>
-      <Footer />
-    </>
+      <Footer themeMode={themeMode} />
+    </div>
   )
 }
 

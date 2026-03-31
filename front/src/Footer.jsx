@@ -1,6 +1,12 @@
-const Footer = () => {
+const Footer = ({ themeMode = "light" }) => {
+  const isDarkMode = themeMode === "dark";
+
+  // Ajusta classes do rodape para respeitar o tema selecionado.
+  const footerClassName = `py-4 py-md-5 border-top ${isDarkMode ? "bg-dark text-light border-secondary" : "bg-white text-dark"}`;
+  const mutedTextClassName = isDarkMode ? "text-light-emphasis" : "text-secondary";
+
   return (
-    <footer className="bg-white text-dark py-4 py-md-5 border-top">
+    <footer className={footerClassName}>
       <div className="container">
         {/* Top Section - Logo & Description */}
         <div className="row mb-4 mb-md-5">
@@ -9,18 +15,18 @@ const Footer = () => {
               <i className="fa fa-paper-plane me-2 text-primary"></i>
               SkySwift
             </h5>
-            <p className="text-secondary small">
+            <p className={`${mutedTextClassName} small`}>
               Revolucionando a forma como o mundo move bens através de tecnologia aérea autônoma.
             </p>
             {/* Social Icons */}
             <div className="d-flex gap-3 mt-3 justify-content-center justify-content-sm-start">
-              <a href="#" className="text-secondary text-decoration-none">
+              <a href="#" className={`${mutedTextClassName} text-decoration-none`}>
                 <i className="fa fa-globe"></i>
               </a>
-              <a href="#" className="text-secondary text-decoration-none">
+              <a href="#" className={`${mutedTextClassName} text-decoration-none`}>
                 <i className="fa fa-linkedin"></i>
               </a>
-              <a href="#" className="text-secondary text-decoration-none">
+              <a href="#" className={`${mutedTextClassName} text-decoration-none`}>
                 <i className="fa fa-twitter"></i>
               </a>
             </div>
@@ -31,17 +37,17 @@ const Footer = () => {
             <h6 className="fw-bold mb-3 text-uppercase">Produto</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none small">
+                <a href="#" className={`${mutedTextClassName} text-decoration-none small`}>
                   Como Funciona
                 </a>
               </li>
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none small">
+                <a href="#" className={`${mutedTextClassName} text-decoration-none small`}>
                   Benefícios
                 </a>
               </li>
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none small">
+                <a href="#" className={`${mutedTextClassName} text-decoration-none small`}>
                   Preços
                 </a>
               </li>
@@ -53,17 +59,17 @@ const Footer = () => {
             <h6 className="fw-bold mb-3 text-uppercase">Empresa</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none small">
+                <a href="#" className={`${mutedTextClassName} text-decoration-none small`}>
                   Sobre Nós
                 </a>
               </li>
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none small">
+                <a href="#" className={`${mutedTextClassName} text-decoration-none small`}>
                   Carreira
                 </a>
               </li>
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none small">
+                <a href="#" className={`${mutedTextClassName} text-decoration-none small`}>
                   Segurança
                 </a>
               </li>
@@ -75,17 +81,17 @@ const Footer = () => {
             <h6 className="fw-bold mb-3 text-uppercase">Suporte</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none small">
+                <a href="#" className={`${mutedTextClassName} text-decoration-none small`}>
                   Central de Ajuda
                 </a>
               </li>
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none small">
+                <a href="#" className={`${mutedTextClassName} text-decoration-none small`}>
                   Termos
                 </a>
               </li>
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none small">
+                <a href="#" className={`${mutedTextClassName} text-decoration-none small`}>
                   Privacidade
                 </a>
               </li>
@@ -94,12 +100,12 @@ const Footer = () => {
         </div>
 
         {/* Divider */}
-        <hr className="border-light" />
+        <hr className={isDarkMode ? "border-secondary" : "border-light"} />
 
         {/* Bottom Section - Copyright */}
         <div className="row">
           <div className="col-12 text-center">
-            <p className="text-secondary small mb-0">
+            <p className={`${mutedTextClassName} small mb-0`}>
               © 2024 SkySwift Tecnologias Inc. Todos os direitos reservados.
             </p>
           </div>
