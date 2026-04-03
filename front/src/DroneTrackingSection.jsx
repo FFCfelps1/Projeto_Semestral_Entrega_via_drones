@@ -4,7 +4,7 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
   const isTabletLayout = viewportWidth <= 1024 && viewportWidth > 640;
   const isMobileLayout = viewportWidth <= 640;
   const isDarkMode = themeMode === "dark";
-
+  console.log("ROTA NO COMPONENTE:", rota)
   // Fonte unica de dados mockados para facilitar ajustes sem mexer na estrutura visual.
   const trackingMock = {
     searchPlaceholder: "Buscar rota simulada",
@@ -94,6 +94,7 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
 
   // Camada visual simulando "mapa" com gradiente e textura estática.
   const mapMockStyle = {
+
     width: "100%",
     flex: 1,
     minHeight: isMobileLayout ? "190px" : "248px",
@@ -515,6 +516,11 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
     maxWidth: isMobileLayout ? "100%" : "60ch",
   };
 
+  const positions = rota?.routes?.[0]?.geometry?.coordinates?.map(
+  ([lng, lat]) => [lat, lng]
+) || []
+console.log("POSITIONS:", positions)
+  
   return (
     <section id="drone-tracking-panel" aria-label="Painel de rastreamento por drones">
       <div className="container">
@@ -533,7 +539,7 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
             {/* mock visual da area de mapa (estatico, sem mapa real). */}
             <div style={{ ...panelAreaBaseStyle, ...mainAreaStyle }}>
               <button onClick={buscarRota} className="btn btn-primary" style={{marginBottom: "10px"}}>
-                  Calcular rota
+                  Calcular rota 
               </button>
               {/* campo de busca fake apenas visual (sem funcionalidade). */}
               <div style={searchBarStyle} aria-hidden="true">
@@ -541,7 +547,16 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
                 <input type="text" placeholder={trackingMock.searchPlaceholder} readOnly style={searchInputStyle} />
               </div>
               {/* Camada visual simulada de mapa/logistica para receber elementos futuros. */}
-              <div style={mapMockStyle}>
+              <div style={{position: "absolute",
+                            bottom: "10px",
+                            left: "10px",
+                            color: "white",
+                            fontSize: "12px",
+                            background: "rgba(0,0,0,0.5)",
+                            padding: "4px 8px",
+                            borderRadius: "4px"
+                      }}>
+                      
                 {/* Linha de rota pontilhada somente visual. */}
                 <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={routeOverlayStyle} aria-hidden="true">
                   <path
@@ -586,6 +601,7 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
                   <span style={droneMarkerLabelStyle}>{trackingMock.droneLabel}</span>
                 </div>
               </div>
+              Rota carregada ({positions.length} pontos)
             </div>
             {/* Coluna lateral inicial para os detalhes da entrega. */}
             <aside style={detailsPanelStyle}>
