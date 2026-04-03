@@ -8,9 +8,20 @@ import Advantages from "./Advantages.jsx"
 import CallToAction from "./CallToAction.jsx"
 import Footer from "./Footer.jsx"
 import DroneTrackingSection from "./DroneTrackingSection.jsx"
-
+import axios from "axios"
 
 const App = () => {
+  const buscarRota = async () =>{
+    const response = await axios.get('http://localhost:3002/rota', {
+      params: {
+      origemLat: -23.5505,
+      origemLng: -46.6333,
+      destinoLat: -23.5600,
+      destinoLng: -46.6500
+      } 
+    })
+    console.log(response.data)
+  }
   // Estado global simples de tema para toda a aplicacao (claro/escuro).
   const [themeMode, setThemeMode] = useState(() => {
     if (typeof window === "undefined") return "light"
