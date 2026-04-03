@@ -572,7 +572,6 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
                     attribution='&copy; OpenStreetMap'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-
                   {positions.length > 0 && (
                     <>
                       <Polyline positions={positions} />
@@ -582,7 +581,6 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
                     </>
                   )}
                 </MapContainer>
-
                 {/*DESTINO REAL DA API */}
                 {destino && (
                   <div
@@ -597,21 +595,15 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
                       borderRadius: "4px",
                     }}
                   >
-                  Destino real: {destino[0].toFixed(4)}, {destino[1].toFixed(4)}
                 </div>
               )}
-
-              {/* Zoom fake */}
-              <div style={zoomControlsStyle}>
-                <button style={zoomButtonStyle}>+</button>
-                <button style={zoomButtonStyle}>-</button>
-              </div>
             </div>
 
             {/* Info da rota */}
             <p style={{ color: "white", marginTop: "10px" }}>
               Rota carregada ({positions.length} pontos)
             </p>
+            <p>Destino real: {destino[0].toFixed(4)}, {destino[1].toFixed(4)}</p>
             </div>
             {/* Coluna lateral inicial para os detalhes da entrega. */}
             <aside style={detailsPanelStyle}>
