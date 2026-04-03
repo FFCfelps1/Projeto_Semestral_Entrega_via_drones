@@ -562,7 +562,26 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
                 <input type="text" placeholder={trackingMock.searchPlaceholder} readOnly style={searchInputStyle} />
               </div>
               {/* Camada visual simulada de mapa/logistica para receber elementos futuros. */}
-              <div style={mapMockStyle}>
+              <div style={{ height: "300px", borderRadius: "10px", overflow: "hidden"}}>
+                <MapContainer   
+                  center={positions[0] || [-23.55, -46.63]}
+                  zoom={13}
+                  style={{height: "100%", width: "100%" }}
+                >
+                  <TileLayer
+                    attribution='&copy; OpenStreetMap'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+
+                  {positions.length > 0 && (
+                    <>
+                      <Polyline positions={positions} />
+
+                      <Marker position={positions[0]} />   {/* origem */}
+                      <Marker position={destino} />        {/* destino */}
+                    </>
+                  )}
+                </MapContainer>
               {/* Linha de rota simulada */}
                 <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={routeOverlayStyle} aria-hidden="true">
                   <path
