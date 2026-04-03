@@ -28,7 +28,7 @@ const DroneTrackingSection = ({ themeMode }) => {
       return;
     }
 
-    setLoading(true);
+    setLoading(true);                   //altera status do botão
     setRotaPontos([]);
 
     try {
