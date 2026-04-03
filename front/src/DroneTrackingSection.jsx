@@ -516,11 +516,12 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
     maxWidth: isMobileLayout ? "100%" : "60ch",
   };
 
+  //conversão do padrão de retorno das coordenadas
   const positions = rota?.routes?.[0]?.geometry?.coordinates?.map(
   ([lng, lat]) => [lat, lng]
 ) || []
   const destino = positions[positions.length-1]
-console.log("POSITIONS:", positions)
+  console.log("POSITIONS:", positions)
   
   return (
     <section id="drone-tracking-panel" aria-label="Painel de rastreamento por drones">
