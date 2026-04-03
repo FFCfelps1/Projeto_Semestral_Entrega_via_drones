@@ -582,19 +582,6 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
                     </>
                   )}
                 </MapContainer>
-              {/* Linha de rota simulada */}
-
-                {/* Origem (fixa visual) */}
-                <div style={{ ...routePointWrapBaseStyle, top: "80%", left: "11%" }}>
-                  <span style={{ ...routePointDotStyle, backgroundColor: "#67d6ff" }} />
-                  <span style={routePointLabelStyle}>{trackingMock.originLabel}</span>
-                </div>
-
-                {/* Destino (visual fixo) */}
-                <div style={{ ...routePointWrapBaseStyle, top: "20%", left: "88%" }}>
-                  <span style={{ ...routePointDotStyle, backgroundColor: "#82f0b3" }} />
-                  <span style={routePointLabelStyle}>{trackingMock.destinationLabel}</span>
-                </div>
 
                 {/*DESTINO REAL DA API */}
                 {destino && (
