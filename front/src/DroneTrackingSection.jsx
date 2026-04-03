@@ -619,14 +619,6 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
                 <button style={zoomButtonStyle}>+</button>
                 <button style={zoomButtonStyle}>-</button>
               </div>
-
-              {/* Drone */}
-              <div style={droneMarkerWrapStyle}>
-                <span style={droneMarkerIconStyle}>
-                  <i className="fa-solid fa-helicopter" />
-                </span>
-                <span style={droneMarkerLabelStyle}>{trackingMock.droneLabel}</span>
-              </div>
             </div>
 
             {/* Info da rota */}
