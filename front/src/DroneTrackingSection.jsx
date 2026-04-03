@@ -583,23 +583,6 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
                   )}
                 </MapContainer>
               {/* Linha de rota simulada */}
-                <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={routeOverlayStyle} aria-hidden="true">
-                  <path
-                    d="M 11 80 C 26 71, 34 62, 45 52 C 57 41, 69 34, 88 20"
-                    stroke="rgba(160, 209, 255, 0.35)"
-                    strokeWidth="4"
-                    fill="none"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M 11 80 C 26 71, 34 62, 45 52 C 57 41, 69 34, 88 20"
-                    stroke="#a8d6ff"
-                    strokeWidth="1.8"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeDasharray="2 5"
-                  />
-                </svg>
 
                 {/* Origem (fixa visual) */}
                 <div style={{ ...routePointWrapBaseStyle, top: "80%", left: "11%" }}>
