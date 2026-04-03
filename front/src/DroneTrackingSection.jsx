@@ -1,4 +1,4 @@
-const DroneTrackingSection = ({ themeMode = "light" }) => {
+const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
   // Breakpoints simples para adaptar layout em tablet e mobile.
   const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1280;
   const isTabletLayout = viewportWidth <= 1024 && viewportWidth > 640;
@@ -532,6 +532,9 @@ const DroneTrackingSection = ({ themeMode = "light" }) => {
           <div style={panelGridStyle}>
             {/* mock visual da area de mapa (estatico, sem mapa real). */}
             <div style={{ ...panelAreaBaseStyle, ...mainAreaStyle }}>
+              <button onClick={buscarRota} className="btn btn-primary" style={{marginBottom: "10px"}}>
+                  Calcular rota
+              </button>
               {/* campo de busca fake apenas visual (sem funcionalidade). */}
               <div style={searchBarStyle} aria-hidden="true">
                 <i className="fa-solid fa-magnifying-glass" style={searchIconStyle} />
@@ -651,6 +654,5 @@ const DroneTrackingSection = ({ themeMode = "light" }) => {
       </div>
     </section>
   );
-};
-
+}
 export default DroneTrackingSection;
