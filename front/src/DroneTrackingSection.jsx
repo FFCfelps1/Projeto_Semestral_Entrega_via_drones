@@ -5,7 +5,7 @@ import axios from "axios";
 
 import "leaflet/dist/leaflet.css";
 
-// Configuração dos ícones do Leaflet
+//configuração dos ícones do Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -17,14 +17,14 @@ const ORIGEM_FIXA = [-23.5505, -46.6333]; // SkySwift (marco zero de sp)
 const NOME_ORIGEM = "Centro Logístico SkySwift, Bloco B";
 
 const DroneTrackingSection = ({ themeMode }) => {
-  const [enderecoDestino, setEnderecoDestino] = useState("");
-  const [destino, setDestino] = useState(null);
-  const [rotaPontos, setRotaPontos] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [enderecoDestino, setEnderecoDestino] = useState("");   //endereço do estino
+  const [destino, setDestino] = useState(null);                 //coodenadas do destino (lat, long)
+  const [rotaPontos, setRotaPontos] = useState([]);             //pontos utilizados para traçar rota
+  const [loading, setLoading] = useState(false);                //status do botão 
 
   const buscarRota = async () => {
-    if (!enderecoDestino.trim()) {      //se o endereço não for digitado, gera um alerta
-      alert("Por favor, digite o endereço de destino.");
+    if (!enderecoDestino.trim()) {      //trim: retira espaços extras da string
+      alert("Por favor, digite o endereço de destino."); //se o endereço não for digitado, gera um alerta
       return;
     }
 
@@ -45,11 +45,11 @@ const DroneTrackingSection = ({ themeMode }) => {
       }
 
       const { lat, lon } = geoResponse.data[0];
-      const destinoCoord = [parseFloat(lat), parseFloat(lon)];
+      const destinoCoord = [parseFloat(lat), parseFloat(lon)];      //coordenadas do destino
 
       setDestino(destinoCoord);
 
-      //Busca a rota na API
+      //busca a rota na API
       const rotaResponse = await axios.get("http://localhost:3002/rota", {
         params: {
           origemLat: ORIGEM_FIXA[0],
@@ -59,8 +59,8 @@ const DroneTrackingSection = ({ themeMode }) => {
         },
       });
 
+      //lista de pontos 
       let pontos = [];
-
       if (rotaResponse.data?.rota && Array.isArray(rotaResponse.data.rota)) {
         pontos = rotaResponse.data.rota;
       } else if (Array.isArray(rotaResponse.data)) {
@@ -71,13 +71,13 @@ const DroneTrackingSection = ({ themeMode }) => {
         pontos = [ORIGEM_FIXA, destinoCoord];
       }
 
-      setRotaPontos(pontos);
+      setRotaPontos(pontos);          //altera pontos da rota
 
-    } catch (error) {
-      console.error("Erro ao calcular rota:", error);
+    } catch (erro) {
+      console.error("Erro ao calcular rota:", erro);
       alert("Não foi possível calcular a rota. Verifique se o backend está rodando.");
     } finally {
-      setLoading(false);
+      setLoading(false);            //altera status do botão
     }
   };
 
@@ -101,7 +101,7 @@ const DroneTrackingSection = ({ themeMode }) => {
           <strong>Destino: </strong> {enderecoDestino} 
         </p>
       </div>
-      {/* Campo de Destino */}
+      {/* campo de Destino */}
       <div className="row mb-4">
         <div className="col-md-8">
           <label className={`form-label fw-bold ${themeMode === "dark" ? "text-light" : "text-dark"}`}>
@@ -118,6 +118,7 @@ const DroneTrackingSection = ({ themeMode }) => {
             onChange={(e) => setEnderecoDestino(e.target.value)}
           />
         </div>
+        {/* botão de calcualr rota */}
         <div className="col-md-4 d-flex align-items-end">
           <button
             className={`btn btn-lg w-100 ${
@@ -131,25 +132,26 @@ const DroneTrackingSection = ({ themeMode }) => {
         </div>
       </div>
 
-      {/* Mapa */}
+      {/* mapa */}
       <div
         className="border rounded-3 overflow-hidden shadow-sm"
         style={{ height: "400px", width: "100%", flexDirection: "column", alignContent: "center" }}
       >
         <MapContainer
           center={ORIGEM_FIXA}
-          zoom={13}
+          zoom={13}       //valor inicial do zoom
           style={{ height: "100%", width: "100%" }}
         >
+          {/* Desenha o mapa de fato */}
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; OpenStreetMap contributors'
+            attribution='&copy; OpenStreetMap contributors'   //crédito ao provedor do mapa 
           />
 
-          {/* Marcador de Origem */}
+          {/* Marcador de origem */}
           <Marker position={ORIGEM_FIXA} />
 
-          {/* Marcador de Destino */}
+          {/* Marcador de destino */}
           {destino && <Marker position={destino} />}
 
           {/* Rota */}
@@ -164,7 +166,7 @@ const DroneTrackingSection = ({ themeMode }) => {
         </MapContainer>
       </div>
 
-      {/* Box do Destino Real - Melhorado e adaptável ao tema */}
+      {/* Box do destino real - melhorado e adaptável ao tema */}
       {destino && (
         <div 
           className={`mt-4 p-4 rounded-3 border shadow-sm ${

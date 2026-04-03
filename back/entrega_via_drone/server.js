@@ -3,7 +3,7 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 
-// Criação do servidor
+// Criação do servidor do primeiro microsserviço
 const app = express();
 app.use(cors());
 app.use(express.json());
