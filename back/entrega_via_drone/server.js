@@ -13,7 +13,7 @@ app.get('/rota', async (req, res) => {
   const { origemLat, origemLng, destinoLat, destinoLng } = req.query;
 
   try {
-    const url = `https://router.openstreetmap.de/route/v1/driving/${origemLng},${origemLat};${destinoLng},${destinoLat}?overview=full&geometries=geojson`;
+    const url = `http://router.project-osrm.org/route/v1/driving/${origemLng},${origemLat};${destinoLng},${destinoLat}?overview=full&geometries=geojson`;
 
     const response = await axios.get(url);
 
