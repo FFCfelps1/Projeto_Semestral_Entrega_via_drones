@@ -113,7 +113,7 @@ const DroneTrackingSection = ({ themeMode }) => {
             className={`form-control form-control-lg ${
               themeMode === "dark" ? "bg-dark text-light border-secondary" : ""
             }`}
-            placeholder="Ex: Avenida Paulista, 1000 - São Paulo, SP"
+            placeholder="Ex.: Avenida Paulista, 1000 - São Paulo, SP"
             value={enderecoDestino} 
             onChange={(e) => setEnderecoDestino(e.target.value)}
           />
