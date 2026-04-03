@@ -1,3 +1,6 @@
+import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+
 const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
   // Breakpoints simples para adaptar layout em tablet e mobile.
   const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1280;
@@ -551,50 +554,50 @@ const DroneTrackingSection = ({ themeMode = "light", buscarRota, rota}) => {
               {/* Camada visual simulada de mapa/logistica para receber elementos futuros. */}
               <div style={mapMockStyle}>
               {/* Linha de rota simulada */}
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={routeOverlayStyle} aria-hidden="true">
-                <path
-                  d="M 11 80 C 26 71, 34 62, 45 52 C 57 41, 69 34, 88 20"
-                  stroke="rgba(160, 209, 255, 0.35)"
-                  strokeWidth="4"
-                  fill="none"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M 11 80 C 26 71, 34 62, 45 52 C 57 41, 69 34, 88 20"
-                  stroke="#a8d6ff"
-                  strokeWidth="1.8"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeDasharray="2 5"
-                />
-              </svg>
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={routeOverlayStyle} aria-hidden="true">
+                  <path
+                    d="M 11 80 C 26 71, 34 62, 45 52 C 57 41, 69 34, 88 20"
+                    stroke="rgba(160, 209, 255, 0.35)"
+                    strokeWidth="4"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M 11 80 C 26 71, 34 62, 45 52 C 57 41, 69 34, 88 20"
+                    stroke="#a8d6ff"
+                    strokeWidth="1.8"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeDasharray="2 5"
+                  />
+                </svg>
 
-              {/* Origem (fixa visual) */}
-              <div style={{ ...routePointWrapBaseStyle, top: "80%", left: "11%" }}>
-                <span style={{ ...routePointDotStyle, backgroundColor: "#67d6ff" }} />
-                <span style={routePointLabelStyle}>{trackingMock.originLabel}</span>
-              </div>
+                {/* Origem (fixa visual) */}
+                <div style={{ ...routePointWrapBaseStyle, top: "80%", left: "11%" }}>
+                  <span style={{ ...routePointDotStyle, backgroundColor: "#67d6ff" }} />
+                  <span style={routePointLabelStyle}>{trackingMock.originLabel}</span>
+                </div>
 
-              {/* Destino (visual fixo) */}
-              <div style={{ ...routePointWrapBaseStyle, top: "20%", left: "88%" }}>
-                <span style={{ ...routePointDotStyle, backgroundColor: "#82f0b3" }} />
-                <span style={routePointLabelStyle}>{trackingMock.destinationLabel}</span>
-              </div>
+                {/* Destino (visual fixo) */}
+                <div style={{ ...routePointWrapBaseStyle, top: "20%", left: "88%" }}>
+                  <span style={{ ...routePointDotStyle, backgroundColor: "#82f0b3" }} />
+                  <span style={routePointLabelStyle}>{trackingMock.destinationLabel}</span>
+                </div>
 
-              {/* 🆕 DESTINO REAL DA API */}
-              {destino && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "10px",
-                    left: "10px",
-                    color: "white",
-                    fontSize: "12px",
-                    background: "rgba(0,0,0,0.5)",
-                    padding: "4px 8px",
-                    borderRadius: "4px",
-                  }}
-                >
+                {/*DESTINO REAL DA API */}
+                {destino && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "10px",
+                      left: "10px",
+                      color: "white",
+                      fontSize: "12px",
+                      background: "rgba(0,0,0,0.5)",
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                    }}
+                  >
                   Destino real: {destino[0].toFixed(4)}, {destino[1].toFixed(4)}
                 </div>
               )}
