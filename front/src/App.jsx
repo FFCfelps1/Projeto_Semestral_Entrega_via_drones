@@ -9,7 +9,7 @@ import CallToAction from "./CallToAction.jsx"
 import Footer from "./Footer.jsx"
 import DroneTrackingSection from "./DroneTrackingSection.jsx"
 import axios from "axios"
-
+import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet"
 const App = () => {
   const [rota, setRota] = useState(null)
   const buscarRota = async () =>{
@@ -23,7 +23,7 @@ const App = () => {
         },
       })
 
-      console.log("✅ Resposta da API:", response.data)
+      console.log("Resposta da API:", response.data)
       setRota(response.data)
     } catch (error) {
       console.error("Erro ao buscar rota:", error)
