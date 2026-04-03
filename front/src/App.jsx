@@ -11,16 +11,23 @@ import DroneTrackingSection from "./DroneTrackingSection.jsx"
 import axios from "axios"
 
 const App = () => {
+  const [rota, setRota] = useState(null)
   const buscarRota = async () =>{
-    const response = await axios.get('http://localhost:3002/rota', {
-      params: {
-      origemLat: -23.5505,
-      origemLng: -46.6333,
-      destinoLat: -23.5600,
-      destinoLng: -46.6500
-      } 
-    })
-    console.log(response.data)
+    try {
+       const response = await axios.get("http://localhost:3002/rota", {
+        params: {
+          origemLat: -23.5505,
+          origemLng: -46.6333,
+          destinoLat: -23.5600,
+          destinoLng: -46.6500,
+        },
+      })
+
+      console.log("✅ Resposta da API:", response.data)
+      setRota(response.data)
+    } catch (error) {
+      console.error("Erro ao buscar rota:", error)
+    }
   }
   // Estado global simples de tema para toda a aplicacao (claro/escuro).
   const [themeMode, setThemeMode] = useState(() => {
@@ -55,7 +62,7 @@ const App = () => {
       <div style={appShellStyle}>
         <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
         <main>
-          <DroneTrackingSection themeMode={themeMode} />
+          <DroneTrackingSection themeMode={themeMode} rota={rota} buscarRota={buscarRota}/>
         </main>
         <Footer themeMode={themeMode} />
       </div>
