@@ -135,7 +135,7 @@ const DroneTrackingSection = ({ themeMode }) => {
       {/* mapa */}
       <div
         className="border rounded-3 overflow-hidden shadow-sm"
-        style={{ height: "400px", width: "100%", flexDirection: "column", alignContent: "center" }}
+        style={{ height: "400px", width: "100%", flexDirection: "column", alignContent: "center", padding: 10}}
       >
         <MapContainer
           center={ORIGEM_FIXA}
