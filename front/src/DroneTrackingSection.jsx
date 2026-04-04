@@ -50,6 +50,13 @@ const DroneTrackingSection = ({ themeMode }) => {
       setDestino(destinoCoord);
 
       //busca a rota na API
+      console.log("Enviando requisição para:", "http://localhost:3002/rota", {
+        origemLat: ORIGEM_FIXA[0],
+        origemLng: ORIGEM_FIXA[1],
+        destinoLat: destinoCoord[0],
+        destinoLng: destinoCoord[1],
+      });
+
       const rotaResponse = await axios.get("http://localhost:3002/rota", {
         params: {
           origemLat: ORIGEM_FIXA[0],
@@ -57,7 +64,10 @@ const DroneTrackingSection = ({ themeMode }) => {
           destinoLat: destinoCoord[0],
           destinoLng: destinoCoord[1],
         },
+        timeout: 60000, // aumentado para 60 segundos
       });
+
+      console.log("Resposta da rota:", rotaResponse.data);
 
       //lista de pontos 
       let pontos = [];
@@ -66,16 +76,36 @@ const DroneTrackingSection = ({ themeMode }) => {
       } else if (Array.isArray(rotaResponse.data)) {
         pontos = rotaResponse.data;
       }
+      console.log("Pontos processados:", pontos.length);
+      
       //tratamento de erro caso a API retorne poucos pontos 
       if (pontos.length < 2) {        //desenhar linha reta
+        console.warn("Poucos pontos retornados, usando linha reta");
         pontos = [ORIGEM_FIXA, destinoCoord];
       }
 
       setRotaPontos(pontos);          //altera pontos da rota
 
     } catch (erro) {
-      console.error("Erro ao calcular rota:", erro);
-      alert("Não foi possível calcular a rota. Verifique se o backend está rodando.");
+      console.error("❌ Erro ao calcular rota:");
+      console.error("Message:", erro.message);
+      console.error("Status:", erro.response?.status);
+      console.error("Response Data:", erro.response?.data);
+      console.error("URL:", erro.config?.url);
+      console.error("Full Error:", erro);
+      
+      let mensagemErro = "Não foi possível calcular a rota.";
+      
+      if (erro.message.includes('timeout')) {
+        mensagemErro = "⏱️ A API de roteamento está lenta. Por favor, aguarde alguns segundos e tente novamente...";
+      } else if (erro.response?.status === 0 || erro.message === 'Network Error') {
+        mensagemErro = "❌ Erro de conexão. O backend está rodando em localhost:3002?";
+      } else if (erro.response?.status === 503) {
+        mensagemErro = "⚠️ A API OSRM não está disponível. Verifique sua conexão e tente novamente.";
+      } else if (erro.response?.data?.erro) {
+        mensagemErro = `❌ ${erro.response.data.erro}`;
+      }
+      alert(mensagemErro);
     } finally {
       setLoading(false);            //altera status do botão
     }
