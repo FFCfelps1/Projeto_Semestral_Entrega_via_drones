@@ -19,7 +19,6 @@ app.get('/rota', async (req, res) => {
 
     res.json(response.data);
   } catch (error) {
-    console.error(error.message);
     res.status(500).json({ erro: 'Erro ao calcular rota' });
   }
 });
