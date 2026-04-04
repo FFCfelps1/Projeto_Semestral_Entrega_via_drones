@@ -14,6 +14,7 @@ const ROUTING_PROVIDERS = [
   "http://router.project-osrm.org/route/v1/driving",
 ];
 
+//transforma para radianos
 function toRad(degrees) {
   return (degrees * Math.PI) / 180;
 }

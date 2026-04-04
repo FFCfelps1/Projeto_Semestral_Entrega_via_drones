@@ -97,13 +97,13 @@ const DroneTrackingSection = ({ themeMode }) => {
       let mensagemErro = "Não foi possível calcular a rota.";
       
       if (erro.message.includes('timeout')) {
-        mensagemErro = "⏱️ A API de roteamento está lenta. Por favor, aguarde alguns segundos e tente novamente...";
+        mensagemErro = "A API de roteamento está lenta. Por favor, aguarde alguns segundos e tente novamente...";
       } else if (erro.response?.status === 0 || erro.message === 'Network Error') {
-        mensagemErro = "❌ Erro de conexão. O backend está rodando em localhost:3002?";
+        mensagemErro = "Erro de conexão. O backend está rodando em localhost:3002?";
       } else if (erro.response?.status === 503) {
-        mensagemErro = "⚠️ A API OSRM não está disponível. Verifique sua conexão e tente novamente.";
+        mensagemErro = "A API OSRM não está disponível. Verifique sua conexão e tente novamente.";
       } else if (erro.response?.data?.erro) {
-        mensagemErro = `❌ ${erro.response.data.erro}`;
+        mensagemErro = `${erro.response.data.erro}`;
       }
       alert(mensagemErro);
     } finally {
