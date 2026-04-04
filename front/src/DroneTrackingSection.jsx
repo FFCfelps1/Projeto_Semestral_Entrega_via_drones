@@ -15,6 +15,8 @@ L.Icon.Default.mergeOptions({
 
 const ORIGEM_FIXA = [-23.5505, -46.6333]; // SkySwift (marco zero de sp)
 const NOME_ORIGEM = "Centro Logístico SkySwift, Bloco B";
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const ROTA_API_URL = `${API_BASE_URL}/api/rota`;
 
 const DroneTrackingSection = ({ themeMode }) => {
   const [enderecoDestino, setEnderecoDestino] = useState("");   //endereço do estino
@@ -50,14 +52,14 @@ const DroneTrackingSection = ({ themeMode }) => {
       setDestino(destinoCoord);
 
       //busca a rota na API
-      console.log("Enviando requisição para:", "http://localhost:3002/rota", {
+      console.log("Enviando requisição para:", ROTA_API_URL, {
         origemLat: ORIGEM_FIXA[0],
         origemLng: ORIGEM_FIXA[1],
         destinoLat: destinoCoord[0],
         destinoLng: destinoCoord[1],
       });
 
-      const rotaResponse = await axios.get("http://localhost:3002/rota", {
+      const rotaResponse = await axios.get(ROTA_API_URL, {
         params: {
           origemLat: ORIGEM_FIXA[0],
           origemLng: ORIGEM_FIXA[1],
@@ -99,7 +101,7 @@ const DroneTrackingSection = ({ themeMode }) => {
       if (erro.message.includes('timeout')) {
         mensagemErro = "⏱️ A API de roteamento está lenta. Por favor, aguarde alguns segundos e tente novamente...";
       } else if (erro.response?.status === 0 || erro.message === 'Network Error') {
-        mensagemErro = "❌ Erro de conexão. O backend está rodando em localhost:3002?";
+        mensagemErro = "❌ Erro de conexão com a API de rota.";
       } else if (erro.response?.status === 503) {
         mensagemErro = "⚠️ A API OSRM não está disponível. Verifique sua conexão e tente novamente.";
       } else if (erro.response?.data?.erro) {

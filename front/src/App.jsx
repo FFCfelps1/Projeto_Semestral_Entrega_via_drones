@@ -54,8 +54,9 @@ const App = () => {
   }
 
   // Roteamento simples por URL sem biblioteca extra:
-  // se a rota for "/rastreamento", exibimos a pagina dedicada do painel.
-  const isTrackingPage = window.location.pathname === "/rastreamento"
+  // aceita "/rastreamento" e "/rastreamento/".
+  const normalizedPath = window.location.pathname.replace(/\/+$/, "") || "/"
+  const isTrackingPage = normalizedPath === "/rastreamento"
 
   if (isTrackingPage) {
     return (
