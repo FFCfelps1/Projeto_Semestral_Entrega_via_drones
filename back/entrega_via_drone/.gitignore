@@ -1,0 +1,19 @@
+# dependências
+node_modules/
+
+# variáveis de ambiente
+.env
+
+# build
+dist/
+build/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+
+# sistema
+.DS_Store
+
+#
+!.vscode/extensions.json
