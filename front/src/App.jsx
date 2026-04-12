@@ -45,7 +45,18 @@ const App = () => {
       window.location.href = mailtoLink
     } catch (error) {
       console.error("Erro ao abrir contato por email:", error)
-      alert("Nao foi possivel abrir o email agora. Tente novamente em instantes.")
+      alert("Não foi possível abrir o e-mail agora. Tente novamente em instantes.")
+    }
+  }
+
+  const handleEnviarMensagemDireto = async (payload) => {
+    try {
+      const response = await axios.post(`${EMAIL_SERVICE_URL}/email/enviar`, payload)
+      return response.data
+    } catch (error) {
+      console.error("Erro ao enviar mensagem pelo site:", error)
+      const mensagemErro = error?.response?.data?.error || "Não foi possível enviar sua mensagem agora."
+      throw new Error(mensagemErro)
     }
   }
 
@@ -142,7 +153,10 @@ const App = () => {
         </div>
       </div>
       <Advantages themeMode={themeMode} />
-      <CallToAction funcao2={handleContatarVendas} />
+      <CallToAction
+        funcao2={handleContatarVendas}
+        onEnviarMensagem={handleEnviarMensagemDireto}
+      />
       </div>
       <Footer themeMode={themeMode} />
     </div>
