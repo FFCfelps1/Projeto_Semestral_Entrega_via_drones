@@ -54,6 +54,52 @@ npm run dev
 http://localhost:5173
 ```
 
+## Backend: Microsservicos
+
+O projeto utiliza dois microsservicos Node.js no diretorio `back`:
+
+1. `back/entrega_via_drone` (porta `3002`): calcula rota para rastreamento.
+2. `back/contato_email` (porta `3003`): gera link de contato por email para o botao "Contatar Vendas".
+
+### Como iniciar o microsservico de rota (3002)
+
+```bash
+cd back/entrega_via_drone
+npm install
+npm run dev
+```
+
+### Como iniciar o microsservico de email (3003)
+
+```bash
+cd back/contato_email
+npm install
+npm run dev
+```
+
+### Endpoints principais
+
+- `GET http://localhost:3002/health`
+- `GET http://localhost:3002/rota?origemLat=...&origemLng=...&destinoLat=...&destinoLng=...`
+- `GET http://localhost:3003/health`
+- `GET http://localhost:3003/email/contato`
+
+### Resposta do endpoint de contato
+
+Exemplo de retorno de `GET /email/contato`:
+
+```json
+{
+  "success": true,
+  "recipient": "entrega.drones@gmail.com",
+  "subject": "Contato SkySwift - Entrega via Drones",
+  "body": "Ola, equipe SkySwift!\n\nGostaria de mais informacoes sobre o servico de entrega via drones.\n\nObrigado.",
+  "link": "mailto:entrega.drones%40gmail.com?subject=Contato+SkySwift+-+Entrega+via+Drones&body=Ola%2C+equipe+SkySwift%21%0A%0AGostaria+de+mais+informacoes+sobre+o+servico+de+entrega+via+drones.%0A%0AObrigado."
+}
+```
+
+No frontend, o botao "Contatar Vendas" chama esse endpoint e abre o cliente de email padrao do usuario com destinatario e texto pre-preenchidos.
+
 ## 📜 Scripts Disponíveis
 
 | Comando | Descrição |
