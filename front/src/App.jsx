@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import Pedido from "./Pedido.jsx"
 import Cartao from "./Cartao.jsx"
-import Feedback from "./Feedback.jsx"
 import TopBar from "./TopBar.jsx"
 import Hero from "./Hero.jsx"
 import Advantages from "./Advantages.jsx"
@@ -10,11 +9,15 @@ import Footer from "./Footer.jsx"
 import DroneTrackingSection from "./DroneTrackingSection.jsx"
 import axios from "axios"
 import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet"
+
+const MAP_SERVICE_URL = "http://localhost:3002"
+const EMAIL_SERVICE_URL = "http://localhost:3003"
+
 const App = () => {
   const [rota, setRota] = useState(null)
   const buscarRota = async () =>{
     try {
-       const response = await axios.get("http://localhost:3002/rota", {
+       const response = await axios.get(`${MAP_SERVICE_URL}/rota`, {
         params: {
           origemLat: -23.5505,
           origemLng: -46.6333,
@@ -29,6 +32,23 @@ const App = () => {
       console.error("Erro ao buscar rota:", error)
     }
   }
+
+  const handleContatarVendas = async () => {
+    try {
+      const response = await axios.get(`${EMAIL_SERVICE_URL}/email/contato`)
+      const mailtoLink = response?.data?.link
+
+      if (!mailtoLink) {
+        throw new Error("Resposta sem link de email")
+      }
+
+      window.location.href = mailtoLink
+    } catch (error) {
+      console.error("Erro ao abrir contato por email:", error)
+      alert("Nao foi possivel abrir o email agora. Tente novamente em instantes.")
+    }
+  }
+
   // Estado global simples de tema para toda a aplicacao (claro/escuro).
   const [themeMode, setThemeMode] = useState(() => {
     if (typeof window === "undefined") return "light"
@@ -68,19 +88,6 @@ const App = () => {
       </div>
     )
   }
-
-  const textoOK = 'Já recebi'
-  const textoNOK = 'Ainda não recebi'
-  const funcaoOK = () => alert("Agradecemos o feedback")
-  const funcaoNOK = () => alert("Verificamos")
-  const componenteFeedBack = (
-    <Feedback 
-      funcaoOK={funcaoOK}
-      funcaoNOK={funcaoNOK}
-      textoNOK={textoNOK}
-      textoOK={textoOK}
-    />
-  )
 
   return (
     <div style={appShellStyle}>
@@ -135,7 +142,7 @@ const App = () => {
         </div>
       </div>
       <Advantages themeMode={themeMode} />
-      <CallToAction />
+      <CallToAction funcao2={handleContatarVendas} />
       </div>
       <Footer themeMode={themeMode} />
     </div>
