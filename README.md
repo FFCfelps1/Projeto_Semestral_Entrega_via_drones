@@ -59,7 +59,9 @@ http://localhost:5173
 O projeto utiliza dois microsservicos Node.js no diretorio `back`:
 
 1. `back/entrega_via_drone` (porta `3002`): calcula rota para rastreamento.
-2. `back/contato_email` (porta `3003`): gera link de contato por email para o botao "Contatar Vendas".
+2. `back/contato_email` (porta `3003`): oferece duas formas de contato:
+  - abrir cliente de e-mail com `mailto`;
+  - enviar mensagem direto no site (backend envia para `entrega.drones@gmail.com`).
 
 ### Como iniciar o microsservico de rota (3002)
 
@@ -83,8 +85,9 @@ npm run dev
 - `GET http://localhost:3002/rota?origemLat=...&origemLng=...&destinoLat=...&destinoLng=...`
 - `GET http://localhost:3003/health`
 - `GET http://localhost:3003/email/contato`
+- `POST http://localhost:3003/email/enviar`
 
-### Resposta do endpoint de contato
+### Resposta do endpoint de contato por `mailto`
 
 Exemplo de retorno de `GET /email/contato`:
 
@@ -93,12 +96,39 @@ Exemplo de retorno de `GET /email/contato`:
   "success": true,
   "recipient": "entrega.drones@gmail.com",
   "subject": "Contato SkySwift - Entrega via Drones",
-  "body": "Ola, equipe SkySwift!\n\nGostaria de mais informacoes sobre o servico de entrega via drones.\n\nObrigado.",
-  "link": "mailto:entrega.drones%40gmail.com?subject=Contato+SkySwift+-+Entrega+via+Drones&body=Ola%2C+equipe+SkySwift%21%0A%0AGostaria+de+mais+informacoes+sobre+o+servico+de+entrega+via+drones.%0A%0AObrigado."
+  "body": "Olá, equipe SkySwift!\n\nTenho interesse em conhecer melhor o serviço de entregas via drones.\nPoderiam, por favor, compartilhar informações sobre:\n- áreas atendidas e disponibilidade da operação;\n- prazo médio e janela estimada de entrega;\n- capacidade de carga por drone e tipos de encomenda aceitos;\n- rastreamento em tempo real e integração com sistemas;\n- modelo comercial, valores e planos disponíveis.\n\nSe possível, peço retorno com uma proposta inicial e orientações para próximo passo.\n\nAtenciosamente,\n[Seu nome]\n[Empresa]\n[Telefone]",
+  "link": "mailto:entrega.drones@gmail.com?subject=Contato%20SkySwift%20-%20Entrega%20via%20Drones&body=..."
 }
 ```
 
-No frontend, o botao "Contatar Vendas" chama esse endpoint e abre o cliente de email padrao do usuario com destinatario e texto pre-preenchidos.
+No frontend, o botao "Contatar Vendas" chama esse endpoint e abre o cliente de e-mail padrao do usuario com destinatario e texto pre-preenchidos.
+
+### Envio direto pelo site (`POST /email/enviar`)
+
+Corpo esperado:
+
+```json
+{
+  "nome": "Joao Silva",
+  "email": "joao@empresa.com",
+  "empresa": "Empresa X",
+  "telefone": "(11) 99999-9999",
+  "mensagem": "Gostaria de uma proposta para entregas recorrentes."
+}
+```
+
+Campos obrigatorios: `nome`, `email`, `mensagem`.
+
+Para envio real de e-mail, configure variaveis de ambiente no microsservico `back/contato_email`:
+
+- `SMTP_HOST` (padrao: `smtp.gmail.com`)
+- `SMTP_PORT` (padrao: `587`)
+- `SMTP_SECURE` (`true` ou `false`)
+- `SMTP_USER`
+- `SMTP_PASS`
+- `SMTP_FROM`
+
+Mesmo no envio direto, o destinatario final permanece fixo em `entrega.drones@gmail.com`.
 
 ## 📜 Scripts Disponíveis
 
