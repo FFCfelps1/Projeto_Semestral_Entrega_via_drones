@@ -56,12 +56,37 @@ http://localhost:5173
 
 ## Backend: Microsservicos
 
-O projeto utiliza dois microsservicos Node.js no diretorio `back`:
+O projeto utiliza uma arquitetura de microsservicos Node.js no diretorio `back`, conectados por um barramento de eventos:
 
-1. `back/entrega_via_drone` (porta `3002`): calcula rota para rastreamento.
-2. `back/contato_email` (porta `3003`): oferece duas formas de contato:
+1. `back/barramento_eventos` (porta `3001`): barramento central de eventos para comunicacao entre servicos.
+2. `back/entrega_via_drone` (porta `3002`): calcula rota para rastreamento.
+3. `back/contato_email` (porta `3003`): oferece duas formas de contato:
   - abrir cliente de e-mail com `mailto`;
   - enviar mensagem direto no site (backend envia para `entrega.drones@gmail.com`).
+
+### Barramento de Eventos (porta 3001)
+
+O barramento de eventos e o componente central da arquitetura de microsservicos. Ele recebe eventos publicados por qualquer servico e os distribui para todos os servicos inscritos.
+
+**Fluxo:**
+1. Cada microsservico se inscreve automaticamente ao iniciar (`POST /inscricao`)
+2. Quando algo acontece, o servico publica um evento (`POST /eventos`)
+3. O barramento distribui o evento para todos os inscritos via `POST /eventos/receber`
+
+**Eventos do sistema:**
+- `RotaCalculada` — publicado pelo servico de rotas quando uma rota e calculada
+- `ContatoSolicitado` — publicado pelo servico de email quando um link mailto e gerado
+- `EmailEnviado` — publicado pelo servico de email quando uma mensagem e enviada
+
+**Ordem de inicializacao:** O barramento deve ser iniciado ANTES dos demais servicos.
+
+### Como iniciar o barramento de eventos (3001)
+
+```bash
+cd back/barramento_eventos
+npm install
+npm run dev
+```
 
 ### Como iniciar o microsservico de rota (3002)
 
@@ -81,11 +106,18 @@ npm run dev
 
 ### Endpoints principais
 
+- `GET http://localhost:3001/health`
+- `POST http://localhost:3001/eventos` — publica um evento
+- `GET http://localhost:3001/eventos` — consulta historico de eventos (filtro: `?tipo=RotaCalculada&limite=10`)
+- `POST http://localhost:3001/inscricao` — inscreve um servico
+- `GET http://localhost:3001/inscricoes` — lista servicos inscritos
 - `GET http://localhost:3002/health`
 - `GET http://localhost:3002/rota?origemLat=...&origemLng=...&destinoLat=...&destinoLng=...`
+- `POST http://localhost:3002/eventos/receber` — recebe eventos do barramento
 - `GET http://localhost:3003/health`
 - `GET http://localhost:3003/email/contato`
 - `POST http://localhost:3003/email/enviar`
+- `POST http://localhost:3003/eventos/receber` — recebe eventos do barramento
 
 ### Resposta do endpoint de contato por `mailto`
 
