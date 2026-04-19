@@ -28,6 +28,41 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Endpoint para publicar um evento no barramento
+// O evento é registrado no historico e distribuido para todos os inscritos
+app.post('/eventos', async (req, res) => {
+  const { tipo, dados, origem } = req.body;
+
+  if (!tipo) {
+    return res.status(400).json({
+      success: false,
+      error: 'Campo obrigatorio: tipo do evento',
+    });
+  }
+
+  // Cria o registro do evento
+  const evento = {
+    id: historicoEventos.length + 1,
+    tipo,
+    dados: dados || {},
+    origem: origem || 'desconhecido',
+    timestamp: new Date().toISOString(),
+  };
+
+  // Salva no historico
+  historicoEventos.push(evento);
+  console.log(`[${evento.timestamp}] Evento recebido: ${tipo} de ${evento.origem}`);
+
+  // Distribui o evento para todos os servicos inscritos
+  const resultados = await distribuirEvento(evento);
+
+  return res.json({
+    success: true,
+    evento,
+    distribuicao: resultados,
+  });
+});
+
 // Endpoint para inscrever um serviço no barramento
 // Cada serviço envia seu nome e url para receber eventos
 app.post('/inscricao', (req, res) => {
