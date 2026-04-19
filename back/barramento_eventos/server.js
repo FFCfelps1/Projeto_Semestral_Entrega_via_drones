@@ -28,6 +28,43 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Endpoint para inscrever um serviço no barramento
+// Cada serviço envia seu nome e url para receber eventos
+app.post('/inscricao', (req, res) => {
+  const { nome, url } = req.body;
+
+  if (!nome || !url) {
+    return res.status(400).json({
+      success: false,
+      error: 'Campos obrigatorios: nome e url',
+    });
+  }
+
+  // Verifica se o serviço ja esta inscrito
+  const jaInscrito = inscricoes.find((s) => s.nome === nome);
+
+  if (jaInscrito) {
+    // Atualiza a url caso tenha mudado
+    jaInscrito.url = url;
+    console.log(`[${new Date().toISOString()}] Servico atualizado: ${nome} -> ${url}`);
+
+    return res.json({
+      success: true,
+      message: `Servico ${nome} atualizado com sucesso`,
+      inscricoes: inscricoes.length,
+    });
+  }
+
+  inscricoes.push({ nome, url });
+  console.log(`[${new Date().toISOString()}] Novo servico inscrito: ${nome} -> ${url}`);
+
+  return res.json({
+    success: true,
+    message: `Servico ${nome} inscrito com sucesso`,
+    inscricoes: inscricoes.length,
+  });
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Barramento de eventos rodando na porta ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
