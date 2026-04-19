@@ -18,6 +18,27 @@ const inscricoes = [];
 // Histórico de eventos publicados
 const historicoEventos = [];
 
+// Distribui um evento para todos os servicos inscritos
+async function distribuirEvento(evento) {
+  const resultados = [];
+
+  for (const servico of inscricoes) {
+    try {
+      await axios.post(`${servico.url}/eventos/receber`, evento, {
+        timeout: 5000,
+      });
+
+      console.log(`[${new Date().toISOString()}] Evento ${evento.tipo} entregue para ${servico.nome}`);
+      resultados.push({ servico: servico.nome, status: 'entregue' });
+    } catch (erro) {
+      console.error(`[${new Date().toISOString()}] Falha ao entregar evento para ${servico.nome}: ${erro.message}`);
+      resultados.push({ servico: servico.nome, status: 'falha', erro: erro.message });
+    }
+  }
+
+  return resultados;
+}
+
 // Endpoint de health check
 app.get('/health', (req, res) => {
   res.json({
