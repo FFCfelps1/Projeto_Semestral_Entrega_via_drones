@@ -121,6 +121,42 @@ app.post('/inscricao', (req, res) => {
   });
 });
 
+// Endpoint para consultar historico de eventos
+// Permite filtrar por tipo e limitar quantidade
+app.get('/eventos', (req, res) => {
+  const { tipo, limite } = req.query;
+
+  let eventos = [...historicoEventos];
+
+  // Filtra por tipo se informado
+  if (tipo) {
+    eventos = eventos.filter((e) => e.tipo === tipo);
+  }
+
+  // Ordena do mais recente para o mais antigo
+  eventos.reverse();
+
+  // Limita quantidade se informado
+  if (limite) {
+    eventos = eventos.slice(0, Number(limite));
+  }
+
+  return res.json({
+    success: true,
+    total: eventos.length,
+    eventos,
+  });
+});
+
+// Endpoint para listar servicos inscritos
+app.get('/inscricoes', (req, res) => {
+  return res.json({
+    success: true,
+    total: inscricoes.length,
+    inscricoes,
+  });
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Barramento de eventos rodando na porta ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
