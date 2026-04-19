@@ -9,6 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = 3003;
+const BARRAMENTO_URL = 'http://localhost:3001';
 const CONTACT_RECIPIENT = 'entrega.drones@gmail.com';
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
 const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
@@ -59,6 +60,27 @@ function createMailer() {
   });
 }
 
+// Publica um evento no barramento de eventos
+async function publicarEvento(tipo, dados) {
+  try {
+    await axios.post(`${BARRAMENTO_URL}/eventos`, {
+      tipo,
+      dados,
+      origem: 'contato_email',
+    });
+    console.log(`[${new Date().toISOString()}] Evento publicado: ${tipo}`);
+  } catch (erro) {
+    console.error(`[${new Date().toISOString()}] Falha ao publicar evento: ${erro.message}`);
+  }
+}
+
+// Endpoint para receber eventos do barramento
+app.post('/eventos/receber', (req, res) => {
+  const evento = req.body;
+  console.log(`[${new Date().toISOString()}] Evento recebido do barramento: ${evento.tipo}`);
+  res.json({ success: true, message: 'Evento recebido' });
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Microsserviço de e-mail rodando' });
 });
@@ -71,6 +93,13 @@ app.get('/email/contato', (req, res) => {
   const mailtoLink = buildMailtoLink(CONTACT_RECIPIENT, finalSubject, finalBody);
 
   console.log(`[${new Date().toISOString()}] Link de contato gerado para ${CONTACT_RECIPIENT}`);
+
+  // Publica evento de contato solicitado
+  publicarEvento('ContatoSolicitado', {
+    destinatario: CONTACT_RECIPIENT,
+    assunto: finalSubject,
+    metodo: 'mailto',
+  });
 
   return res.json({
     success: true,
@@ -131,6 +160,14 @@ app.post('/email/enviar', async (req, res) => {
 
     console.log(`[${new Date().toISOString()}] Mensagem enviada para ${CONTACT_RECIPIENT}. ID: ${info.messageId}`);
 
+    // Publica evento de email enviado
+    publicarEvento('EmailEnviado', {
+      destinatario: CONTACT_RECIPIENT,
+      remetente: email,
+      nome,
+      messageId: info.messageId,
+    });
+
     return res.json({
       success: true,
       recipient: CONTACT_RECIPIENT,
@@ -147,7 +184,18 @@ app.post('/email/enviar', async (req, res) => {
   }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Serviço de e-mail rodando na porta ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
+
+  // Auto-inscricao no barramento de eventos
+  try {
+    await axios.post(`${BARRAMENTO_URL}/inscricao`, {
+      nome: 'contato_email',
+      url: `http://localhost:${PORT}`,
+    });
+    console.log(`[${new Date().toISOString()}] Inscrito no barramento de eventos`);
+  } catch (erro) {
+    console.error(`[${new Date().toISOString()}] Falha ao se inscrever no barramento: ${erro.message}`);
+  }
 });
