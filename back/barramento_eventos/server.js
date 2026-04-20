@@ -19,10 +19,16 @@ const inscricoes = [];
 const historicoEventos = [];
 
 // Distribui um evento para todos os servicos inscritos
+// Pula o servico que originou o evento para evitar loop
 async function distribuirEvento(evento) {
   const resultados = [];
 
   for (const servico of inscricoes) {
+    // Nao envia o evento de volta para o servico que o publicou
+    if (servico.nome === evento.origem) {
+      continue;
+    }
+
     try {
       await axios.post(`${servico.url}/eventos/receber`, evento, {
         timeout: 5000,
