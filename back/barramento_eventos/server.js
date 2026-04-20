@@ -144,7 +144,10 @@ app.get('/eventos', (req, res) => {
 
   // Limita quantidade se informado
   if (limite) {
-    eventos = eventos.slice(0, Number(limite));
+    const limiteNum = Number(limite);
+    if (Number.isFinite(limiteNum) && limiteNum > 0) {
+      eventos = eventos.slice(0, limiteNum);
+    }
   }
 
   return res.json({
