@@ -9,6 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 const ROUTING_TIMEOUT_MS = 5000;
+const BARRAMENTO_URL = 'http://localhost:3001';
 const ROUTING_PROVIDERS = [
   "https://router.project-osrm.org/route/v1/driving",
   "http://router.project-osrm.org/route/v1/driving",
@@ -48,6 +49,32 @@ function buildFallbackRoute(origemLat, origemLng, destinoLat, destinoLng) {
     aviso: "Rota aproximada usada por indisponibilidade do provedor externo.",
   };
 }
+
+// Publica um evento no barramento de eventos
+async function publicarEvento(tipo, dados) {
+  try {
+    await axios.post(`${BARRAMENTO_URL}/eventos`, {
+      tipo,
+      dados,
+      origem: 'entrega_via_drone',
+    });
+    console.log(`[${new Date().toISOString()}] Evento publicado: ${tipo}`);
+  } catch (erro) {
+    console.error(`[${new Date().toISOString()}] Falha ao publicar evento: ${erro.message}`);
+  }
+}
+
+// Endpoint para receber eventos do barramento
+app.post('/eventos/receber', (req, res) => {
+  const evento = req.body;
+
+  if (!evento || !evento.tipo) {
+    return res.status(400).json({ success: false, error: 'Evento invalido' });
+  }
+
+  console.log(`[${new Date().toISOString()}] Evento recebido do barramento: ${evento.tipo}`);
+  res.json({ success: true, message: 'Evento recebido' });
+});
 
 // Endpoint de health check
 app.get('/health', (req, res) => {
@@ -101,6 +128,18 @@ app.get('/rota', async (req, res) => {
 
           console.log(`Rota calculada com sucesso. Pontos: ${rota.length}, Distância: ${distancia}m, Duração: ${duracao}s`);
 
+          // Publica evento de rota calculada no barramento
+          publicarEvento('RotaCalculada', {
+            origemLat: origemLatNum,
+            origemLng: origemLngNum,
+            destinoLat: destinoLatNum,
+            destinoLng: destinoLngNum,
+            distancia,
+            duracao,
+            pontos: rota.length,
+            fallback: false,
+          });
+
           return res.json({
             rota,
             distancia,
@@ -116,7 +155,21 @@ app.get('/rota', async (req, res) => {
     }
 
     console.warn('Todos os provedores falharam. Retornando rota aproximada.');
-    return res.json(buildFallbackRoute(origemLatNum, origemLngNum, destinoLatNum, destinoLngNum));
+    const rotaFallback = buildFallbackRoute(origemLatNum, origemLngNum, destinoLatNum, destinoLngNum);
+
+    // Publica evento mesmo com rota fallback
+    publicarEvento('RotaCalculada', {
+      origemLat: origemLatNum,
+      origemLng: origemLngNum,
+      destinoLat: destinoLatNum,
+      destinoLng: destinoLngNum,
+      distancia: rotaFallback.distancia,
+      duracao: rotaFallback.duracao,
+      pontos: rotaFallback.rota.length,
+      fallback: true,
+    });
+
+    return res.json(rotaFallback);
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ erro: 'Erro ao calcular rota' });
@@ -124,7 +177,18 @@ app.get('/rota', async (req, res) => {
 });
 
 const PORT = 3002;
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Map service rodando na porta ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
+
+  // Auto-inscricao no barramento de eventos
+  try {
+    await axios.post(`${BARRAMENTO_URL}/inscricao`, {
+      nome: 'entrega_via_drone',
+      url: `http://localhost:${PORT}`,
+    });
+    console.log(`[${new Date().toISOString()}] Inscrito no barramento de eventos`);
+  } catch (erro) {
+    console.error(`[${new Date().toISOString()}] Falha ao se inscrever no barramento: ${erro.message}`);
+  }
 });
