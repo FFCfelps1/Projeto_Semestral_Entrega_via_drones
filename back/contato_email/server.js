@@ -78,6 +78,11 @@ async function publicarEvento(tipo, dados) {
 // Endpoint para receber eventos do barramento
 app.post('/eventos/receber', (req, res) => {
   const evento = req.body;
+
+  if (!evento || !evento.tipo) {
+    return res.status(400).json({ success: false, error: 'Evento invalido' });
+  }
+
   console.log(`[${new Date().toISOString()}] Evento recebido do barramento: ${evento.tipo}`);
   res.json({ success: true, message: 'Evento recebido' });
 });
