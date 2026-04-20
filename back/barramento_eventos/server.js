@@ -16,7 +16,9 @@ const PORT = 3001;
 const inscricoes = [];
 
 // Histórico de eventos publicados
+// Limite maximo para evitar consumo excessivo de memoria
 const historicoEventos = [];
+const MAX_HISTORICO = 1000;
 
 // Distribui um evento para todos os servicos inscritos
 // Pula o servico que originou o evento para evitar loop
@@ -76,8 +78,11 @@ app.post('/eventos', async (req, res) => {
     timestamp: new Date().toISOString(),
   };
 
-  // Salva no historico
+  // Salva no historico (remove eventos antigos se exceder o limite)
   historicoEventos.push(evento);
+  if (historicoEventos.length > MAX_HISTORICO) {
+    historicoEventos.shift();
+  }
   console.log(`[${evento.timestamp}] Evento recebido: ${tipo} de ${evento.origem}`);
 
   // Distribui o evento para todos os servicos inscritos
