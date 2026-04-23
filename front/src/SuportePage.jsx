@@ -337,22 +337,6 @@ const SuportePage = ({ themeMode = "light", onContatar }) => {
                       <i className="fa fa-envelope me-2"></i>
                       Enviar E-mail
                     </button>
-                    <a
-                      href="/#mensagem-direta"
-                      className="btn btn-outline-light fw-bold px-4 py-2"
-                      style={{ borderRadius: "10px", fontSize: "clamp(0.85rem, 1.3vw, 0.95rem)" }}
-                    >
-                      <i className="fa fa-paper-plane me-2"></i>
-                      Enviar Mensagem no Site
-                    </a>
-                    <a
-                      href="/"
-                      className="btn btn-outline-light fw-bold px-4 py-2"
-                      style={{ borderRadius: "10px", fontSize: "clamp(0.85rem, 1.3vw, 0.95rem)" }}
-                    >
-                      <i className="fa fa-home me-2"></i>
-                      Voltar ao Início
-                    </a>
                   </div>
                 </div>
               </div>
