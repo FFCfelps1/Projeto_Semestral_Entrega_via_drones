@@ -5,7 +5,7 @@ import { useState } from "react";
 const perguntas = [
   {
     id: 1,
-    pergunta: "Como funciona o cálculo de 'pagamento por entrega'?",
+    pergunta: "Como funciona o cálculo de \"pagamento por entrega\"?",
     resposta:
       "O preço do plano Pessoal é baseado na distância entre os pontos de coleta e entrega, mais o peso do item. Você recebe uma cotação instantânea antes de confirmar sua solicitação.",
   },
@@ -23,7 +23,7 @@ const perguntas = [
   },
   {
     id: 4,
-    pergunta: "O que caracteriza uma solução 'Corporativa'?",
+    pergunta: "O que caracteriza uma solução \"Corporativa\"?",
     resposta:
       "Soluções corporativas são para empresas que necessitam de mais de 500 entregas por mês, manuseio especializado (refrigerado, frágil ou alto valor), ou integração profunda via API em suas próprias plataformas.",
   },
