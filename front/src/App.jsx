@@ -118,7 +118,10 @@ const App = () => {
   return (
     <div style={appShellStyle}>
       <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
-      <Hero />
+      <Hero
+        funcao1={() => { window.location.href = "/precos" }}
+        funcao2={() => { window.location.href = "/rastreamento" }}
+      />
       <div className={`container border mt-4 ${themeMode === "dark" ? "border-secondary" : ""}`}>
       <div className="row g-4">
         <div className="col-sm-12 col-md-6 col-xl-3">
