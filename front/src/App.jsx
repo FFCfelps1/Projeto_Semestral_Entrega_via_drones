@@ -8,6 +8,7 @@ import CallToAction from "./CallToAction.jsx"
 import Footer from "./Footer.jsx"
 import DroneTrackingSection from "./DroneTrackingSection.jsx"
 import PrecosPage from "./PrecosPage.jsx"
+import SuportePage from "./SuportePage.jsx"
 import axios from "axios"
 
 const MAP_SERVICE_URL =
@@ -94,6 +95,7 @@ const App = () => {
   // se a rota for "/precos", exibimos a pagina de precos.
   const isTrackingPage = window.location.pathname === "/rastreamento"
   const isPrecosPage = window.location.pathname === "/precos"
+  const isSuportePage = window.location.pathname === "/suporte"
 
   if (isTrackingPage) {
     return (
@@ -118,6 +120,18 @@ const App = () => {
         <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
         <main>
           <PrecosPage themeMode={themeMode} onContatar={handleContatarVendas} />
+        </main>
+        <Footer themeMode={themeMode} />
+      </div>
+    )
+  }
+
+  if (isSuportePage) {
+    return (
+      <div style={appShellStyle}>
+        <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
+        <main>
+          <SuportePage themeMode={themeMode} onContatar={handleContatarVendas} />
         </main>
         <Footer themeMode={themeMode} />
       </div>
