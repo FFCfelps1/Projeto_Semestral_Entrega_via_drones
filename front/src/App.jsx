@@ -7,6 +7,7 @@ import Advantages from "./Advantages.jsx"
 import CallToAction from "./CallToAction.jsx"
 import Footer from "./Footer.jsx"
 import DroneTrackingSection from "./DroneTrackingSection.jsx"
+import PrecosPage from "./PrecosPage.jsx"
 import axios from "axios"
 import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet"
 
@@ -86,7 +87,9 @@ const App = () => {
 
   // Roteamento simples por URL sem biblioteca extra:
   // se a rota for "/rastreamento", exibimos a pagina dedicada do painel.
+  // se a rota for "/precos", exibimos a pagina de precos.
   const isTrackingPage = window.location.pathname === "/rastreamento"
+  const isPrecosPage = window.location.pathname === "/precos"
 
   if (isTrackingPage) {
     return (
@@ -94,6 +97,18 @@ const App = () => {
         <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
         <main>
           <DroneTrackingSection themeMode={themeMode} rota={rota} buscarRota={buscarRota}/>
+        </main>
+        <Footer themeMode={themeMode} />
+      </div>
+    )
+  }
+
+  if (isPrecosPage) {
+    return (
+      <div style={appShellStyle}>
+        <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
+        <main>
+          <PrecosPage themeMode={themeMode} onContatar={handleContatarVendas} />
         </main>
         <Footer themeMode={themeMode} />
       </div>
