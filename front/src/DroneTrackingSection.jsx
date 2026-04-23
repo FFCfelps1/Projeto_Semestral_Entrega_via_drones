@@ -16,7 +16,9 @@ L.Icon.Default.mergeOptions({
 const ORIGEM_FIXA = [-23.5505, -46.6333]; // SkySwift (marco zero de sp)
 const NOME_ORIGEM = "Centro Logístico SkySwift, Bloco B";
 
-const DroneTrackingSection = ({ themeMode }) => {
+const DroneTrackingSection = ({ themeMode, mapServiceUrl }) => {
+  const mapBaseUrl = mapServiceUrl || "http://localhost:3002";
+  const rotaEndpoint = `${mapBaseUrl}/rota`;
   const [enderecoDestino, setEnderecoDestino] = useState("");   //endereço do estino
   const [destino, setDestino] = useState(null);                 //coodenadas do destino (lat, long)
   const [rotaPontos, setRotaPontos] = useState([]);             //pontos utilizados para traçar rota
@@ -50,14 +52,14 @@ const DroneTrackingSection = ({ themeMode }) => {
       setDestino(destinoCoord);
 
       //busca a rota na API
-      console.log("Enviando requisição para:", "http://localhost:3002/rota", {
+      console.log("Enviando requisição para:", rotaEndpoint, {
         origemLat: ORIGEM_FIXA[0],
         origemLng: ORIGEM_FIXA[1],
         destinoLat: destinoCoord[0],
         destinoLng: destinoCoord[1],
       });
 
-      const rotaResponse = await axios.get("http://localhost:3002/rota", {
+      const rotaResponse = await axios.get(rotaEndpoint, {
         params: {
           origemLat: ORIGEM_FIXA[0],
           origemLng: ORIGEM_FIXA[1],
@@ -99,7 +101,7 @@ const DroneTrackingSection = ({ themeMode }) => {
       if (erro.message.includes('timeout')) {
         mensagemErro = "A API de roteamento está lenta. Por favor, aguarde alguns segundos e tente novamente...";
       } else if (erro.response?.status === 0 || erro.message === 'Network Error') {
-        mensagemErro = "Erro de conexão. O backend está rodando em localhost:3002?";
+        mensagemErro = "Erro de conexão com o serviço de roteamento. Verifique se o backend está online.";
       } else if (erro.response?.status === 503) {
         mensagemErro = "A API OSRM não está disponível. Verifique sua conexão e tente novamente.";
       } else if (erro.response?.data?.erro) {

@@ -162,6 +162,51 @@ Para envio real de e-mail, configure variaveis de ambiente no microsservico `bac
 
 Mesmo no envio direto, o destinatario final permanece fixo em `entrega.drones@gmail.com`.
 
+## Deploy na Vercel (frontend + APIs)
+
+Este repositorio esta preparado para deploy unico na Vercel com:
+
+- frontend React em `front`;
+- funcoes serverless em `api/entrega_via_drone` e `api/contato_email`.
+
+### Endpoints em producao
+
+- `GET /api/entrega_via_drone/health`
+- `GET /api/entrega_via_drone/rota?origemLat=...&origemLng=...&destinoLat=...&destinoLng=...`
+- `GET /api/contato_email/health`
+- `GET /api/contato_email/email/contato`
+- `POST /api/contato_email/email/enviar`
+
+### Variaveis de ambiente na Vercel
+
+Para habilitar envio real em `POST /api/contato_email/email/enviar`, configure no projeto Vercel:
+
+- `SMTP_HOST` (opcional, padrao `smtp.gmail.com`)
+- `SMTP_PORT` (opcional, padrao `587`)
+- `SMTP_SECURE` (`true` ou `false`)
+- `SMTP_USER`
+- `SMTP_PASS`
+- `SMTP_FROM`
+- `CONTACT_RECIPIENT` (opcional, padrao `entrega.drones@gmail.com`)
+
+Opcional para integracao com barramento externo:
+
+- `BARRAMENTO_URL`
+
+### URLs do frontend
+
+No ambiente de desenvolvimento local, o frontend continua usando:
+
+- `http://localhost:3002` para rota;
+- `http://localhost:3003` para contato.
+
+Em producao, o frontend usa automaticamente as rotas serverless em `/api/...`.
+
+Se quiser sobrescrever manualmente no frontend:
+
+- `VITE_MAP_SERVICE_URL`
+- `VITE_EMAIL_SERVICE_URL`
+
 ## 📜 Scripts Disponíveis
 
 | Comando | Descrição |

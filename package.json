@@ -1,5 +1,13 @@
 {
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix front",
+    "build": "npm run build --prefix front",
+    "preview": "npm run preview --prefix front",
+    "lint": "npm run lint --prefix front"
+  },
   "dependencies": {
-    "bootstrap": "^5.3.8"
+    "bootstrap": "^5.3.8",
+    "nodemailer": "^8.0.5"
   }
 }

@@ -8,10 +8,14 @@ import CallToAction from "./CallToAction.jsx"
 import Footer from "./Footer.jsx"
 import DroneTrackingSection from "./DroneTrackingSection.jsx"
 import axios from "axios"
-import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet"
 
-const MAP_SERVICE_URL = "http://localhost:3002"
-const EMAIL_SERVICE_URL = "http://localhost:3003"
+const MAP_SERVICE_URL =
+  import.meta.env.VITE_MAP_SERVICE_URL ||
+  (import.meta.env.DEV ? "http://localhost:3002" : "/api/entrega_via_drone")
+
+const EMAIL_SERVICE_URL =
+  import.meta.env.VITE_EMAIL_SERVICE_URL ||
+  (import.meta.env.DEV ? "http://localhost:3003" : "/api/contato_email")
 
 const App = () => {
   const [rota, setRota] = useState(null)
@@ -93,7 +97,12 @@ const App = () => {
       <div style={appShellStyle}>
         <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
         <main>
-          <DroneTrackingSection themeMode={themeMode} rota={rota} buscarRota={buscarRota}/>
+          <DroneTrackingSection
+            themeMode={themeMode}
+            rota={rota}
+            buscarRota={buscarRota}
+            mapServiceUrl={MAP_SERVICE_URL}
+          />
         </main>
         <Footer themeMode={themeMode} />
       </div>
