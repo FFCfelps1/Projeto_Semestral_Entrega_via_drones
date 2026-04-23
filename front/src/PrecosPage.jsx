@@ -112,7 +112,7 @@ const PrecosPage = ({ themeMode = "light", onContatar }) => {
           <div className="row justify-content-center">
             <div className="col-12 col-lg-8">
               <span
-                className="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-2 mb-3"
+                className="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-2 mb-3 d-inline-block"
                 style={{ fontSize: "0.75rem", letterSpacing: "0.06em", borderRadius: "20px" }}
               >
                 <i className="fa fa-tag me-1"></i>
@@ -121,9 +121,20 @@ const PrecosPage = ({ themeMode = "light", onContatar }) => {
               <h1 className="fw-bold mb-3" style={tituloStyle}>
                 Preços Simples e Transparentes
               </h1>
-              <p className="mx-auto mb-0" style={{ ...subtituloStyle, maxWidth: "560px" }}>
+              <p className="mx-auto mb-4" style={{ ...subtituloStyle, maxWidth: "560px" }}>
                 Seja para enviar um presente ou gerenciar uma frota global, a SkySwift tem um plano de entrega feito para você.
               </p>
+              <div className="d-flex justify-content-center gap-2 flex-wrap mb-2">
+                <span className="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2" style={{ fontSize: "0.75rem" }}>
+                  <i className="fa fa-check me-1"></i>Sem taxa de adesão
+                </span>
+                <span className="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2" style={{ fontSize: "0.75rem" }}>
+                  <i className="fa fa-check me-1"></i>Cancele quando quiser
+                </span>
+                <span className="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2" style={{ fontSize: "0.75rem" }}>
+                  <i className="fa fa-check me-1"></i>Suporte incluso
+                </span>
+              </div>
             </div>
           </div>
         </div>
