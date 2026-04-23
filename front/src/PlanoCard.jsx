@@ -45,10 +45,11 @@ const PlanoCard = ({ themeMode = "light", plano }) => {
 
   const precoStyle = {
     color: isDarkMode ? "#ffffff" : "#1f2937",
-    fontSize: "clamp(2.75rem, 5vw, 3.75rem)",
-    fontWeight: 800,
-    lineHeight: 1,
-    letterSpacing: "-0.03em",
+    fontSize: "clamp(2rem, 4vw, 2.75rem)",
+    fontWeight: 700,
+    lineHeight: 1.1,
+    letterSpacing: "-0.02em",
+    fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif",
   };
 
   const sufixoStyle = {
