@@ -60,6 +60,7 @@ http://localhost:5173
 - `/` — Página inicial (hero, pedidos, vantagens, CTA)
 - `/precos` — Planos de preço (Pessoal, Empresarial, Corporativo) e FAQ
 - `/rastreamento` — Rastreamento de entrega por drone com mapa interativo
+- `/suporte` — Central de ajuda com busca e tópicos expansíveis
 
 ## Backend: Microsservicos
 

@@ -3,6 +3,7 @@ const TopBar = ({ themeMode = "light", onToggleTheme }) => {
   const isTrackingPage = typeof window !== "undefined" && window.location.pathname === "/rastreamento";
   const isSubPage = typeof window !== "undefined" && window.location.pathname !== "/";
   const isPrecosPage = typeof window !== "undefined" && window.location.pathname === "/precos";
+  const isSuportePage = typeof window !== "undefined" && window.location.pathname === "/suporte";
   const isHomePage = !isSubPage;
   const homeHref = isSubPage ? "/" : "#home";
 
