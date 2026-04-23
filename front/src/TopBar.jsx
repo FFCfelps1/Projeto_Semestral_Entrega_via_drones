@@ -1,7 +1,8 @@
 const TopBar = ({ themeMode = "light", onToggleTheme }) => {
   const isDarkMode = themeMode === "dark";
   const isTrackingPage = typeof window !== "undefined" && window.location.pathname === "/rastreamento";
-  const homeHref = isTrackingPage ? "/" : "#home";
+  const isSubPage = typeof window !== "undefined" && window.location.pathname !== "/";
+  const homeHref = isSubPage ? "/" : "#home";
 
   // O icone e o texto representam o modo atualmente ativo na interface.
   const themeIconClass = isDarkMode ? "fa-moon" : "fa-sun";
