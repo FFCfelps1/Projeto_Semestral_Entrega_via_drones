@@ -16,7 +16,7 @@ const TopBar = ({ themeMode = "light", onToggleTheme }) => {
     <nav className={`navbar navbar-expand-lg shadow-sm ${isDarkMode ? "navbar-dark bg-dark" : "navbar-light bg-light"}`}>
       <div className="container-fluid">
         {/* Logo/Brand */}
-        <a className="navbar-brand fw-bold" href="#home">
+        <a className="navbar-brand fw-bold" href={homeHref}>
           <i className="fa-solid fa-jet-fighter"></i>
           Entrega via Drones
         </a>
