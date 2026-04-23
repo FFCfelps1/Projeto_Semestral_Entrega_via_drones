@@ -169,6 +169,7 @@ const App = () => {
       </div>
       <Advantages themeMode={themeMode} />
       <CallToAction
+        funcao1={() => { window.location.href = "/precos" }}
         funcao2={handleContatarVendas}
         onEnviarMensagem={handleEnviarMensagemDireto}
       />
