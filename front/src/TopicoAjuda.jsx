@@ -49,7 +49,7 @@ const TopicoAjuda = ({ themeMode = "light", topico }) => {
 
   return (
     <div
-      className="p-4 d-flex flex-column"
+      className="h-100 p-4 d-flex flex-column"
       style={cardStyle}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
