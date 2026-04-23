@@ -31,14 +31,17 @@ const PlanoCard = ({ themeMode = "light", plano }) => {
   };
 
   const precoStyle = {
-    color: isDarkMode ? "#e6f0ff" : "#1f2937",
-    fontSize: "clamp(2rem, 4vw, 3rem)",
+    color: isDarkMode ? "#ffffff" : "#1f2937",
+    fontSize: "clamp(2.5rem, 5vw, 3.5rem)",
     fontWeight: 800,
+    lineHeight: 1,
+    letterSpacing: "-0.02em",
   };
 
   const sufixoStyle = {
     color: isDarkMode ? "#9fb3cb" : "#6c757d",
-    fontSize: "clamp(0.875rem, 1.5vw, 1rem)",
+    fontSize: "clamp(0.85rem, 1.3vw, 1rem)",
+    fontWeight: 400,
   };
 
   const descricaoStyle = {
@@ -83,7 +86,7 @@ const PlanoCard = ({ themeMode = "light", plano }) => {
       </h3>
 
       {/* Preco */}
-      <div className="mb-2">
+      <div className="mb-3 d-flex align-items-baseline gap-1">
         <span style={precoStyle}>{plano.preco}</span>
         <span style={sufixoStyle}>{plano.sufixoPreco}</span>
       </div>
