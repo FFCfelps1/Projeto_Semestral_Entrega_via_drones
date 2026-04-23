@@ -81,7 +81,7 @@ const Footer = ({ themeMode = "light" }) => {
             <h6 className="fw-bold mb-3 text-uppercase">Suporte</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
-                <a href="#" className={`${mutedTextClassName} text-decoration-none small`}>
+                <a href="/suporte" className={`${mutedTextClassName} text-decoration-none small`}>
                   Central de Ajuda
                 </a>
               </li>
