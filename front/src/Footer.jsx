@@ -47,7 +47,7 @@ const Footer = ({ themeMode = "light" }) => {
                 </a>
               </li>
               <li className="mb-2">
-                <a href="#" className={`${mutedTextClassName} text-decoration-none small`}>
+                <a href="/precos" className={`${mutedTextClassName} text-decoration-none small`}>
                   Preços
                 </a>
               </li>
