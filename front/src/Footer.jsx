@@ -47,7 +47,7 @@ const Footer = ({ themeMode = "light" }) => {
                 </a>
               </li>
               <li className="mb-2">
-                <a href="#" className={`${mutedTextClassName} text-decoration-none small`}>
+                <a href="/precos" className={`${mutedTextClassName} text-decoration-none small`}>
                   Preços
                 </a>
               </li>
@@ -106,7 +106,7 @@ const Footer = ({ themeMode = "light" }) => {
         <div className="row">
           <div className="col-12 text-center">
             <p className={`${mutedTextClassName} small mb-0`}>
-              © 2024 SkySwift Tecnologias Inc. Todos os direitos reservados.
+              © 2026 SkySwift Tecnologias Inc. Todos os direitos reservados.
             </p>
           </div>
         </div>

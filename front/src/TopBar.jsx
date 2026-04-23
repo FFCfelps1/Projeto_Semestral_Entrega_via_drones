@@ -1,7 +1,10 @@
 const TopBar = ({ themeMode = "light", onToggleTheme }) => {
   const isDarkMode = themeMode === "dark";
   const isTrackingPage = typeof window !== "undefined" && window.location.pathname === "/rastreamento";
-  const homeHref = isTrackingPage ? "/" : "#home";
+  const isSubPage = typeof window !== "undefined" && window.location.pathname !== "/";
+  const isPrecosPage = typeof window !== "undefined" && window.location.pathname === "/precos";
+  const isHomePage = !isSubPage;
+  const homeHref = isSubPage ? "/" : "#home";
 
   // O icone e o texto representam o modo atualmente ativo na interface.
   const themeIconClass = isDarkMode ? "fa-moon" : "fa-sun";
@@ -13,7 +16,7 @@ const TopBar = ({ themeMode = "light", onToggleTheme }) => {
     <nav className={`navbar navbar-expand-lg shadow-sm ${isDarkMode ? "navbar-dark bg-dark" : "navbar-light bg-light"}`}>
       <div className="container-fluid">
         {/* Logo/Brand */}
-        <a className="navbar-brand fw-bold" href="#home">
+        <a className="navbar-brand fw-bold" href={homeHref}>
           <i className="fa-solid fa-jet-fighter"></i>
           Entrega via Drones
         </a>
@@ -35,7 +38,7 @@ const TopBar = ({ themeMode = "light", onToggleTheme }) => {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href={homeHref}>
+              <a className={`nav-link ${isHomePage ? "active" : ""}`} aria-current={isHomePage ? "page" : undefined} href={homeHref}>
                 <i className="fa fa-home me-1"></i>
                 Início
               </a>
@@ -53,7 +56,7 @@ const TopBar = ({ themeMode = "light", onToggleTheme }) => {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#precos">
+              <a className={`nav-link ${isPrecosPage ? "active" : ""}`} aria-current={isPrecosPage ? "page" : undefined} href="/precos">
                 <i className="fa fa-tag me-1"></i>
                 Preços
               </a>

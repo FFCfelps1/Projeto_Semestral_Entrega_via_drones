@@ -7,6 +7,7 @@ import Advantages from "./Advantages.jsx"
 import CallToAction from "./CallToAction.jsx"
 import Footer from "./Footer.jsx"
 import DroneTrackingSection from "./DroneTrackingSection.jsx"
+import PrecosPage from "./PrecosPage.jsx"
 import axios from "axios"
 
 const MAP_SERVICE_URL =
@@ -90,7 +91,9 @@ const App = () => {
 
   // Roteamento simples por URL sem biblioteca extra:
   // se a rota for "/rastreamento", exibimos a pagina dedicada do painel.
+  // se a rota for "/precos", exibimos a pagina de precos.
   const isTrackingPage = window.location.pathname === "/rastreamento"
+  const isPrecosPage = window.location.pathname === "/precos"
 
   if (isTrackingPage) {
     return (
@@ -109,10 +112,25 @@ const App = () => {
     )
   }
 
+  if (isPrecosPage) {
+    return (
+      <div style={appShellStyle}>
+        <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
+        <main>
+          <PrecosPage themeMode={themeMode} onContatar={handleContatarVendas} />
+        </main>
+        <Footer themeMode={themeMode} />
+      </div>
+    )
+  }
+
   return (
     <div style={appShellStyle}>
       <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
-      <Hero />
+      <Hero
+        funcao1={() => { window.location.href = "/precos" }}
+        funcao2={() => { window.location.href = "/rastreamento" }}
+      />
       <div className={`container border mt-4 ${themeMode === "dark" ? "border-secondary" : ""}`}>
       <div className="row g-4">
         <div className="col-sm-12 col-md-6 col-xl-3">
@@ -163,6 +181,7 @@ const App = () => {
       </div>
       <Advantages themeMode={themeMode} />
       <CallToAction
+        funcao1={() => { window.location.href = "/precos" }}
         funcao2={handleContatarVendas}
         onEnviarMensagem={handleEnviarMensagemDireto}
       />

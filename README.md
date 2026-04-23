@@ -23,6 +23,7 @@ Uma aplicação web moderna para gerenciamento de entregas autônomas via drones
 - ✅ Interface responsiva com suporte a mobile, tablet e desktop
 - 🌓 Modo claro e escuro (dark mode) com persistência em localStorage
 - 🎨 Componentes reutilizáveis e bem estruturados
+- 💰 Página de preços com três planos e FAQ interativo
 - 🔧 Commits estruturados seguindo padrão semântico
 - 📦 Versionamento semântico com tags Git
 
@@ -53,6 +54,12 @@ npm run dev
 ```
 http://localhost:5173
 ```
+
+### Páginas do Frontend
+
+- `/` — Página inicial (hero, pedidos, vantagens, CTA)
+- `/precos` — Planos de preço (Pessoal, Empresarial, Corporativo) e FAQ
+- `/rastreamento` — Rastreamento de entrega por drone com mapa interativo
 
 ## Backend: Microsservicos
 
