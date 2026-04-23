@@ -62,12 +62,6 @@ const TopBar = ({ themeMode = "light", onToggleTheme }) => {
                 Preços
               </a>
             </li>
-            <li className="nav-item">
-              <a className={`nav-link ${isSuportePage ? "active" : ""}`} aria-current={isSuportePage ? "page" : undefined} href="/suporte">
-                <i className="fa fa-life-ring me-1"></i>
-                Suporte
-              </a>
-            </li>
             <li className="nav-item ms-lg-2">
               {/* Botao para alternar claro/escuro com icone do modo atual. */}
               <button
