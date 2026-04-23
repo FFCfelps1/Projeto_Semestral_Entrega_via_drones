@@ -292,9 +292,16 @@ const SuportePage = ({ themeMode = "light", onContatar }) => {
               </button>
             </div>
           ) : (
-            <div className="row g-4">
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+                gap: "1.5rem",
+                alignItems: "start",
+              }}
+            >
               {topicosFiltrados.map((topico) => (
-                <div key={topico.id} className="col-12 col-md-6 col-lg-4">
+                <div key={topico.id}>
                   <TopicoAjuda themeMode={themeMode} topico={topico} />
                 </div>
               ))}
