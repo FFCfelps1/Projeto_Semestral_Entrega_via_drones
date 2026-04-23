@@ -292,7 +292,7 @@ const SuportePage = ({ themeMode = "light", onContatar }) => {
               </button>
             </div>
           ) : (
-            <div className="row g-4 align-items-start">
+            <div className="row g-4">
               {topicosFiltrados.map((topico) => (
                 <div key={topico.id} className="col-12 col-md-6 col-lg-4">
                   <TopicoAjuda themeMode={themeMode} topico={topico} />
