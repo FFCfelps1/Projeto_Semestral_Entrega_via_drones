@@ -1,3 +1,6 @@
+// Componente de card individual para exibicao de um plano de preco
+// Recebe themeMode para adaptar cores ao tema claro/escuro
+// Recebe plano com: label, nome, preco, sufixoPreco, descricao, textoBotao, funcaoBotao, destaque, recursos
 const PlanoCard = ({ themeMode = "light", plano }) => {
   const isDarkMode = themeMode === "dark";
   const destaque = plano.destaque || false;

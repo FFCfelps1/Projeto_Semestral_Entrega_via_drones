@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+// Lista de perguntas e respostas para a secao de FAQ
+// Conteudo traduzido e adaptado do design de referencia
 const perguntas = [
   {
     id: 1,
