@@ -22,6 +22,7 @@ const TopicoAjuda = ({ themeMode = "light", topico }) => {
     boxShadow: hover
       ? isDarkMode ? "0 8px 24px rgba(0, 0, 0, 0.3)" : "0 8px 24px rgba(0, 0, 0, 0.06)"
       : "none",
+    minHeight: "280px",
   };
 
   const tituloStyle = {
