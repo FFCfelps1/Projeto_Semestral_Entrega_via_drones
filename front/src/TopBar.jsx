@@ -3,6 +3,7 @@ const TopBar = ({ themeMode = "light", onToggleTheme }) => {
   const isTrackingPage = typeof window !== "undefined" && window.location.pathname === "/rastreamento";
   const isSubPage = typeof window !== "undefined" && window.location.pathname !== "/";
   const isPrecosPage = typeof window !== "undefined" && window.location.pathname === "/precos";
+  const isSuportePage = typeof window !== "undefined" && window.location.pathname === "/suporte";
   const isHomePage = !isSubPage;
   const homeHref = isSubPage ? "/" : "#home";
 
@@ -59,6 +60,12 @@ const TopBar = ({ themeMode = "light", onToggleTheme }) => {
               <a className={`nav-link ${isPrecosPage ? "active" : ""}`} aria-current={isPrecosPage ? "page" : undefined} href="/precos">
                 <i className="fa fa-tag me-1"></i>
                 Preços
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className={`nav-link ${isSuportePage ? "active" : ""}`} aria-current={isSuportePage ? "page" : undefined} href="/suporte">
+                <i className="fa fa-life-ring me-1"></i>
+                Suporte
               </a>
             </li>
             <li className="nav-item ms-lg-2">
