@@ -47,6 +47,18 @@ app.post("/usuarios", async (req, res) => {
     }
 })
 
+//consultar usuários
+app.get("/usuarios", async (req, res) => {
+    try{
+        const [linhas] = await conexao.query('SELECT * FROM usuarios')
+        res.json(linhas)
+    } 
+    catch(error){
+        console.log(error);
+        res.status(500).json({erro: 'Erro ao buscar usuarios'}) 
+    }
+})
+
 //executa o servidor 
 const port = 3000
 app.listen(port, () => {
