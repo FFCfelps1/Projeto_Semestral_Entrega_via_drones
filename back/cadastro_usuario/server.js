@@ -59,6 +59,24 @@ app.get("/usuarios", async (req, res) => {
     }
 })
 
+//atualizar completamente um usuario especifico
+app.put('/usuarios/:id', async (req, res) => {
+    try{
+        const {id} = req.params
+        const {nome, email, senha} = req.body
+        const [resultado] = await conexao.query(`UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?`, [nome, email, senha, id])
+        res.status(201).json({
+            nome: nome, 
+            email: email,
+            senha: senha, 
+        })
+    }
+    catch(erro){
+        console.log(erro)
+        res.status(500).json({ erro: "Erro ao atualizar nome, email e senha"})
+    }
+})
+
 //executa o servidor 
 const port = 3001
 app.listen(port, () => {
