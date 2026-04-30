@@ -6,3 +6,7 @@ CREATE TABLE usuarios (
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
+
+INSERT INTO usuarios (nome, email, senha) VALUES ('Arthur', 'arthur@email.com', '1234')
+
+SELECT * FROM usuarios;
