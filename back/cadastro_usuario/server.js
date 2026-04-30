@@ -94,6 +94,22 @@ app.delete('/usuarios/:id', async (req, res) => {
 
 })
 
+//atualizar parcialmente um usuário (senha)
+app.patch('/usuarios/:id', async (req, res) => {
+    try{
+        const {id} = req.params
+        const {senha} = req.body
+        const [resultado] = await conexao.query("UPDATE usuarios SET senha = ? WHERE id = ?", [senha, id])
+        res.status(201).json({
+            senha: senha
+        })
+    } 
+    catch(error){
+        console.log(error);
+        res.status(500).json({erro: 'Erro ao atualizar senha'})
+    }
+})
+
 //executa o servidor 
 const port = 3001
 app.listen(port, () => {
