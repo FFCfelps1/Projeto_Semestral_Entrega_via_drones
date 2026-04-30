@@ -46,3 +46,9 @@ app.post("/usuarios", async (req, res) => {
         res.status(500).json({erro: 'Erro ao inserir usuário'})
     }
 })
+
+//executa o servidor 
+const port = 3000
+app.listen(port, () => {
+    console.log(`Servidor executando na porta ${port}`)
+})
