@@ -32,13 +32,13 @@ conectar()
 //cadastrar usuário 
 app.post("/usuarios", async (req, res) => {
     try{
-        const {id, nome, email, senha} = req.body         //acessa o corpo da requisição 
-        const [resultado] = await conexao.query(`INSERT INTO usuarios (id, nome, email, senha) VALUES (?, ?, ?, ?)`, [id, nome, email, senha])
+        const {nome, email, senha} = req.body         //acessa o corpo da requisição 
+        const [resultado] = await conexao.query(`INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)`, [nome, email, senha])
         res.status(201).json({
-            id: id,
             nome: nome,
             email: email,
-            senha: senha
+            senha: senha, 
+            id: resultado.insertId
         })
     } 
     catch(error){
