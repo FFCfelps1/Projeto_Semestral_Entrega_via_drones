@@ -77,6 +77,23 @@ app.put('/usuarios/:id', async (req, res) => {
     }
 })
 
+//remoção de um usuário
+app.delete('/usuarios/:id', async (req, res) => {
+    try{
+        const {id} = req.params
+        const sql = 'DELETE FROM usuarios WHERE id = ?'
+        await conexao.query(sql, [id])
+        res.json({mensagem: "Usuário excluído com sucesso!"})
+    }
+    catch(erro){
+        console.log(erro)
+        res.status(500).json({
+            erro: 'Erro ao excluir usuário'
+        })
+    }
+
+})
+
 //executa o servidor 
 const port = 3001
 app.listen(port, () => {
