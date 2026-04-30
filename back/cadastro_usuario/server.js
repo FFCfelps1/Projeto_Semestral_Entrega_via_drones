@@ -95,7 +95,7 @@ app.delete('/usuarios/:id', async (req, res) => {
 })
 
 //atualizar parcialmente um usuário (senha)
-app.patch('/usuarios/:id', async (req, res) => {
+app.patch('/usuarios/senha/:id', async (req, res) => {
     try{
         const {id} = req.params
         const {senha} = req.body
@@ -107,6 +107,22 @@ app.patch('/usuarios/:id', async (req, res) => {
     catch(error){
         console.log(error);
         res.status(500).json({erro: 'Erro ao atualizar senha'})
+    }
+})
+
+//atualizar parcialmente um usuario (email)
+app.patch('/usuarios/email/:id', async (req, res) => {
+    try{
+        const {id} = req.params
+        const {email} = req.body
+        const [resultado] = await conexao.query("UPDATE usuarios SET email = ? WHERE id = ?", [email, id])
+        res.status(201).json({
+            email: email
+        })
+    }
+    catch(erro){
+        console.log(erro);
+        res.status(500).json({erro: "Erro ao atualizar email"})
     }
 })
 
