@@ -60,7 +60,7 @@ app.get("/usuarios", async (req, res) => {
 })
 
 //executa o servidor 
-const port = 3000
+const port = 3001
 app.listen(port, () => {
     console.log(`Servidor executando na porta ${port}`)
 })
