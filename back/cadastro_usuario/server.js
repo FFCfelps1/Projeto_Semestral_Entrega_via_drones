@@ -27,3 +27,22 @@ const conectar = async () => {          //utilizando promise
     }
 }
 conectar()
+
+// ******* definindo endpoints *******
+//cadastrar usuário 
+app.post("/usuarios", async (req, res) => {
+    try{
+        const {id, nome, email, senha} = req.body         //acessa o corpo da requisição 
+        const [resultado] = await conexao.query(`INSERT INTO usuarios (id, nome, email, senha) VALUES (?, ?, ?, ?)`, [id, nome, email, senha])
+        res.status(201).json({
+            id: id,
+            nome: nome,
+            email: email,
+            senha: senha
+        })
+    } 
+    catch(error){
+        console.log(error)
+        res.status(500).json({erro: 'Erro ao inserir usuário'})
+    }
+})
