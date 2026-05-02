@@ -127,7 +127,7 @@ app.patch('/usuarios/email/:id', async (req, res) => {
 })
 
 //executa o servidor 
-const port = 3001
+const port = 3002
 app.listen(port, () => {
     console.log(`Servidor executando na porta ${port}`)
 })
