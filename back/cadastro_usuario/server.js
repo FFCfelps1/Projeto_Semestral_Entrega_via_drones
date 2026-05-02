@@ -1,13 +1,16 @@
 require('dotenv').config()
 const express = require('express');
 const mysql2 = require('mysql2/promise')
-
+const axios = require('axios')
 const app = express()
 
 //middleware
 app.use(express.json())
 
 let conexao                             //representa a conexão com o banco
+
+//endereço do barramento 
+const BARRAMENTO_URL = 'http://localhost:3001'
 
 //função para conectar com o banco
 const conectar = async () => {          //utilizando promise
@@ -131,3 +134,18 @@ const port = 3002
 app.listen(port, () => {
     console.log(`Servidor executando na porta ${port}`)
 })
+
+//inscrever no barramento quando o servidor inicia 
+async function increverNoBarramento(){
+    try{
+        await axios.post(`${BARRAMENTO_URL}/inscricao`, {
+            nome: 'cadastro_usuario', 
+            url: 'http://lcoalhost:3002'
+        });
+        console.log('Inscrito no barramento de eventos')
+    }
+    catch(error){
+        console.log('Erro ao inscrever no barramento', error.message);
+        
+    }
+}
