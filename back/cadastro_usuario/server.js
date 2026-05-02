@@ -156,3 +156,16 @@ app.post('/eventos/receber', (req, res) => {
     console.log(`Evento recebido: ${tipo} de ${origem}`, dados)
     res.json({success: true ,mensagem: 'Evento recebido'})
 })
+
+async function publicarEvento(tipo, dados){
+    try {
+        await axios.post(`${BARRAMENTO_URL}/eventos`, {
+            tipo,
+            dados, 
+            origem: 'cadastro_usuarios'
+        })
+        console.log(`Evento publicado: ${tipo}`)
+    } catch (error) {
+        console.log("Erro ao publicar evento: ", error.message)
+    }
+}
