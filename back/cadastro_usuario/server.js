@@ -129,12 +129,6 @@ app.patch('/usuarios/email/:id', async (req, res) => {
     }
 })
 
-//executa o servidor 
-const port = 3002
-app.listen(port, () => {
-    console.log(`Servidor executando na porta ${port}`)
-})
-
 //inscrever no barramento quando o servidor inicia 
 async function increverNoBarramento(){
     try{
@@ -145,7 +139,20 @@ async function increverNoBarramento(){
         console.log('Inscrito no barramento de eventos')
     }
     catch(error){
-        console.log('Erro ao inscrever no barramento', error.message);
-        
+        console.log('Erro ao inscrever no barramento: ', error.message);
     }
 }
+
+//executa o servidor 
+const port = 3002
+app.listen(port, () => {
+    console.log(`Servidor executando na porta ${port}`)
+    inscreverNoBarramento();
+})
+
+//receber eventos do barramento 
+app.post('/eventos/receber', (req, res) => {
+    const {tipo, dados, origem} = req.body
+    console.log(`Evento recebido: ${tipo} de ${origem}`, dados)
+    res.json({success: true ,mensagem: 'Evento recebido'})
+})
