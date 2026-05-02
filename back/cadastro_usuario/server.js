@@ -31,12 +31,34 @@ const conectar = async () => {          //utilizando promise
 }
 conectar()
 
+// ******* função para publicar eventos *******
+async function publicarEvento(tipo, dados) {
+    try {
+        await axios.post(`${BARRAMENTO_URL}/eventos`, {
+            tipo,
+            dados,
+            origem: 'cadastro_usuario'
+        });
+        console.log(`Evento publicado: ${tipo}`);
+    } catch (erro) {
+        console.log('Erro ao publicar evento:', erro.message);
+    }
+}
+
 // ******* definindo endpoints *******
 //cadastrar usuário 
 app.post("/usuarios", async (req, res) => {
     try{
         const {nome, email, senha} = req.body         //acessa o corpo da requisição 
         const [resultado] = await conexao.query(`INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)`, [nome, email, senha])
+        
+        //publicar evento
+        await publicarEvento('usuario_criado', {
+            id: resultado.insertId,
+            nome,
+            email
+        });
+        
         res.status(201).json({
             nome: nome,
             email: email,
@@ -68,6 +90,14 @@ app.put('/usuarios/:id', async (req, res) => {
         const {id} = req.params
         const {nome, email, senha} = req.body
         const [resultado] = await conexao.query(`UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?`, [nome, email, senha, id])
+        
+        //publicar evento
+        await publicarEvento('usuario_atualizado', {
+            id,
+            nome,
+            email
+        });
+        
         res.status(201).json({
             nome: nome, 
             email: email,
@@ -86,6 +116,12 @@ app.delete('/usuarios/:id', async (req, res) => {
         const {id} = req.params
         const sql = 'DELETE FROM usuarios WHERE id = ?'
         await conexao.query(sql, [id])
+        
+        //publicar evento
+        await publicarEvento('usuario_deletado', {
+            id
+        });
+        
         res.json({mensagem: "Usuário excluído com sucesso!"})
     }
     catch(erro){
@@ -103,6 +139,12 @@ app.patch('/usuarios/senha/:id', async (req, res) => {
         const {id} = req.params
         const {senha} = req.body
         const [resultado] = await conexao.query("UPDATE usuarios SET senha = ? WHERE id = ?", [senha, id])
+        
+        // Publicar evento
+        await publicarEvento('usuario_senha_atualizada', {
+            id
+        });
+        
         res.status(201).json({
             senha: senha
         })
@@ -119,6 +161,13 @@ app.patch('/usuarios/email/:id', async (req, res) => {
         const {id} = req.params
         const {email} = req.body
         const [resultado] = await conexao.query("UPDATE usuarios SET email = ? WHERE id = ?", [email, id])
+        
+        // Publicar evento
+        await publicarEvento('usuario_email_atualizado', {
+            id,
+            email
+        });
+        
         res.status(201).json({
             email: email
         })
@@ -129,12 +178,22 @@ app.patch('/usuarios/email/:id', async (req, res) => {
     }
 })
 
+// ******* endpoint para receber eventos *******
+app.post('/eventos/receber', (req, res) => {
+    const { tipo, dados, origem } = req.body;
+    console.log(`Evento recebido: ${tipo} de ${origem}`, dados);
+    
+    // Aqui você pode reagir aos eventos de outros serviços
+    
+    res.json({ success: true, mensagem: 'Evento recebido' });
+});
+
 //inscrever no barramento quando o servidor inicia 
-async function increverNoBarramento(){
+async function inscreverNoBarramento(){
     try{
         await axios.post(`${BARRAMENTO_URL}/inscricao`, {
             nome: 'cadastro_usuario', 
-            url: 'http://lcoalhost:3002'
+            url: 'http://localhost:3002'
         });
         console.log('Inscrito no barramento de eventos')
     }
@@ -169,3 +228,23 @@ async function publicarEvento(tipo, dados){
         console.log("Erro ao publicar evento: ", error.message)
     }
 }
+
+//modifica post usuários
+app.post("/usuarios", async (req, res) => {
+    try{
+        const {nome, email, senha} = req.body
+        const [resultado] = await conexao.query(`INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)`, [nome, email, senha])
+        
+        // Publicar evento
+        await publicarEvento('usuario_criado', {
+            id: resultado.insertId,
+            nome,
+            email
+        });
+        
+        res.status(201).json({success: true, nome: nome, email: email, senha: senha})
+    } catch(error){
+        console.log('Erro ao inserir usuário: ',error.message)
+        res.status(500),json({erro: 'Erro ao inserir usuário'})
+    }
+})
