@@ -10,6 +10,7 @@ import DroneTrackingSection from "./DroneTrackingSection.jsx"
 import PrecosPage from "./PrecosPage.jsx"
 import SuportePage from "./SuportePage.jsx"
 import LoginPage from "./LoginPage.jsx"
+import AccountPage from "./AccountPage.jsx"
 import axios from "axios"
 
 const MAP_SERVICE_URL =
@@ -180,6 +181,57 @@ const App = () => {
     }
   }
 
+  const handleAtualizarPerfil = async (dados) => {
+    if (!authSession?.token) {
+      throw new Error("Sessao expirada. Entre novamente.")
+    }
+
+    try {
+      const response = await axios.patch(
+        `${AUTH_SERVICE_URL}/auth/me`,
+        {
+          nome: dados.nome.trim(),
+          email: dados.email.trim().toLowerCase(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authSession.token}`,
+          },
+        },
+      )
+
+      const sessaoAtualizada = {
+        ...authSession,
+        usuario: response.data.usuario,
+      }
+
+      salvarSessao(sessaoAtualizada)
+      return response.data
+    } catch (error) {
+      const mensagemErro = error?.response?.data?.error || "Nao foi possivel atualizar o perfil."
+      throw new Error(mensagemErro)
+    }
+  }
+
+  const handleAlterarSenha = async (dados) => {
+    if (!authSession?.token) {
+      throw new Error("Sessao expirada. Entre novamente.")
+    }
+
+    try {
+      const response = await axios.patch(`${AUTH_SERVICE_URL}/auth/me/senha`, dados, {
+        headers: {
+          Authorization: `Bearer ${authSession.token}`,
+        },
+      })
+
+      return response.data
+    } catch (error) {
+      const mensagemErro = error?.response?.data?.error || "Nao foi possivel atualizar a senha."
+      throw new Error(mensagemErro)
+    }
+  }
+
   // Estado global simples de tema para toda a aplicacao (claro/escuro).
   const [themeMode, setThemeMode] = useState(() => {
     if (typeof window === "undefined") return "light"
@@ -211,6 +263,7 @@ const App = () => {
   const isPrecosPage = window.location.pathname === "/precos"
   const isSuportePage = window.location.pathname === "/suporte"
   const isLoginPage = window.location.pathname === "/login"
+  const isContaPage = window.location.pathname === "/conta"
   const topBarProps = {
     themeMode,
     onToggleTheme: handleToggleTheme,
@@ -274,6 +327,30 @@ const App = () => {
             authServiceUrl={AUTH_SERVICE_URL}
             onAutenticar={handleAutenticacao}
           />
+        </main>
+        <Footer themeMode={themeMode} />
+      </div>
+    )
+  }
+
+  if (isContaPage) {
+    if (!validandoSessao && !authSession?.usuario) {
+      window.location.href = "/login"
+      return null
+    }
+
+    return (
+      <div style={appShellStyle}>
+        <TopBar {...topBarProps} />
+        <main>
+          {validandoSessao ? null : (
+            <AccountPage
+              themeMode={themeMode}
+              usuario={authSession.usuario}
+              onAtualizarPerfil={handleAtualizarPerfil}
+              onAlterarSenha={handleAlterarSenha}
+            />
+          )}
         </main>
         <Footer themeMode={themeMode} />
       </div>

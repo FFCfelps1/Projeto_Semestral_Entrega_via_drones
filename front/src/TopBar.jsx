@@ -5,6 +5,7 @@ const TopBar = ({ themeMode = "light", onToggleTheme, usuario, onLogout }) => {
   const isPrecosPage = typeof window !== "undefined" && window.location.pathname === "/precos";
   const isSuportePage = typeof window !== "undefined" && window.location.pathname === "/suporte";
   const isLoginPage = typeof window !== "undefined" && window.location.pathname === "/login";
+  const isContaPage = typeof window !== "undefined" && window.location.pathname === "/conta";
   const isHomePage = !isSubPage;
   const homeHref = isSubPage ? "/" : "#home";
 
@@ -66,10 +67,14 @@ const TopBar = ({ themeMode = "light", onToggleTheme, usuario, onLogout }) => {
             {usuario ? (
               <>
                 <li className="nav-item">
-                  <span className={`nav-link ${isDarkMode ? "text-light" : "text-dark"}`}>
+                  <a
+                    className={`nav-link ${isContaPage ? "active" : ""}`}
+                    aria-current={isContaPage ? "page" : undefined}
+                    href="/conta"
+                  >
                     <i className="fa fa-user-circle me-1"></i>
                     {usuario.nome || usuario.email}
-                  </span>
+                  </a>
                 </li>
                 <li className="nav-item">
                   <button
