@@ -336,6 +336,7 @@ app.post('/auth/login', async (req, res) => {
 })
 //cadastrar usuário 
 app.post("/usuarios", async (req, res) => {
+    return res.status(410).json({ error: 'Use /auth/cadastro para cadastrar usuarios.' })
     try{
         const {nome, email, senha} = req.body         //acessa o corpo da requisição 
         const senhaHash = await bcrypt.hash(senha, 10)
