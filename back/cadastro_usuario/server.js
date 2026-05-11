@@ -337,28 +337,6 @@ app.post('/auth/login', async (req, res) => {
 //cadastrar usuário 
 app.post("/usuarios", async (req, res) => {
     return res.status(410).json({ error: 'Use /auth/cadastro para cadastrar usuarios.' })
-    try{
-        const {nome, email, senha} = req.body         //acessa o corpo da requisição 
-        const senhaHash = await bcrypt.hash(senha, 10)
-        const [resultado] = await conexao.query(`INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)`, [nome, email, senhaHash])
-        
-        //publicar evento
-        await publicarEvento('usuario_criado', {
-            id: resultado.insertId,
-            nome,
-            email
-        });
-        
-        res.status(201).json({
-            nome: nome,
-            email: email,
-            id: resultado.insertId
-        })
-    } 
-    catch(error){
-        console.log(error)
-        res.status(500).json({erro: 'Erro ao inserir usuário'})
-    }
 })
 
 //consultar usuários
