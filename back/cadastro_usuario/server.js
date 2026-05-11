@@ -347,7 +347,7 @@ app.get("/usuarios", autenticarToken, async (req, res) => {
     } 
     catch(error){
         console.log(error);
-        res.status(500).json({erro: 'Erro ao buscar usuarios'}) 
+        res.status(500).json({error: 'Erro ao buscar usuarios'}) 
     }
 })
 
@@ -373,7 +373,7 @@ app.put('/usuarios/:id', autenticarToken, autorizarMesmoUsuario, async (req, res
     }
     catch(erro){
         console.log(erro)
-        res.status(500).json({ erro: "Erro ao atualizar nome, email e senha"})
+        res.status(500).json({ error: "Erro ao atualizar nome, email e senha"})
     }
 })
 
@@ -394,7 +394,7 @@ app.delete('/usuarios/:id', autenticarToken, autorizarMesmoUsuario, async (req, 
     catch(erro){
         console.log(erro)
         res.status(500).json({
-            erro: 'Erro ao excluir usuário'
+            error: 'Erro ao excluir usuário'
         })
     }
 
@@ -417,7 +417,7 @@ app.patch('/usuarios/senha/:id', autenticarToken, autorizarMesmoUsuario, async (
     } 
     catch(error){
         console.log(error);
-        res.status(500).json({erro: 'Erro ao atualizar senha'})
+        res.status(500).json({error: 'Erro ao atualizar senha'})
     }
 })
 
@@ -440,7 +440,7 @@ app.patch('/usuarios/email/:id', autenticarToken, autorizarMesmoUsuario, async (
     }
     catch(erro){
         console.log(erro);
-        res.status(500).json({erro: "Erro ao atualizar email"})
+        res.status(500).json({error: "Erro ao atualizar email"})
     }
 })
 
