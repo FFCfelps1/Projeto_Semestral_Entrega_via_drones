@@ -39,13 +39,16 @@ const App = () => {
       return null
     }
   })
+  const [validandoSessao, setValidandoSessao] = useState(() => Boolean(authSession?.token))
 
   const salvarSessao = (sessionData) => {
+    setValidandoSessao(false)
     setAuthSession(sessionData)
     window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessionData))
   }
 
   const handleLogout = () => {
+    setValidandoSessao(false)
     setAuthSession(null)
     window.localStorage.removeItem(AUTH_STORAGE_KEY)
 
@@ -57,9 +60,13 @@ const App = () => {
   useEffect(() => {
     const token = authSession?.token
 
-    if (!token) return
+    if (!token) {
+      setValidandoSessao(false)
+      return
+    }
 
     let sessaoAtiva = true
+    setValidandoSessao(true)
 
     const validarSessao = async () => {
       try {
@@ -91,6 +98,10 @@ const App = () => {
           window.localStorage.removeItem(AUTH_STORAGE_KEY)
           return null
         })
+      } finally {
+        if (sessaoAtiva) {
+          setValidandoSessao(false)
+        }
       }
     }
 
@@ -203,7 +214,7 @@ const App = () => {
   const topBarProps = {
     themeMode,
     onToggleTheme: handleToggleTheme,
-    usuario: authSession?.usuario,
+    usuario: validandoSessao ? null : authSession?.usuario,
     onLogout: handleLogout,
   }
 
@@ -249,7 +260,7 @@ const App = () => {
   }
 
   if (isLoginPage) {
-    if (authSession?.usuario) {
+    if (!validandoSessao && authSession?.usuario) {
       window.location.href = "/"
       return null
     }
