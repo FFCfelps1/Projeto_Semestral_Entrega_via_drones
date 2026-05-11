@@ -122,7 +122,7 @@ const LoginPage = ({ themeMode = "light", authServiceUrl, onAutenticar }) => {
       })
 
       window.setTimeout(() => {
-        window.location.href = "/"
+        window.location.href = "/conta"
       }, 600)
     } catch (error) {
       setStatus({
