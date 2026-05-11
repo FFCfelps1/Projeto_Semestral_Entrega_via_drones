@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const LoginPage = ({ themeMode = "light", authServiceUrl }) => {
+const LoginPage = ({ themeMode = "light", authServiceUrl, onAutenticar }) => {
   const isDarkMode = themeMode === "dark"
   const [modo, setModo] = useState("login")
   const [formulario, setFormulario] = useState({
@@ -9,6 +9,7 @@ const LoginPage = ({ themeMode = "light", authServiceUrl }) => {
     senha: "",
   })
   const [status, setStatus] = useState(null)
+  const [enviando, setEnviando] = useState(false)
   const isCadastro = modo === "cadastro"
 
   const pageStyle = {
@@ -48,12 +49,38 @@ const LoginPage = ({ themeMode = "light", authServiceUrl }) => {
     setStatus(null)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    setStatus({
-      tipo: "info",
-      texto: `A conexao com o backend de autenticacao sera feita em ${authServiceUrl}.`,
-    })
+
+    if (!onAutenticar) {
+      setStatus({
+        tipo: "info",
+        texto: `A conexao com o backend de autenticacao sera feita em ${authServiceUrl}.`,
+      })
+      return
+    }
+
+    try {
+      setEnviando(true)
+      setStatus(null)
+
+      const resposta = await onAutenticar({
+        modo,
+        dados: formulario,
+      })
+
+      setStatus({
+        tipo: "sucesso",
+        texto: resposta?.message || "Autenticacao realizada com sucesso.",
+      })
+    } catch (error) {
+      setStatus({
+        tipo: "erro",
+        texto: error.message || "Nao foi possivel concluir a autenticacao.",
+      })
+    } finally {
+      setEnviando(false)
+    }
   }
 
   return (
@@ -148,13 +175,13 @@ const LoginPage = ({ themeMode = "light", authServiceUrl }) => {
                 </div>
 
                 {status && (
-                  <div className="alert alert-info" role="alert">
+                  <div className={`alert ${status.tipo === "sucesso" ? "alert-success" : status.tipo === "erro" ? "alert-danger" : "alert-info"}`} role="alert">
                     {status.texto}
                   </div>
                 )}
 
-                <button type="submit" className="btn btn-primary w-100 fw-bold py-2">
-                  {isCadastro ? "Criar conta" : "Entrar"}
+                <button type="submit" className="btn btn-primary w-100 fw-bold py-2" disabled={enviando}>
+                  {enviando ? "Enviando..." : isCadastro ? "Criar conta" : "Entrar"}
                 </button>
               </form>
             </div>

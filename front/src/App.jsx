@@ -71,6 +71,24 @@ const App = () => {
     }
   }
 
+  const handleAutenticacao = async ({ modo, dados }) => {
+    const endpoint = modo === "cadastro" ? "/auth/cadastro" : "/auth/login"
+    const payload = modo === "cadastro"
+      ? dados
+      : {
+          email: dados.email,
+          senha: dados.senha,
+        }
+
+    try {
+      const response = await axios.post(`${AUTH_SERVICE_URL}${endpoint}`, payload)
+      return response.data
+    } catch (error) {
+      const mensagemErro = error?.response?.data?.error || "Nao foi possivel concluir a autenticacao."
+      throw new Error(mensagemErro)
+    }
+  }
+
   // Estado global simples de tema para toda a aplicacao (claro/escuro).
   const [themeMode, setThemeMode] = useState(() => {
     if (typeof window === "undefined") return "light"
@@ -149,7 +167,11 @@ const App = () => {
       <div style={appShellStyle}>
         <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
         <main>
-          <LoginPage themeMode={themeMode} authServiceUrl={AUTH_SERVICE_URL} />
+          <LoginPage
+            themeMode={themeMode}
+            authServiceUrl={AUTH_SERVICE_URL}
+            onAutenticar={handleAutenticacao}
+          />
         </main>
         <Footer themeMode={themeMode} />
       </div>
