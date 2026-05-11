@@ -117,6 +117,66 @@ app.get('/auth/me', autenticarToken, async (req, res) => {
     }
 })
 
+app.patch('/auth/me', autenticarToken, async (req, res) => {
+    try {
+        const nome = req.body.nome !== undefined ? String(req.body.nome).trim() : undefined
+        const email = req.body.email !== undefined ? normalizarEmail(req.body.email) : undefined
+
+        if (nome === undefined && email === undefined) {
+            return res.status(400).json({ error: 'Informe nome ou email para atualizar.' })
+        }
+
+        if (nome !== undefined && !nome) {
+            return res.status(400).json({ error: 'Nome nao pode ficar vazio.' })
+        }
+
+        if (email !== undefined && !emailValido(email)) {
+            return res.status(400).json({ error: 'Informe um email valido.' })
+        }
+
+        const [usuarios] = await conexao.query(
+            'SELECT id, nome, email FROM usuarios WHERE id = ? LIMIT 1',
+            [req.auth.id]
+        )
+
+        if (usuarios.length === 0) {
+            return res.status(404).json({ error: 'Usuario nao encontrado.' })
+        }
+
+        if (email !== undefined && email !== usuarios[0].email) {
+            const [usuariosComEmail] = await conexao.query(
+                'SELECT id FROM usuarios WHERE email = ? AND id <> ? LIMIT 1',
+                [email, req.auth.id]
+            )
+
+            if (usuariosComEmail.length > 0) {
+                return res.status(409).json({ error: 'Este email ja esta cadastrado.' })
+            }
+        }
+
+        const usuario = {
+            id: usuarios[0].id,
+            nome: nome ?? usuarios[0].nome,
+            email: email ?? usuarios[0].email
+        }
+
+        await conexao.query(
+            'UPDATE usuarios SET nome = ?, email = ? WHERE id = ?',
+            [usuario.nome, usuario.email, usuario.id]
+        )
+
+        await publicarEvento('usuario_atualizado', usuario)
+
+        res.json({
+            message: 'Perfil atualizado com sucesso.',
+            usuario
+        })
+    } catch (error) {
+        console.log('Erro ao atualizar perfil autenticado:', error.message)
+        res.status(500).json({ error: 'Erro ao atualizar perfil autenticado.' })
+    }
+})
+
 app.post('/auth/cadastro', async (req, res) => {
     try {
         const { senha } = req.body
