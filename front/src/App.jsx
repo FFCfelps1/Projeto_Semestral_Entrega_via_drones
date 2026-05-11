@@ -24,8 +24,27 @@ const AUTH_SERVICE_URL =
   import.meta.env.VITE_AUTH_SERVICE_URL ||
   (import.meta.env.DEV ? "http://localhost:3004" : "/api/cadastro_usuario")
 
+const AUTH_STORAGE_KEY = "skyswift-auth"
+
 const App = () => {
   const [rota, setRota] = useState(null)
+  const [authSession, setAuthSession] = useState(() => {
+    if (typeof window === "undefined") return null
+
+    try {
+      const savedSession = window.localStorage.getItem(AUTH_STORAGE_KEY)
+      return savedSession ? JSON.parse(savedSession) : null
+    } catch (error) {
+      window.localStorage.removeItem(AUTH_STORAGE_KEY)
+      return null
+    }
+  })
+
+  const salvarSessao = (sessionData) => {
+    setAuthSession(sessionData)
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessionData))
+  }
+
   const buscarRota = async () =>{
     try {
        const response = await axios.get(`${MAP_SERVICE_URL}/rota`, {
@@ -82,6 +101,7 @@ const App = () => {
 
     try {
       const response = await axios.post(`${AUTH_SERVICE_URL}${endpoint}`, payload)
+      salvarSessao(response.data)
       return response.data
     } catch (error) {
       const mensagemErro = error?.response?.data?.error || "Nao foi possivel concluir a autenticacao."
