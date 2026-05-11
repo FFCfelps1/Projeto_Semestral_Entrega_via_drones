@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const LoginPage = ({ themeMode = "light" }) => {
+const LoginPage = ({ themeMode = "light", authServiceUrl }) => {
   const isDarkMode = themeMode === "dark"
   const [modo, setModo] = useState("login")
   const [formulario, setFormulario] = useState({
@@ -52,7 +52,7 @@ const LoginPage = ({ themeMode = "light" }) => {
     event.preventDefault()
     setStatus({
       tipo: "info",
-      texto: "A conexao com o backend de autenticacao sera adicionada no proximo passo.",
+      texto: `A conexao com o backend de autenticacao sera feita em ${authServiceUrl}.`,
     })
   }
 

@@ -20,6 +20,10 @@ const EMAIL_SERVICE_URL =
   import.meta.env.VITE_EMAIL_SERVICE_URL ||
   (import.meta.env.DEV ? "http://localhost:3003" : "/api/contato_email")
 
+const AUTH_SERVICE_URL =
+  import.meta.env.VITE_AUTH_SERVICE_URL ||
+  (import.meta.env.DEV ? "http://localhost:3004" : "/api/cadastro_usuario")
+
 const App = () => {
   const [rota, setRota] = useState(null)
   const buscarRota = async () =>{
@@ -145,7 +149,7 @@ const App = () => {
       <div style={appShellStyle}>
         <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
         <main>
-          <LoginPage themeMode={themeMode} />
+          <LoginPage themeMode={themeMode} authServiceUrl={AUTH_SERVICE_URL} />
         </main>
         <Footer themeMode={themeMode} />
       </div>
