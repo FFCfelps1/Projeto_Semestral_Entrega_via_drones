@@ -38,6 +38,40 @@ const LoginPage = ({ themeMode = "light", authServiceUrl, onAutenticar }) => {
 
   const inputClassName = `form-control ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
 
+  const emailValido = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+
+  const validarFormulario = () => {
+    const nome = formulario.nome.trim()
+    const email = formulario.email.trim()
+    const senha = formulario.senha
+
+    if (isCadastro && !nome) {
+      return "Informe seu nome para criar a conta."
+    }
+
+    if (!email) {
+      return "Informe seu email."
+    }
+
+    if (!emailValido(email)) {
+      return "Informe um email valido."
+    }
+
+    if (!senha) {
+      return "Informe sua senha."
+    }
+
+    if (senha.length < 6) {
+      return "A senha deve ter pelo menos 6 caracteres."
+    }
+
+    if (isCadastro && senha !== formulario.confirmarSenha) {
+      return "As senhas nao coincidem."
+    }
+
+    return null
+  }
+
   const handleChange = (event) => {
     const { name, value } = event.target
     setFormulario((dadosAtuais) => ({
@@ -67,10 +101,12 @@ const LoginPage = ({ themeMode = "light", authServiceUrl, onAutenticar }) => {
       setEnviando(true)
       setStatus(null)
 
-      if (isCadastro && formulario.senha !== formulario.confirmarSenha) {
+      const erroValidacao = validarFormulario()
+
+      if (erroValidacao) {
         setStatus({
           tipo: "erro",
-          texto: "As senhas nao coincidem.",
+          texto: erroValidacao,
         })
         return
       }
