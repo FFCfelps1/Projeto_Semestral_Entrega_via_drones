@@ -116,6 +116,14 @@ app.get('/health', async (req, res) => {
     }
 })
 
+app.use((req, res, next) => {
+    if (!conexao) {
+        return res.status(503).json({ error: 'Banco de dados indisponivel.' })
+    }
+
+    next()
+})
+
 app.get('/auth/me', autenticarToken, async (req, res) => {
     try {
         const [usuarios] = await conexao.query(
