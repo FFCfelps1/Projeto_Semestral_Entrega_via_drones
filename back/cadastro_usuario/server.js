@@ -52,12 +52,113 @@ async function publicarEvento(tipo, dados) {
     }
 }
 
+function criarSessao(usuario) {
+    const token = jwt.sign(
+        { id: usuario.id, email: usuario.email },
+        JWT_SECRET,
+        { expiresIn: '2h' }
+    )
+
+    return {
+        message: 'Autenticacao realizada com sucesso.',
+        token,
+        usuario
+    }
+}
+
 // ******* definindo endpoints *******
+app.post('/auth/cadastro', async (req, res) => {
+    try {
+        const { nome, email, senha } = req.body
+
+        if (!nome || !email || !senha) {
+            return res.status(400).json({ error: 'Nome, email e senha sao obrigatorios.' })
+        }
+
+        if (senha.length < 6) {
+            return res.status(400).json({ error: 'A senha deve ter pelo menos 6 caracteres.' })
+        }
+
+        const [usuariosExistentes] = await conexao.query(
+            'SELECT id FROM usuarios WHERE email = ? LIMIT 1',
+            [email]
+        )
+
+        if (usuariosExistentes.length > 0) {
+            return res.status(409).json({ error: 'Este email ja esta cadastrado.' })
+        }
+
+        const senhaHash = await bcrypt.hash(senha, 10)
+        const [resultado] = await conexao.query(
+            'INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)',
+            [nome, email, senhaHash]
+        )
+
+        const usuario = {
+            id: resultado.insertId,
+            nome,
+            email
+        }
+
+        await publicarEvento('usuario_criado', usuario)
+
+        res.status(201).json(criarSessao(usuario))
+    } catch (error) {
+        console.log('Erro ao cadastrar usuario:', error.message)
+        res.status(500).json({ error: 'Erro ao cadastrar usuario.' })
+    }
+})
+
+app.post('/auth/login', async (req, res) => {
+    try {
+        const { email, senha } = req.body
+
+        if (!email || !senha) {
+            return res.status(400).json({ error: 'Email e senha sao obrigatorios.' })
+        }
+
+        const [usuarios] = await conexao.query(
+            'SELECT id, nome, email, senha FROM usuarios WHERE email = ? LIMIT 1',
+            [email]
+        )
+
+        if (usuarios.length === 0) {
+            return res.status(401).json({ error: 'Email ou senha invalidos.' })
+        }
+
+        const usuarioEncontrado = usuarios[0]
+        const senhaJaCriptografada = usuarioEncontrado.senha.startsWith('$2')
+        const senhaValida = senhaJaCriptografada
+            ? await bcrypt.compare(senha, usuarioEncontrado.senha)
+            : senha === usuarioEncontrado.senha
+
+        if (!senhaValida) {
+            return res.status(401).json({ error: 'Email ou senha invalidos.' })
+        }
+
+        if (!senhaJaCriptografada) {
+            const senhaHash = await bcrypt.hash(senha, 10)
+            await conexao.query('UPDATE usuarios SET senha = ? WHERE id = ?', [senhaHash, usuarioEncontrado.id])
+        }
+
+        const usuario = {
+            id: usuarioEncontrado.id,
+            nome: usuarioEncontrado.nome,
+            email: usuarioEncontrado.email
+        }
+
+        res.json(criarSessao(usuario))
+    } catch (error) {
+        console.log('Erro ao autenticar usuario:', error.message)
+        res.status(500).json({ error: 'Erro ao autenticar usuario.' })
+    }
+})
 //cadastrar usuário 
 app.post("/usuarios", async (req, res) => {
     try{
         const {nome, email, senha} = req.body         //acessa o corpo da requisição 
-        const [resultado] = await conexao.query(`INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)`, [nome, email, senha])
+        const senhaHash = await bcrypt.hash(senha, 10)
+        const [resultado] = await conexao.query(`INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)`, [nome, email, senhaHash])
         
         //publicar evento
         await publicarEvento('usuario_criado', {
@@ -69,7 +170,6 @@ app.post("/usuarios", async (req, res) => {
         res.status(201).json({
             nome: nome,
             email: email,
-            senha: senha, 
             id: resultado.insertId
         })
     } 
@@ -82,7 +182,7 @@ app.post("/usuarios", async (req, res) => {
 //consultar usuários
 app.get("/usuarios", async (req, res) => {
     try{
-        const [linhas] = await conexao.query('SELECT * FROM usuarios')
+        const [linhas] = await conexao.query('SELECT id, nome, email, data_criacao FROM usuarios')
         res.json(linhas)
     } 
     catch(error){
@@ -96,7 +196,8 @@ app.put('/usuarios/:id', async (req, res) => {
     try{
         const {id} = req.params
         const {nome, email, senha} = req.body
-        const [resultado] = await conexao.query(`UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?`, [nome, email, senha, id])
+        const senhaHash = await bcrypt.hash(senha, 10)
+        const [resultado] = await conexao.query(`UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?`, [nome, email, senhaHash, id])
         
         //publicar evento
         await publicarEvento('usuario_atualizado', {
@@ -107,8 +208,7 @@ app.put('/usuarios/:id', async (req, res) => {
         
         res.status(201).json({
             nome: nome, 
-            email: email,
-            senha: senha, 
+            email: email
         })
     }
     catch(erro){
@@ -145,16 +245,15 @@ app.patch('/usuarios/senha/:id', async (req, res) => {
     try{
         const {id} = req.params
         const {senha} = req.body
-        const [resultado] = await conexao.query("UPDATE usuarios SET senha = ? WHERE id = ?", [senha, id])
+        const senhaHash = await bcrypt.hash(senha, 10)
+        const [resultado] = await conexao.query("UPDATE usuarios SET senha = ? WHERE id = ?", [senhaHash, id])
         
         // Publicar evento
         await publicarEvento('usuario_senha_atualizada', {
             id
         });
         
-        res.status(201).json({
-            senha: senha
-        })
+        res.status(201).json({mensagem: 'Senha atualizada com sucesso'})
     } 
     catch(error){
         console.log(error);
@@ -215,42 +314,3 @@ app.listen(PORT, () => {
     inscreverNoBarramento();
 })
 
-//receber eventos do barramento 
-app.post('/eventos/receber', (req, res) => {
-    const {tipo, dados, origem} = req.body
-    console.log(`Evento recebido: ${tipo} de ${origem}`, dados)
-    res.json({success: true ,mensagem: 'Evento recebido'})
-})
-
-async function publicarEvento(tipo, dados){
-    try {
-        await axios.post(`${BARRAMENTO_URL}/eventos`, {
-            tipo,
-            dados, 
-            origem: 'cadastro_usuarios'
-        })
-        console.log(`Evento publicado: ${tipo}`)
-    } catch (error) {
-        console.log("Erro ao publicar evento: ", error.message)
-    }
-}
-
-//modifica post usuários
-app.post("/usuarios", async (req, res) => {
-    try{
-        const {nome, email, senha} = req.body
-        const [resultado] = await conexao.query(`INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)`, [nome, email, senha])
-        
-        // Publicar evento
-        await publicarEvento('usuario_criado', {
-            id: resultado.insertId,
-            nome,
-            email
-        });
-        
-        res.status(201).json({success: true, nome: nome, email: email, senha: senha})
-    } catch(error){
-        console.log('Erro ao inserir usuário: ',error.message)
-        res.status(500),json({erro: 'Erro ao inserir usuário'})
-    }
-})
