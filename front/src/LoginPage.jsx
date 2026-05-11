@@ -11,6 +11,7 @@ const LoginPage = ({ themeMode = "light", authServiceUrl, onAutenticar }) => {
   })
   const [status, setStatus] = useState(null)
   const [enviando, setEnviando] = useState(false)
+  const [mostrarSenha, setMostrarSenha] = useState(false)
   const isCadastro = modo === "cadastro"
 
   const pageStyle = {
@@ -48,6 +49,7 @@ const LoginPage = ({ themeMode = "light", authServiceUrl, onAutenticar }) => {
   const trocarModo = (novoModo) => {
     setModo(novoModo)
     setStatus(null)
+    setMostrarSenha(false)
   }
 
   const handleSubmit = async (event) => {
@@ -174,17 +176,28 @@ const LoginPage = ({ themeMode = "light", authServiceUrl, onAutenticar }) => {
                   <label className="form-label fw-semibold" htmlFor="auth-senha">
                     Senha
                   </label>
-                  <input
-                    id="auth-senha"
-                    name="senha"
-                    type="password"
-                    className={inputClassName}
-                    value={formulario.senha}
-                    onChange={handleChange}
-                    autoComplete={isCadastro ? "new-password" : "current-password"}
-                    minLength="6"
-                    required
-                  />
+                  <div className="input-group">
+                    <input
+                      id="auth-senha"
+                      name="senha"
+                      type={mostrarSenha ? "text" : "password"}
+                      className={inputClassName}
+                      value={formulario.senha}
+                      onChange={handleChange}
+                      autoComplete={isCadastro ? "new-password" : "current-password"}
+                      minLength="6"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className={`btn ${isDarkMode ? "btn-outline-light" : "btn-outline-secondary"}`}
+                      onClick={() => setMostrarSenha((valorAtual) => !valorAtual)}
+                      aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+                      title={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+                    >
+                      <i className={`fa-solid ${mostrarSenha ? "fa-eye-slash" : "fa-eye"}`} aria-hidden="true"></i>
+                    </button>
+                  </div>
                 </div>
 
                 {isCadastro && (
@@ -192,17 +205,28 @@ const LoginPage = ({ themeMode = "light", authServiceUrl, onAutenticar }) => {
                     <label className="form-label fw-semibold" htmlFor="auth-confirmar-senha">
                       Confirmar senha
                     </label>
-                    <input
-                      id="auth-confirmar-senha"
-                      name="confirmarSenha"
-                      type="password"
-                      className={inputClassName}
-                      value={formulario.confirmarSenha}
-                      onChange={handleChange}
-                      autoComplete="new-password"
-                      minLength="6"
-                      required
-                    />
+                    <div className="input-group">
+                      <input
+                        id="auth-confirmar-senha"
+                        name="confirmarSenha"
+                        type={mostrarSenha ? "text" : "password"}
+                        className={inputClassName}
+                        value={formulario.confirmarSenha}
+                        onChange={handleChange}
+                        autoComplete="new-password"
+                        minLength="6"
+                        required
+                      />
+                      <button
+                        type="button"
+                        className={`btn ${isDarkMode ? "btn-outline-light" : "btn-outline-secondary"}`}
+                        onClick={() => setMostrarSenha((valorAtual) => !valorAtual)}
+                        aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+                        title={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+                      >
+                        <i className={`fa-solid ${mostrarSenha ? "fa-eye-slash" : "fa-eye"}`} aria-hidden="true"></i>
+                      </button>
+                    </div>
                   </div>
                 )}
 
