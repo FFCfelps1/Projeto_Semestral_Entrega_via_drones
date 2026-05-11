@@ -3,6 +3,11 @@ import { useState } from "react"
 const LoginPage = ({ themeMode = "light" }) => {
   const isDarkMode = themeMode === "dark"
   const [modo, setModo] = useState("login")
+  const [formulario, setFormulario] = useState({
+    nome: "",
+    email: "",
+    senha: "",
+  })
   const isCadastro = modo === "cadastro"
 
   const pageStyle = {
@@ -29,6 +34,18 @@ const LoginPage = ({ themeMode = "light" }) => {
 
   const inputClassName = `form-control ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
 
+  const handleChange = (event) => {
+    const { name, value } = event.target
+    setFormulario((dadosAtuais) => ({
+      ...dadosAtuais,
+      [name]: value,
+    }))
+  }
+
+  const trocarModo = (novoModo) => {
+    setModo(novoModo)
+  }
+
   return (
     <section className="py-5" style={pageStyle}>
       <div className="container">
@@ -51,14 +68,14 @@ const LoginPage = ({ themeMode = "light" }) => {
                 <button
                   type="button"
                   className={`btn flex-fill ${!isCadastro ? "btn-primary" : isDarkMode ? "btn-outline-light" : "btn-outline-primary"}`}
-                  onClick={() => setModo("login")}
+                  onClick={() => trocarModo("login")}
                 >
                   Entrar
                 </button>
                 <button
                   type="button"
                   className={`btn flex-fill ${isCadastro ? "btn-primary" : isDarkMode ? "btn-outline-light" : "btn-outline-primary"}`}
-                  onClick={() => setModo("cadastro")}
+                  onClick={() => trocarModo("cadastro")}
                 >
                   Cadastrar-se
                 </button>
@@ -75,7 +92,15 @@ const LoginPage = ({ themeMode = "light" }) => {
                     <label className="form-label fw-semibold" htmlFor="auth-nome">
                       Nome
                     </label>
-                    <input id="auth-nome" name="nome" className={inputClassName} autoComplete="name" required />
+                    <input
+                      id="auth-nome"
+                      name="nome"
+                      className={inputClassName}
+                      value={formulario.nome}
+                      onChange={handleChange}
+                      autoComplete="name"
+                      required
+                    />
                   </div>
                 )}
 
@@ -83,7 +108,16 @@ const LoginPage = ({ themeMode = "light" }) => {
                   <label className="form-label fw-semibold" htmlFor="auth-email">
                     Email
                   </label>
-                  <input id="auth-email" name="email" type="email" className={inputClassName} autoComplete="email" required />
+                  <input
+                    id="auth-email"
+                    name="email"
+                    type="email"
+                    className={inputClassName}
+                    value={formulario.email}
+                    onChange={handleChange}
+                    autoComplete="email"
+                    required
+                  />
                 </div>
 
                 <div className="mb-3">
@@ -95,6 +129,8 @@ const LoginPage = ({ themeMode = "light" }) => {
                     name="senha"
                     type="password"
                     className={inputClassName}
+                    value={formulario.senha}
+                    onChange={handleChange}
                     autoComplete={isCadastro ? "new-password" : "current-password"}
                     minLength="6"
                     required
