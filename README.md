@@ -223,7 +223,7 @@ Mesmo no envio direto, o destinatario final permanece fixo em `entrega.drones@gm
 Este repositorio esta preparado para deploy unico na Vercel com:
 
 - frontend React em `front`;
-- funcoes serverless em `api/entrega_via_drone` e `api/contato_email`.
+- funcoes serverless em `api/entrega_via_drone`, `api/contato_email` e `api/cadastro_usuario`.
 
 ### Endpoints em producao
 
@@ -232,6 +232,13 @@ Este repositorio esta preparado para deploy unico na Vercel com:
 - `GET /api/contato_email/health`
 - `GET /api/contato_email/email/contato`
 - `POST /api/contato_email/email/enviar`
+- `GET /api/cadastro_usuario/health`
+- `POST /api/cadastro_usuario/auth/cadastro`
+- `POST /api/cadastro_usuario/auth/login`
+- `GET /api/cadastro_usuario/auth/me`
+- `PATCH /api/cadastro_usuario/auth/me`
+- `PATCH /api/cadastro_usuario/auth/me/senha`
+- `DELETE /api/cadastro_usuario/auth/me`
 
 ### Variaveis de ambiente na Vercel
 
@@ -245,6 +252,16 @@ Para habilitar envio real em `POST /api/contato_email/email/enviar`, configure n
 - `SMTP_FROM`
 - `CONTACT_RECIPIENT` (opcional, padrao `entrega.drones@gmail.com`)
 
+Para habilitar autenticacao em producao, configure as variaveis do banco MySQL e do JWT:
+
+- `DB_HOST`
+- `DB_USER`
+- `DB_PASSWORD`
+- `DB_NAME`
+- `DB_PORT` (opcional, padrao `3306`)
+- `DB_CONNECTION_LIMIT` (opcional, padrao `10`)
+- `JWT_SECRET`
+
 Opcional para integracao com barramento externo:
 
 - `BARRAMENTO_URL`
@@ -255,6 +272,7 @@ No ambiente de desenvolvimento local, o frontend continua usando:
 
 - `http://localhost:3002` para rota;
 - `http://localhost:3003` para contato.
+- `http://localhost:3004` para autenticacao.
 
 Em producao, o frontend usa automaticamente as rotas serverless em `/api/...`.
 
@@ -262,6 +280,7 @@ Se quiser sobrescrever manualmente no frontend:
 
 - `VITE_MAP_SERVICE_URL`
 - `VITE_EMAIL_SERVICE_URL`
+- `VITE_AUTH_SERVICE_URL`
 
 ## 📜 Scripts Disponíveis
 
