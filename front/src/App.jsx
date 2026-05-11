@@ -198,6 +198,11 @@ const App = () => {
   }
 
   if (isLoginPage) {
+    if (authSession?.usuario) {
+      window.location.href = "/"
+      return null
+    }
+
     return (
       <div style={appShellStyle}>
         <TopBar {...topBarProps} />
