@@ -4,6 +4,7 @@ const TopBar = ({ themeMode = "light", onToggleTheme }) => {
   const isSubPage = typeof window !== "undefined" && window.location.pathname !== "/";
   const isPrecosPage = typeof window !== "undefined" && window.location.pathname === "/precos";
   const isSuportePage = typeof window !== "undefined" && window.location.pathname === "/suporte";
+  const isLoginPage = typeof window !== "undefined" && window.location.pathname === "/login";
   const isHomePage = !isSubPage;
   const homeHref = isSubPage ? "/" : "#home";
 
@@ -60,6 +61,12 @@ const TopBar = ({ themeMode = "light", onToggleTheme }) => {
               <a className={`nav-link ${isPrecosPage ? "active" : ""}`} aria-current={isPrecosPage ? "page" : undefined} href="/precos">
                 <i className="fa fa-tag me-1"></i>
                 Preços
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className={`nav-link ${isLoginPage ? "active" : ""}`} aria-current={isLoginPage ? "page" : undefined} href="/login">
+                <i className="fa fa-right-to-bracket me-1"></i>
+                Entrar
               </a>
             </li>
             <li className="nav-item ms-lg-2">
