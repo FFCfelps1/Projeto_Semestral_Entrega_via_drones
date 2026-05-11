@@ -369,7 +369,16 @@ const App = () => {
       <div style={appShellStyle}>
         <TopBar {...topBarProps} />
         <main>
-          {validandoSessao ? null : (
+          {validandoSessao ? (
+            <section className="py-5" style={{ minHeight: "calc(100vh - 72px)" }}>
+              <div className="container">
+                <div className="d-flex align-items-center gap-3">
+                  <div className="spinner-border text-primary" role="status" aria-hidden="true"></div>
+                  <p className="mb-0 fw-semibold">Validando sessao...</p>
+                </div>
+              </div>
+            </section>
+          ) : (
             <AccountPage
               themeMode={themeMode}
               usuario={authSession.usuario}
