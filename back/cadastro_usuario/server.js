@@ -66,6 +66,14 @@ function criarSessao(usuario) {
     }
 }
 
+function normalizarEmail(email) {
+    return String(email || '').trim().toLowerCase()
+}
+
+function emailValido(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
 function autenticarToken(req, res, next) {
     const authHeader = req.headers.authorization || ''
     const [tipo, token] = authHeader.split(' ')
@@ -111,10 +119,16 @@ app.get('/auth/me', autenticarToken, async (req, res) => {
 
 app.post('/auth/cadastro', async (req, res) => {
     try {
-        const { nome, email, senha } = req.body
+        const { senha } = req.body
+        const nome = String(req.body.nome || '').trim()
+        const email = normalizarEmail(req.body.email)
 
         if (!nome || !email || !senha) {
             return res.status(400).json({ error: 'Nome, email e senha sao obrigatorios.' })
+        }
+
+        if (!emailValido(email)) {
+            return res.status(400).json({ error: 'Informe um email valido.' })
         }
 
         if (senha.length < 6) {
@@ -153,10 +167,15 @@ app.post('/auth/cadastro', async (req, res) => {
 
 app.post('/auth/login', async (req, res) => {
     try {
-        const { email, senha } = req.body
+        const { senha } = req.body
+        const email = normalizarEmail(req.body.email)
 
         if (!email || !senha) {
             return res.status(400).json({ error: 'Email e senha sao obrigatorios.' })
+        }
+
+        if (!emailValido(email)) {
+            return res.status(400).json({ error: 'Informe um email valido.' })
         }
 
         const [usuarios] = await conexao.query(
