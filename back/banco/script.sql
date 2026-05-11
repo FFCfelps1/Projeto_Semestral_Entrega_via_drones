@@ -7,6 +7,6 @@ CREATE TABLE usuarios (
     PRIMARY KEY (id)
 );
 
-INSERT INTO usuarios (nome, email, senha) VALUES ('Arthur', 'arthur@email.com', '1234')
+INSERT INTO usuarios (nome, email, senha) VALUES ('Arthur', 'arthur@email.com', '123456');
 
 SELECT * FROM usuarios;
