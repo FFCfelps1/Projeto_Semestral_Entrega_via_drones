@@ -73,6 +73,10 @@ const LoginPage = ({ themeMode = "light", authServiceUrl, onAutenticar }) => {
         tipo: "sucesso",
         texto: resposta?.message || "Autenticacao realizada com sucesso.",
       })
+
+      window.setTimeout(() => {
+        window.location.href = "/"
+      }, 600)
     } catch (error) {
       setStatus({
         tipo: "erro",
