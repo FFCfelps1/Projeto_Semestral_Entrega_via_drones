@@ -7,6 +7,7 @@ const LoginPage = ({ themeMode = "light", authServiceUrl, onAutenticar }) => {
     nome: "",
     email: "",
     senha: "",
+    confirmarSenha: "",
   })
   const [status, setStatus] = useState(null)
   const [enviando, setEnviando] = useState(false)
@@ -63,6 +64,14 @@ const LoginPage = ({ themeMode = "light", authServiceUrl, onAutenticar }) => {
     try {
       setEnviando(true)
       setStatus(null)
+
+      if (isCadastro && formulario.senha !== formulario.confirmarSenha) {
+        setStatus({
+          tipo: "erro",
+          texto: "As senhas nao coincidem.",
+        })
+        return
+      }
 
       const resposta = await onAutenticar({
         modo,
@@ -177,6 +186,25 @@ const LoginPage = ({ themeMode = "light", authServiceUrl, onAutenticar }) => {
                     required
                   />
                 </div>
+
+                {isCadastro && (
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold" htmlFor="auth-confirmar-senha">
+                      Confirmar senha
+                    </label>
+                    <input
+                      id="auth-confirmar-senha"
+                      name="confirmarSenha"
+                      type="password"
+                      className={inputClassName}
+                      value={formulario.confirmarSenha}
+                      onChange={handleChange}
+                      autoComplete="new-password"
+                      minLength="6"
+                      required
+                    />
+                  </div>
+                )}
 
                 {status && (
                   <div className={`alert ${status.tipo === "sucesso" ? "alert-success" : status.tipo === "erro" ? "alert-danger" : "alert-info"}`} role="alert">
