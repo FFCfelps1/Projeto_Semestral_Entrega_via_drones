@@ -79,8 +79,18 @@ async function atualizarUsuario(req, res, auth) {
   });
 }
 
+async function excluirUsuario(res, auth) {
+  const resultado = await query("DELETE FROM usuarios WHERE id = ?", [auth.id]);
+
+  if (resultado.affectedRows === 0) {
+    return sendJson(res, 404, { error: "Usuario nao encontrado." });
+  }
+
+  return sendJson(res, 200, { message: "Conta excluida com sucesso." });
+}
+
 module.exports = async function handler(req, res) {
-  if (!["GET", "PATCH"].includes(req.method)) {
+  if (!["GET", "PATCH", "DELETE"].includes(req.method)) {
     return sendJson(res, 405, { error: "Metodo nao permitido" });
   }
 
@@ -91,7 +101,11 @@ module.exports = async function handler(req, res) {
       return consultarUsuario(res, auth);
     }
 
-    return atualizarUsuario(req, res, auth);
+    if (req.method === "PATCH") {
+      return atualizarUsuario(req, res, auth);
+    }
+
+    return excluirUsuario(res, auth);
   } catch (error) {
     return handleError(res, error, "Erro ao processar usuario autenticado.");
   }
