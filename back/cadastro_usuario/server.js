@@ -406,7 +406,7 @@ app.delete('/usuarios/:id', autenticarToken, autorizarMesmoUsuario, async (req, 
             id
         });
         
-        res.json({mensagem: "Usuário excluído com sucesso!"})
+        res.json({message: "Usuário excluído com sucesso!"})
     }
     catch(erro){
         console.log(erro)
@@ -430,7 +430,7 @@ app.patch('/usuarios/senha/:id', autenticarToken, autorizarMesmoUsuario, async (
             id
         });
         
-        res.status(201).json({mensagem: 'Senha atualizada com sucesso'})
+        res.status(201).json({message: 'Senha atualizada com sucesso'})
     } 
     catch(error){
         console.log(error);
@@ -468,7 +468,7 @@ app.post('/eventos/receber', (req, res) => {
     
     // Aqui você pode reagir aos eventos de outros serviços
     
-    res.json({ success: true, mensagem: 'Evento recebido' });
+    res.json({ success: true, message: 'Evento recebido' });
 });
 
 //inscrever no barramento quando o servidor inicia 
