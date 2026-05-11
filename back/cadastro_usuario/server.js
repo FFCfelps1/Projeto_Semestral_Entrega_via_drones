@@ -1,27 +1,34 @@
 require('dotenv').config()
 const express = require('express');
+const cors = require('cors')
 const mysql2 = require('mysql2/promise')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 const axios = require('axios')
 const app = express()
 
 //middleware
+app.use(cors())
 app.use(express.json())
 
 let conexao                             //representa a conexão com o banco
 
 //endereço do barramento 
-const BARRAMENTO_URL = 'http://localhost:3001'
+const PORT = Number(process.env.PORT || 3004)
+const SERVICE_URL = process.env.SERVICE_URL || `http://localhost:${PORT}`
+const BARRAMENTO_URL = process.env.BARRAMENTO_URL || 'http://localhost:3001'
+const JWT_SECRET = process.env.JWT_SECRET || 'skyswift-dev-secret'
 
 //função para conectar com o banco
 const conectar = async () => {          //utilizando promise
     //execução assíncrona para não bloquear
     try{
         conexao = await mysql2.createConnection({
-        host: process.env.HOST, 
-        user: process.env.USER,
-        password: process.env.PASSWORD,
-        database: process.env.DATABASE,
-        port: process.env.PORT
+        host: process.env.DB_HOST || process.env.HOST, 
+        user: process.env.DB_USER || process.env.USER,
+        password: process.env.DB_PASSWORD || process.env.PASSWORD,
+        database: process.env.DB_NAME || process.env.DATABASE,
+        port: Number(process.env.DB_PORT || 3306)
         })
         console.log('Conectado ao MySQL')
     }
@@ -193,7 +200,7 @@ async function inscreverNoBarramento(){
     try{
         await axios.post(`${BARRAMENTO_URL}/inscricao`, {
             nome: 'cadastro_usuario', 
-            url: 'http://localhost:3002'
+            url: SERVICE_URL
         });
         console.log('Inscrito no barramento de eventos')
     }
@@ -203,9 +210,8 @@ async function inscreverNoBarramento(){
 }
 
 //executa o servidor 
-const port = 3002
-app.listen(port, () => {
-    console.log(`Servidor executando na porta ${port}`)
+app.listen(PORT, () => {
+    console.log(`Servidor executando na porta ${PORT}`)
     inscreverNoBarramento();
 })
 
