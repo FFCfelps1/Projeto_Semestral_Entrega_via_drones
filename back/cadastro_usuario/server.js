@@ -66,7 +66,41 @@ function criarSessao(usuario) {
     }
 }
 
+function autenticarToken(req, res, next) {
+    const authHeader = req.headers.authorization || ''
+    const [tipo, token] = authHeader.split(' ')
+
+    if (tipo !== 'Bearer' || !token) {
+        return res.status(401).json({ error: 'Token de autenticacao nao informado.' })
+    }
+
+    try {
+        req.auth = jwt.verify(token, JWT_SECRET)
+        next()
+    } catch (error) {
+        return res.status(401).json({ error: 'Token de autenticacao invalido ou expirado.' })
+    }
+}
+
 // ******* definindo endpoints *******
+app.get('/auth/me', autenticarToken, async (req, res) => {
+    try {
+        const [usuarios] = await conexao.query(
+            'SELECT id, nome, email FROM usuarios WHERE id = ? LIMIT 1',
+            [req.auth.id]
+        )
+
+        if (usuarios.length === 0) {
+            return res.status(404).json({ error: 'Usuario nao encontrado.' })
+        }
+
+        res.json({ usuario: usuarios[0] })
+    } catch (error) {
+        console.log('Erro ao buscar usuario autenticado:', error.message)
+        res.status(500).json({ error: 'Erro ao buscar usuario autenticado.' })
+    }
+})
+
 app.post('/auth/cadastro', async (req, res) => {
     try {
         const { nome, email, senha } = req.body

@@ -54,6 +54,53 @@ const App = () => {
     }
   }
 
+  useEffect(() => {
+    const token = authSession?.token
+
+    if (!token) return
+
+    let sessaoAtiva = true
+
+    const validarSessao = async () => {
+      try {
+        const response = await axios.get(`${AUTH_SERVICE_URL}/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (!sessaoAtiva) return
+
+        setAuthSession((sessaoAtual) => {
+          if (sessaoAtual?.token !== token) return sessaoAtual
+
+          const sessaoAtualizada = {
+            ...sessaoAtual,
+            usuario: response.data.usuario,
+          }
+
+          window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessaoAtualizada))
+          return sessaoAtualizada
+        })
+      } catch (error) {
+        if (!sessaoAtiva) return
+
+        setAuthSession((sessaoAtual) => {
+          if (sessaoAtual?.token !== token) return sessaoAtual
+
+          window.localStorage.removeItem(AUTH_STORAGE_KEY)
+          return null
+        })
+      }
+    }
+
+    validarSessao()
+
+    return () => {
+      sessaoAtiva = false
+    }
+  }, [authSession?.token])
+
   const buscarRota = async () =>{
     try {
        const response = await axios.get(`${MAP_SERVICE_URL}/rota`, {
