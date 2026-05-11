@@ -71,6 +71,7 @@ O projeto utiliza uma arquitetura de microsservicos Node.js no diretorio `back`,
 3. `back/contato_email` (porta `3003`): oferece duas formas de contato:
   - abrir cliente de e-mail com `mailto`;
   - enviar mensagem direto no site (backend envia para `entrega.drones@gmail.com`).
+4. `back/cadastro_usuario` (porta `3004`): autentica usuarios, cria cadastro, gerencia perfil e emite token JWT.
 
 ### Barramento de Eventos (porta 3001)
 
@@ -112,6 +113,46 @@ npm install
 npm run dev
 ```
 
+### Como configurar login e cadastro (3004)
+
+Crie o banco e a tabela de usuarios no MySQL executando o script:
+
+```sql
+source back/banco/script.sql;
+```
+
+Ou abra `back/banco/script.sql` no MySQL Workbench e execute o arquivo completo.
+
+Configure `back/cadastro_usuario/.env` a partir de `back/cadastro_usuario/.env.example`:
+
+```env
+PORT=3004
+SERVICE_URL=http://localhost:3004
+BARRAMENTO_URL=http://localhost:3001
+
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=sua_senha_mysql
+DB_NAME=skyswift
+DB_PORT=3306
+
+JWT_SECRET=troque-este-segredo-em-producao
+```
+
+Inicie o microsservico:
+
+```bash
+cd back/cadastro_usuario
+npm install
+npm run dev
+```
+
+No frontend local, a autenticacao usa `http://localhost:3004` por padrao. Para sobrescrever:
+
+```env
+VITE_AUTH_SERVICE_URL=http://localhost:3004
+```
+
 ### Endpoints principais
 
 - `GET http://localhost:3001/health`
@@ -126,6 +167,13 @@ npm run dev
 - `GET http://localhost:3003/email/contato`
 - `POST http://localhost:3003/email/enviar`
 - `POST http://localhost:3003/eventos/receber` — recebe eventos do barramento
+- `GET http://localhost:3004/health`
+- `POST http://localhost:3004/auth/cadastro`
+- `POST http://localhost:3004/auth/login`
+- `GET http://localhost:3004/auth/me`
+- `PATCH http://localhost:3004/auth/me`
+- `PATCH http://localhost:3004/auth/me/senha`
+- `DELETE http://localhost:3004/auth/me`
 
 ### Resposta do endpoint de contato por `mailto`
 
