@@ -156,7 +156,7 @@ const App = () => {
     <div style={appShellStyle}>
       <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
       <Hero
-        funcao1={() => { window.location.href = "/precos" }}
+        funcao1={() => { window.location.href = "/login" }}
         funcao2={() => { window.location.href = "/rastreamento" }}
       />
       <div className={`container border mt-4 ${themeMode === "dark" ? "border-secondary" : ""}`}>
@@ -209,7 +209,7 @@ const App = () => {
       </div>
       <Advantages themeMode={themeMode} />
       <CallToAction
-        funcao1={() => { window.location.href = "/precos" }}
+        funcao1={() => { window.location.href = "/login" }}
         funcao2={handleContatarVendas}
         onEnviarMensagem={handleEnviarMensagemDireto}
       />
