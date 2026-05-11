@@ -220,6 +220,23 @@ app.patch('/auth/me/senha', autenticarToken, async (req, res) => {
     }
 })
 
+app.delete('/auth/me', autenticarToken, async (req, res) => {
+    try {
+        const [resultado] = await conexao.query('DELETE FROM usuarios WHERE id = ?', [req.auth.id])
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ error: 'Usuario nao encontrado.' })
+        }
+
+        await publicarEvento('usuario_deletado', { id: req.auth.id })
+
+        res.json({ message: 'Conta excluida com sucesso.' })
+    } catch (error) {
+        console.log('Erro ao excluir conta autenticada:', error.message)
+        res.status(500).json({ error: 'Erro ao excluir conta autenticada.' })
+    }
+})
+
 app.post('/auth/cadastro', async (req, res) => {
     try {
         const { senha } = req.body
