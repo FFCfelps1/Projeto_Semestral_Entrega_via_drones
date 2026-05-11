@@ -42,6 +42,47 @@ const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAltera
   const inputClassName = `form-control ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
   const mutedClassName = isDarkMode ? "text-light opacity-75" : "text-secondary"
 
+  const emailValido = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+
+  const validarPerfil = () => {
+    const nome = perfil.nome.trim()
+    const email = perfil.email.trim()
+
+    if (!nome) {
+      return "Nome nao pode ficar vazio."
+    }
+
+    if (!email) {
+      return "Informe seu email."
+    }
+
+    if (!emailValido(email)) {
+      return "Informe um email valido."
+    }
+
+    return null
+  }
+
+  const validarSenha = () => {
+    if (!senha.senhaAtual) {
+      return "Informe sua senha atual."
+    }
+
+    if (!senha.novaSenha) {
+      return "Informe a nova senha."
+    }
+
+    if (senha.novaSenha.length < 6) {
+      return "A nova senha deve ter pelo menos 6 caracteres."
+    }
+
+    if (senha.novaSenha !== senha.confirmarNovaSenha) {
+      return "As senhas nao coincidem."
+    }
+
+    return null
+  }
+
   const handlePerfilChange = (event) => {
     const { name, value } = event.target
     setPerfil((dadosAtuais) => ({
@@ -60,6 +101,16 @@ const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAltera
 
   const handlePerfilSubmit = async (event) => {
     event.preventDefault()
+
+    const erroValidacao = validarPerfil()
+
+    if (erroValidacao) {
+      setStatusPerfil({
+        tipo: "erro",
+        texto: erroValidacao,
+      })
+      return
+    }
 
     try {
       setSalvandoPerfil(true)
@@ -84,10 +135,12 @@ const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAltera
   const handleSenhaSubmit = async (event) => {
     event.preventDefault()
 
-    if (senha.novaSenha !== senha.confirmarNovaSenha) {
+    const erroValidacao = validarSenha()
+
+    if (erroValidacao) {
       setStatusSenha({
         tipo: "erro",
-        texto: "As senhas nao coincidem.",
+        texto: erroValidacao,
       })
       return
     }
