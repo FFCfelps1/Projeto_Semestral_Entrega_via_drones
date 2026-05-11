@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 
-const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAlterarSenha }) => {
+const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAlterarSenha, onExcluirConta }) => {
   const isDarkMode = themeMode === "dark"
   const [perfil, setPerfil] = useState({
     nome: usuario?.nome || "",
@@ -13,8 +13,10 @@ const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAltera
   })
   const [statusPerfil, setStatusPerfil] = useState(null)
   const [statusSenha, setStatusSenha] = useState(null)
+  const [statusConta, setStatusConta] = useState(null)
   const [salvandoPerfil, setSalvandoPerfil] = useState(false)
   const [salvandoSenha, setSalvandoSenha] = useState(false)
+  const [excluindoConta, setExcluindoConta] = useState(false)
 
   useEffect(() => {
     setPerfil({
@@ -114,6 +116,30 @@ const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAltera
       })
     } finally {
       setSalvandoSenha(false)
+    }
+  }
+
+  const handleExcluirConta = async () => {
+    const confirmarExclusao = window.confirm("Tem certeza que deseja excluir sua conta?")
+
+    if (!confirmarExclusao) return
+
+    try {
+      setExcluindoConta(true)
+      setStatusConta(null)
+
+      const resposta = await onExcluirConta()
+
+      setStatusConta({
+        tipo: "sucesso",
+        texto: resposta?.message || "Conta excluida com sucesso.",
+      })
+    } catch (error) {
+      setStatusConta({
+        tipo: "erro",
+        texto: error.message || "Nao foi possivel excluir a conta.",
+      })
+      setExcluindoConta(false)
     }
   }
 
@@ -240,6 +266,34 @@ const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAltera
                 {salvandoSenha ? "Atualizando..." : "Atualizar senha"}
               </button>
             </form>
+          </div>
+        </div>
+
+        <div className="row mt-4">
+          <div className="col-12">
+            <div className="p-4" style={panelStyle}>
+              <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                  <h2 className="h4 fw-bold mb-1">Excluir conta</h2>
+                  <p className={`mb-0 ${mutedClassName}`}>Remove seu cadastro e encerra a sessao atual.</p>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn btn-outline-danger fw-bold"
+                  onClick={handleExcluirConta}
+                  disabled={excluindoConta}
+                >
+                  {excluindoConta ? "Excluindo..." : "Excluir conta"}
+                </button>
+              </div>
+
+              {statusConta && (
+                <div className={`${alertClassName(statusConta)} mt-3`} role="alert">
+                  {statusConta.texto}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

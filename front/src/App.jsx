@@ -232,6 +232,32 @@ const App = () => {
     }
   }
 
+  const handleExcluirConta = async () => {
+    if (!authSession?.token) {
+      throw new Error("Sessao expirada. Entre novamente.")
+    }
+
+    try {
+      const response = await axios.delete(`${AUTH_SERVICE_URL}/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${authSession.token}`,
+        },
+      })
+
+      setValidandoSessao(false)
+      setAuthSession(null)
+      window.localStorage.removeItem(AUTH_STORAGE_KEY)
+      window.setTimeout(() => {
+        window.location.href = "/"
+      }, 600)
+
+      return response.data
+    } catch (error) {
+      const mensagemErro = error?.response?.data?.error || "Nao foi possivel excluir a conta."
+      throw new Error(mensagemErro)
+    }
+  }
+
   // Estado global simples de tema para toda a aplicacao (claro/escuro).
   const [themeMode, setThemeMode] = useState(() => {
     if (typeof window === "undefined") return "light"
@@ -349,6 +375,7 @@ const App = () => {
               usuario={authSession.usuario}
               onAtualizarPerfil={handleAtualizarPerfil}
               onAlterarSenha={handleAlterarSenha}
+              onExcluirConta={handleExcluirConta}
             />
           )}
         </main>
