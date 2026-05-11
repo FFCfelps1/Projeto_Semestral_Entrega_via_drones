@@ -99,6 +99,23 @@ function autorizarMesmoUsuario(req, res, next) {
 }
 
 // ******* definindo endpoints *******
+app.get('/health', async (req, res) => {
+    try {
+        await conexao.query('SELECT 1')
+
+        res.json({
+            status: 'ok',
+            service: 'cadastro_usuario'
+        })
+    } catch (error) {
+        res.status(503).json({
+            status: 'erro',
+            service: 'cadastro_usuario',
+            error: 'Banco de dados indisponivel.'
+        })
+    }
+})
+
 app.get('/auth/me', autenticarToken, async (req, res) => {
     try {
         const [usuarios] = await conexao.query(
