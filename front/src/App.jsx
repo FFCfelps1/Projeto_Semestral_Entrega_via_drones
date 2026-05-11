@@ -149,9 +149,13 @@ const App = () => {
   const handleAutenticacao = async ({ modo, dados }) => {
     const endpoint = modo === "cadastro" ? "/auth/cadastro" : "/auth/login"
     const payload = modo === "cadastro"
-      ? dados
+      ? {
+          nome: dados.nome.trim(),
+          email: dados.email.trim().toLowerCase(),
+          senha: dados.senha,
+        }
       : {
-          email: dados.email,
+          email: dados.email.trim().toLowerCase(),
           senha: dados.senha,
         }
 
