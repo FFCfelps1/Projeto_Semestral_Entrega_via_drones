@@ -82,6 +82,14 @@ function autenticarToken(req, res, next) {
     }
 }
 
+function autorizarMesmoUsuario(req, res, next) {
+    if (Number(req.params.id) !== Number(req.auth.id)) {
+        return res.status(403).json({ error: 'Voce nao tem permissao para alterar este usuario.' })
+    }
+
+    next()
+}
+
 // ******* definindo endpoints *******
 app.get('/auth/me', autenticarToken, async (req, res) => {
     try {
@@ -214,7 +222,7 @@ app.post("/usuarios", async (req, res) => {
 })
 
 //consultar usuários
-app.get("/usuarios", async (req, res) => {
+app.get("/usuarios", autenticarToken, async (req, res) => {
     try{
         const [linhas] = await conexao.query('SELECT id, nome, email, data_criacao FROM usuarios')
         res.json(linhas)
@@ -226,7 +234,7 @@ app.get("/usuarios", async (req, res) => {
 })
 
 //atualizar completamente um usuario especifico
-app.put('/usuarios/:id', async (req, res) => {
+app.put('/usuarios/:id', autenticarToken, autorizarMesmoUsuario, async (req, res) => {
     try{
         const {id} = req.params
         const {nome, email, senha} = req.body
@@ -252,7 +260,7 @@ app.put('/usuarios/:id', async (req, res) => {
 })
 
 //remoção de um usuário
-app.delete('/usuarios/:id', async (req, res) => {
+app.delete('/usuarios/:id', autenticarToken, autorizarMesmoUsuario, async (req, res) => {
     try{
         const {id} = req.params
         const sql = 'DELETE FROM usuarios WHERE id = ?'
@@ -275,7 +283,7 @@ app.delete('/usuarios/:id', async (req, res) => {
 })
 
 //atualizar parcialmente um usuário (senha)
-app.patch('/usuarios/senha/:id', async (req, res) => {
+app.patch('/usuarios/senha/:id', autenticarToken, autorizarMesmoUsuario, async (req, res) => {
     try{
         const {id} = req.params
         const {senha} = req.body
@@ -296,7 +304,7 @@ app.patch('/usuarios/senha/:id', async (req, res) => {
 })
 
 //atualizar parcialmente um usuario (email)
-app.patch('/usuarios/email/:id', async (req, res) => {
+app.patch('/usuarios/email/:id', autenticarToken, autorizarMesmoUsuario, async (req, res) => {
     try{
         const {id} = req.params
         const {email} = req.body
