@@ -17,6 +17,7 @@ const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAltera
   const [salvandoPerfil, setSalvandoPerfil] = useState(false)
   const [salvandoSenha, setSalvandoSenha] = useState(false)
   const [excluindoConta, setExcluindoConta] = useState(false)
+  const [mostrarSenha, setMostrarSenha] = useState(false)
 
   useEffect(() => {
     setPerfil({
@@ -105,6 +106,7 @@ const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAltera
         novaSenha: "",
         confirmarNovaSenha: "",
       })
+      setMostrarSenha(false)
       setStatusSenha({
         tipo: "sucesso",
         texto: resposta?.message || "Senha atualizada com sucesso.",
@@ -145,6 +147,18 @@ const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAltera
 
   const alertClassName = (status) =>
     `alert ${status?.tipo === "sucesso" ? "alert-success" : "alert-danger"}`
+
+  const passwordToggleButton = (
+    <button
+      type="button"
+      className={`btn ${isDarkMode ? "btn-outline-light" : "btn-outline-secondary"}`}
+      onClick={() => setMostrarSenha((valorAtual) => !valorAtual)}
+      aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+      title={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+    >
+      <i className={`fa-solid ${mostrarSenha ? "fa-eye-slash" : "fa-eye"}`} aria-hidden="true"></i>
+    </button>
+  )
 
   return (
     <section className="py-5" style={pageStyle}>
@@ -210,50 +224,59 @@ const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAltera
                 <label className="form-label fw-semibold" htmlFor="conta-senha-atual">
                   Senha atual
                 </label>
-                <input
-                  id="conta-senha-atual"
-                  name="senhaAtual"
-                  type="password"
-                  className={inputClassName}
-                  value={senha.senhaAtual}
-                  onChange={handleSenhaChange}
-                  autoComplete="current-password"
-                  required
-                />
+                <div className="input-group">
+                  <input
+                    id="conta-senha-atual"
+                    name="senhaAtual"
+                    type={mostrarSenha ? "text" : "password"}
+                    className={inputClassName}
+                    value={senha.senhaAtual}
+                    onChange={handleSenhaChange}
+                    autoComplete="current-password"
+                    required
+                  />
+                  {passwordToggleButton}
+                </div>
               </div>
 
               <div className="mb-3">
                 <label className="form-label fw-semibold" htmlFor="conta-nova-senha">
                   Nova senha
                 </label>
-                <input
-                  id="conta-nova-senha"
-                  name="novaSenha"
-                  type="password"
-                  className={inputClassName}
-                  value={senha.novaSenha}
-                  onChange={handleSenhaChange}
-                  autoComplete="new-password"
-                  minLength="6"
-                  required
-                />
+                <div className="input-group">
+                  <input
+                    id="conta-nova-senha"
+                    name="novaSenha"
+                    type={mostrarSenha ? "text" : "password"}
+                    className={inputClassName}
+                    value={senha.novaSenha}
+                    onChange={handleSenhaChange}
+                    autoComplete="new-password"
+                    minLength="6"
+                    required
+                  />
+                  {passwordToggleButton}
+                </div>
               </div>
 
               <div className="mb-3">
                 <label className="form-label fw-semibold" htmlFor="conta-confirmar-nova-senha">
                   Confirmar nova senha
                 </label>
-                <input
-                  id="conta-confirmar-nova-senha"
-                  name="confirmarNovaSenha"
-                  type="password"
-                  className={inputClassName}
-                  value={senha.confirmarNovaSenha}
-                  onChange={handleSenhaChange}
-                  autoComplete="new-password"
-                  minLength="6"
-                  required
-                />
+                <div className="input-group">
+                  <input
+                    id="conta-confirmar-nova-senha"
+                    name="confirmarNovaSenha"
+                    type={mostrarSenha ? "text" : "password"}
+                    className={inputClassName}
+                    value={senha.confirmarNovaSenha}
+                    onChange={handleSenhaChange}
+                    autoComplete="new-password"
+                    minLength="6"
+                    required
+                  />
+                  {passwordToggleButton}
+                </div>
               </div>
 
               {statusSenha && (
