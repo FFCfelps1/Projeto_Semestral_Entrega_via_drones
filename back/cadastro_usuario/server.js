@@ -12,31 +12,53 @@ app.use(cors())
 app.use(express.json())
 
 let conexao                             //representa a conexão com o banco
+let conectandoBanco = false
 
 //endereço do barramento 
 const PORT = Number(process.env.PORT || 3004)
 const SERVICE_URL = process.env.SERVICE_URL || `http://localhost:${PORT}`
 const BARRAMENTO_URL = process.env.BARRAMENTO_URL || 'http://localhost:3001'
 const JWT_SECRET = process.env.JWT_SECRET || 'skyswift-dev-secret'
+const DB_RETRY_MS = Number(process.env.DB_RETRY_MS || 5000)
 
 //função para conectar com o banco
 const conectar = async () => {          //utilizando promise
+    if (conectandoBanco) return conexao
+
+    conectandoBanco = true
+
     //execução assíncrona para não bloquear
     try{
-        conexao = await mysql2.createConnection({
+        conexao = mysql2.createPool({
         host: process.env.DB_HOST || process.env.HOST, 
         user: process.env.DB_USER || process.env.USER,
         password: process.env.DB_PASSWORD || process.env.PASSWORD,
         database: process.env.DB_NAME || process.env.DATABASE,
-        port: Number(process.env.DB_PORT || 3306)
+        port: Number(process.env.DB_PORT || 3306),
+        waitForConnections: true,
+        connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10)
         })
+        await conexao.query('SELECT 1')
         console.log('Conectado ao MySQL')
     }
     catch(erro){
-        console.log(`Erro ao conectar com o banco: ${erro}`)
+        conexao = null
+        console.log(`Erro ao conectar com o banco: ${erro.message}`)
+        setTimeout(conectar, DB_RETRY_MS)
+    }
+    finally {
+        conectandoBanco = false
     }
 }
 conectar()
+
+async function obterConexao() {
+    if (!conexao) {
+        await conectar()
+    }
+
+    return conexao
+}
 
 // ******* função para publicar eventos *******
 async function publicarEvento(tipo, dados) {
@@ -101,7 +123,13 @@ function autorizarMesmoUsuario(req, res, next) {
 // ******* definindo endpoints *******
 app.get('/health', async (req, res) => {
     try {
-        await conexao.query('SELECT 1')
+        const banco = await obterConexao()
+
+        if (!banco) {
+            throw new Error('Banco de dados indisponivel.')
+        }
+
+        await banco.query('SELECT 1')
 
         res.json({
             status: 'ok',
@@ -116,8 +144,10 @@ app.get('/health', async (req, res) => {
     }
 })
 
-app.use((req, res, next) => {
-    if (!conexao) {
+app.use(async (req, res, next) => {
+    const banco = await obterConexao()
+
+    if (!banco) {
         return res.status(503).json({ error: 'Banco de dados indisponivel.' })
     }
 
