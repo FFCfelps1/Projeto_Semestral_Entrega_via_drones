@@ -177,6 +177,49 @@ app.patch('/auth/me', autenticarToken, async (req, res) => {
     }
 })
 
+app.patch('/auth/me/senha', autenticarToken, async (req, res) => {
+    try {
+        const { senhaAtual, novaSenha } = req.body
+
+        if (!senhaAtual || !novaSenha) {
+            return res.status(400).json({ error: 'Senha atual e nova senha sao obrigatorias.' })
+        }
+
+        if (novaSenha.length < 6) {
+            return res.status(400).json({ error: 'A nova senha deve ter pelo menos 6 caracteres.' })
+        }
+
+        const [usuarios] = await conexao.query(
+            'SELECT id, senha FROM usuarios WHERE id = ? LIMIT 1',
+            [req.auth.id]
+        )
+
+        if (usuarios.length === 0) {
+            return res.status(404).json({ error: 'Usuario nao encontrado.' })
+        }
+
+        const usuario = usuarios[0]
+        const senhaJaCriptografada = usuario.senha.startsWith('$2')
+        const senhaAtualValida = senhaJaCriptografada
+            ? await bcrypt.compare(senhaAtual, usuario.senha)
+            : senhaAtual === usuario.senha
+
+        if (!senhaAtualValida) {
+            return res.status(401).json({ error: 'Senha atual invalida.' })
+        }
+
+        const senhaHash = await bcrypt.hash(novaSenha, 10)
+        await conexao.query('UPDATE usuarios SET senha = ? WHERE id = ?', [senhaHash, req.auth.id])
+
+        await publicarEvento('usuario_senha_atualizada', { id: req.auth.id })
+
+        res.json({ message: 'Senha atualizada com sucesso.' })
+    } catch (error) {
+        console.log('Erro ao atualizar senha autenticada:', error.message)
+        res.status(500).json({ error: 'Erro ao atualizar senha autenticada.' })
+    }
+})
+
 app.post('/auth/cadastro', async (req, res) => {
     try {
         const { senha } = req.body
