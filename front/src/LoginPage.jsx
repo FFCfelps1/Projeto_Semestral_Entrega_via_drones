@@ -8,6 +8,7 @@ const LoginPage = ({ themeMode = "light" }) => {
     email: "",
     senha: "",
   })
+  const [status, setStatus] = useState(null)
   const isCadastro = modo === "cadastro"
 
   const pageStyle = {
@@ -44,6 +45,15 @@ const LoginPage = ({ themeMode = "light" }) => {
 
   const trocarModo = (novoModo) => {
     setModo(novoModo)
+    setStatus(null)
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    setStatus({
+      tipo: "info",
+      texto: "A conexao com o backend de autenticacao sera adicionada no proximo passo.",
+    })
   }
 
   return (
@@ -86,7 +96,7 @@ const LoginPage = ({ themeMode = "light" }) => {
                 {isCadastro ? "Informe seus dados para criar um novo acesso." : "Use seu email e senha para continuar."}
               </p>
 
-              <form className="mt-4">
+              <form className="mt-4" onSubmit={handleSubmit}>
                 {isCadastro && (
                   <div className="mb-3">
                     <label className="form-label fw-semibold" htmlFor="auth-nome">
@@ -136,6 +146,12 @@ const LoginPage = ({ themeMode = "light" }) => {
                     required
                   />
                 </div>
+
+                {status && (
+                  <div className="alert alert-info" role="alert">
+                    {status.texto}
+                  </div>
+                )}
 
                 <button type="submit" className="btn btn-primary w-100 fw-bold py-2">
                   {isCadastro ? "Criar conta" : "Entrar"}
