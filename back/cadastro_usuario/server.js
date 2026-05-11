@@ -112,14 +112,6 @@ function autenticarToken(req, res, next) {
     }
 }
 
-function autorizarMesmoUsuario(req, res, next) {
-    if (Number(req.params.id) !== Number(req.auth.id)) {
-        return res.status(403).json({ error: 'Voce nao tem permissao para alterar este usuario.' })
-    }
-
-    next()
-}
-
 // ******* definindo endpoints *******
 app.get('/health', async (req, res) => {
     try {
@@ -389,116 +381,6 @@ app.post('/auth/login', async (req, res) => {
         res.status(500).json({ error: 'Erro ao autenticar usuario.' })
     }
 })
-//cadastrar usuário 
-app.post("/usuarios", async (req, res) => {
-    return res.status(410).json({ error: 'Use /auth/cadastro para cadastrar usuarios.' })
-})
-
-//consultar usuários
-app.get("/usuarios", autenticarToken, async (req, res) => {
-    try{
-        const [linhas] = await conexao.query('SELECT id, nome, email, data_criacao FROM usuarios')
-        res.json(linhas)
-    } 
-    catch(error){
-        console.log(error);
-        res.status(500).json({error: 'Erro ao buscar usuarios'}) 
-    }
-})
-
-//atualizar completamente um usuario especifico
-app.put('/usuarios/:id', autenticarToken, autorizarMesmoUsuario, async (req, res) => {
-    try{
-        const {id} = req.params
-        const {nome, email, senha} = req.body
-        const senhaHash = await bcrypt.hash(senha, 10)
-        const [resultado] = await conexao.query(`UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?`, [nome, email, senhaHash, id])
-        
-        //publicar evento
-        await publicarEvento('usuario_atualizado', {
-            id,
-            nome,
-            email
-        });
-        
-        res.status(201).json({
-            nome: nome, 
-            email: email
-        })
-    }
-    catch(erro){
-        console.log(erro)
-        res.status(500).json({ error: "Erro ao atualizar nome, email e senha"})
-    }
-})
-
-//remoção de um usuário
-app.delete('/usuarios/:id', autenticarToken, autorizarMesmoUsuario, async (req, res) => {
-    try{
-        const {id} = req.params
-        const sql = 'DELETE FROM usuarios WHERE id = ?'
-        await conexao.query(sql, [id])
-        
-        //publicar evento
-        await publicarEvento('usuario_deletado', {
-            id
-        });
-        
-        res.json({message: "Usuário excluído com sucesso!"})
-    }
-    catch(erro){
-        console.log(erro)
-        res.status(500).json({
-            error: 'Erro ao excluir usuário'
-        })
-    }
-
-})
-
-//atualizar parcialmente um usuário (senha)
-app.patch('/usuarios/senha/:id', autenticarToken, autorizarMesmoUsuario, async (req, res) => {
-    try{
-        const {id} = req.params
-        const {senha} = req.body
-        const senhaHash = await bcrypt.hash(senha, 10)
-        const [resultado] = await conexao.query("UPDATE usuarios SET senha = ? WHERE id = ?", [senhaHash, id])
-        
-        // Publicar evento
-        await publicarEvento('usuario_senha_atualizada', {
-            id
-        });
-        
-        res.status(201).json({message: 'Senha atualizada com sucesso'})
-    } 
-    catch(error){
-        console.log(error);
-        res.status(500).json({error: 'Erro ao atualizar senha'})
-    }
-})
-
-//atualizar parcialmente um usuario (email)
-app.patch('/usuarios/email/:id', autenticarToken, autorizarMesmoUsuario, async (req, res) => {
-    try{
-        const {id} = req.params
-        const {email} = req.body
-        const [resultado] = await conexao.query("UPDATE usuarios SET email = ? WHERE id = ?", [email, id])
-        
-        // Publicar evento
-        await publicarEvento('usuario_email_atualizado', {
-            id,
-            email
-        });
-        
-        res.status(201).json({
-            email: email
-        })
-    }
-    catch(erro){
-        console.log(erro);
-        res.status(500).json({error: "Erro ao atualizar email"})
-    }
-})
-
 // ******* endpoint para receber eventos *******
 app.post('/eventos/receber', (req, res) => {
     const { tipo, dados, origem } = req.body;
