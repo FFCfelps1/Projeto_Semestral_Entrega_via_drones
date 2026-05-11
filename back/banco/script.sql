@@ -1,4 +1,8 @@
-CREATE TABLE usuarios (
+CREATE DATABASE IF NOT EXISTS skyswift;
+
+USE skyswift;
+
+CREATE TABLE IF NOT EXISTS usuarios (
     id INT NOT NULL AUTO_INCREMENT,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -7,6 +11,10 @@ CREATE TABLE usuarios (
     PRIMARY KEY (id)
 );
 
-INSERT INTO usuarios (nome, email, senha) VALUES ('Arthur', 'arthur@email.com', '123456');
+INSERT INTO usuarios (nome, email, senha)
+SELECT 'Arthur', 'arthur@email.com', '123456'
+WHERE NOT EXISTS (
+    SELECT 1 FROM usuarios WHERE email = 'arthur@email.com'
+);
 
-SELECT * FROM usuarios;
+SELECT id, nome, email, data_criacao FROM usuarios;
