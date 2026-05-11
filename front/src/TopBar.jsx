@@ -1,4 +1,4 @@
-const TopBar = ({ themeMode = "light", onToggleTheme }) => {
+const TopBar = ({ themeMode = "light", onToggleTheme, usuario, onLogout }) => {
   const isDarkMode = themeMode === "dark";
   const isTrackingPage = typeof window !== "undefined" && window.location.pathname === "/rastreamento";
   const isSubPage = typeof window !== "undefined" && window.location.pathname !== "/";
@@ -63,12 +63,33 @@ const TopBar = ({ themeMode = "light", onToggleTheme }) => {
                 Preços
               </a>
             </li>
-            <li className="nav-item">
-              <a className={`nav-link ${isLoginPage ? "active" : ""}`} aria-current={isLoginPage ? "page" : undefined} href="/login">
-                <i className="fa fa-right-to-bracket me-1"></i>
-                Entrar
-              </a>
-            </li>
+            {usuario ? (
+              <>
+                <li className="nav-item">
+                  <span className={`nav-link ${isDarkMode ? "text-light" : "text-dark"}`}>
+                    <i className="fa fa-user-circle me-1"></i>
+                    {usuario.nome || usuario.email}
+                  </span>
+                </li>
+                <li className="nav-item">
+                  <button
+                    type="button"
+                    className={`nav-link border-0 bg-transparent ${isDarkMode ? "text-light" : "text-dark"}`}
+                    onClick={onLogout}
+                  >
+                    <i className="fa fa-right-from-bracket me-1"></i>
+                    Sair
+                  </button>
+                </li>
+              </>
+            ) : (
+              <li className="nav-item">
+                <a className={`nav-link ${isLoginPage ? "active" : ""}`} aria-current={isLoginPage ? "page" : undefined} href="/login">
+                  <i className="fa fa-right-to-bracket me-1"></i>
+                  Entrar
+                </a>
+              </li>
+            )}
             <li className="nav-item ms-lg-2">
               {/* Botao para alternar claro/escuro com icone do modo atual. */}
               <button

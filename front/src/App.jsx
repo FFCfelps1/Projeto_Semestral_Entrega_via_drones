@@ -45,6 +45,15 @@ const App = () => {
     window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessionData))
   }
 
+  const handleLogout = () => {
+    setAuthSession(null)
+    window.localStorage.removeItem(AUTH_STORAGE_KEY)
+
+    if (window.location.pathname === "/login") {
+      window.location.href = "/"
+    }
+  }
+
   const buscarRota = async () =>{
     try {
        const response = await axios.get(`${MAP_SERVICE_URL}/rota`, {
@@ -140,11 +149,17 @@ const App = () => {
   const isPrecosPage = window.location.pathname === "/precos"
   const isSuportePage = window.location.pathname === "/suporte"
   const isLoginPage = window.location.pathname === "/login"
+  const topBarProps = {
+    themeMode,
+    onToggleTheme: handleToggleTheme,
+    usuario: authSession?.usuario,
+    onLogout: handleLogout,
+  }
 
   if (isTrackingPage) {
     return (
       <div style={appShellStyle}>
-        <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
+        <TopBar {...topBarProps} />
         <main>
           <DroneTrackingSection
             themeMode={themeMode}
@@ -161,7 +176,7 @@ const App = () => {
   if (isPrecosPage) {
     return (
       <div style={appShellStyle}>
-        <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
+        <TopBar {...topBarProps} />
         <main>
           <PrecosPage themeMode={themeMode} onContatar={handleContatarVendas} />
         </main>
@@ -173,7 +188,7 @@ const App = () => {
   if (isSuportePage) {
     return (
       <div style={appShellStyle}>
-        <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
+        <TopBar {...topBarProps} />
         <main>
           <SuportePage themeMode={themeMode} onContatar={handleContatarVendas} />
         </main>
@@ -185,7 +200,7 @@ const App = () => {
   if (isLoginPage) {
     return (
       <div style={appShellStyle}>
-        <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
+        <TopBar {...topBarProps} />
         <main>
           <LoginPage
             themeMode={themeMode}
@@ -200,7 +215,7 @@ const App = () => {
 
   return (
     <div style={appShellStyle}>
-      <TopBar themeMode={themeMode} onToggleTheme={handleToggleTheme} />
+      <TopBar {...topBarProps} />
       <Hero
         funcao1={() => { window.location.href = "/login" }}
         funcao2={() => { window.location.href = "/rastreamento" }}
