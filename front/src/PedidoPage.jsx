@@ -12,6 +12,7 @@ const pedidoInicial = {
 const PedidoPage = ({ themeMode = "light" }) => {
   const isDarkMode = themeMode === "dark"
   const [pedido, setPedido] = useState(pedidoInicial)
+  const [erros, setErros] = useState({})
 
   const handlePedidoChange = (event) => {
     const { name, value } = event.target
@@ -20,13 +21,48 @@ const PedidoPage = ({ themeMode = "light" }) => {
       ...dadosAtuais,
       [name]: value,
     }))
+    setErros((errosAtuais) => ({
+      ...errosAtuais,
+      [name]: "",
+    }))
+  }
+
+  const validarPedido = () => {
+    const novosErros = {}
+
+    if (!pedido.item.trim()) {
+      novosErros.item = "Informe o item ou a descricao do pacote."
+    }
+
+    if (!pedido.peso) {
+      novosErros.peso = "Informe o peso aproximado."
+    } else if (Number(pedido.peso) <= 0) {
+      novosErros.peso = "O peso deve ser maior que zero."
+    }
+
+    if (!pedido.origem.trim()) {
+      novosErros.origem = "Informe o endereco de retirada."
+    }
+
+    if (!pedido.destino.trim()) {
+      novosErros.destino = "Informe o endereco de entrega."
+    }
+
+    if (!pedido.tipoEntrega) {
+      novosErros.tipoEntrega = "Selecione o tipo de entrega."
+    }
+
+    return novosErros
   }
 
   const handlePedidoSubmit = (event) => {
     event.preventDefault()
 
-    if (!event.currentTarget.checkValidity()) {
-      event.currentTarget.reportValidity()
+    const errosValidacao = validarPedido()
+    setErros(errosValidacao)
+
+    if (Object.keys(errosValidacao).length > 0) {
+      return
     }
   }
 
@@ -73,7 +109,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
 
               <div className="row g-4 align-items-stretch">
                 <div className="col-12 col-lg-7">
-                  <form className="h-100" onSubmit={handlePedidoSubmit}>
+                  <form className="h-100" onSubmit={handlePedidoSubmit} noValidate>
                     <h2 className="h4 fw-bold mb-3">Detalhes da solicitacao</h2>
                     <p className={`mb-0 ${mutedClassName}`}>
                       Informe os dados do envio para visualizar a simulacao do pedido antes de confirmar.
@@ -88,12 +124,13 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           id="pedido-item"
                           name="item"
                           type="text"
-                          className={inputClassName}
+                          className={`${inputClassName} ${erros.item ? "is-invalid" : ""}`}
                           value={pedido.item}
                           onChange={handlePedidoChange}
                           placeholder="Ex.: medicamentos, documentos ou pequeno volume"
                           required
                         />
+                        {erros.item && <div className="invalid-feedback">{erros.item}</div>}
                       </div>
 
                       <div className="mb-3">
@@ -105,7 +142,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                             id="pedido-peso"
                             name="peso"
                             type="number"
-                            className={inputClassName}
+                            className={`${inputClassName} ${erros.peso ? "is-invalid" : ""}`}
                             min="0"
                             step="0.1"
                             value={pedido.peso}
@@ -117,6 +154,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                             kg
                           </span>
                         </div>
+                        {erros.peso && <div className="invalid-feedback d-block">{erros.peso}</div>}
                       </div>
 
                       <div className="mb-3">
@@ -127,12 +165,13 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           id="pedido-origem"
                           name="origem"
                           type="text"
-                          className={inputClassName}
+                          className={`${inputClassName} ${erros.origem ? "is-invalid" : ""}`}
                           value={pedido.origem}
                           onChange={handlePedidoChange}
                           placeholder="Ex.: Rua das Flores, 120 - Centro"
                           required
                         />
+                        {erros.origem && <div className="invalid-feedback">{erros.origem}</div>}
                       </div>
 
                       <div className="mb-3">
@@ -143,12 +182,13 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           id="pedido-destino"
                           name="destino"
                           type="text"
-                          className={inputClassName}
+                          className={`${inputClassName} ${erros.destino ? "is-invalid" : ""}`}
                           value={pedido.destino}
                           onChange={handlePedidoChange}
                           placeholder="Ex.: Avenida Brasil, 850 - Jardim"
                           required
                         />
+                        {erros.destino && <div className="invalid-feedback">{erros.destino}</div>}
                       </div>
 
                       <div className="mb-3">
@@ -158,7 +198,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                         <select
                           id="pedido-tipo-entrega"
                           name="tipoEntrega"
-                          className={selectClassName}
+                          className={`${selectClassName} ${erros.tipoEntrega ? "is-invalid" : ""}`}
                           value={pedido.tipoEntrega}
                           onChange={handlePedidoChange}
                           required
@@ -170,6 +210,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           <option value="expressa">Expressa</option>
                           <option value="prioritaria">Prioritaria</option>
                         </select>
+                        {erros.tipoEntrega && <div className="invalid-feedback">{erros.tipoEntrega}</div>}
                       </div>
 
                       <div>
