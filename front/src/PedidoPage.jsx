@@ -63,7 +63,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                         />
                       </div>
 
-                      <div>
+                      <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-peso">
                           Peso aproximado
                         </label>
@@ -81,6 +81,19 @@ const PedidoPage = ({ themeMode = "light" }) => {
                             kg
                           </span>
                         </div>
+                      </div>
+
+                      <div>
+                        <label className="form-label fw-semibold" htmlFor="pedido-origem">
+                          Endereco de retirada
+                        </label>
+                        <input
+                          id="pedido-origem"
+                          name="origem"
+                          type="text"
+                          className={inputClassName}
+                          placeholder="Ex.: Rua das Flores, 120 - Centro"
+                        />
                       </div>
                     </div>
 
