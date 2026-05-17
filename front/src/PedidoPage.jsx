@@ -126,6 +126,13 @@ const PedidoPage = ({ themeMode = "light" }) => {
     setPedidosSimulados((pedidosAtuais) => [novoPedido, ...pedidosAtuais])
   }
 
+  const handleLimparFormulario = () => {
+    setPedido(pedidoInicial)
+    setErros({})
+    setStatusPedido(statusInicialPedido)
+    setPedidoSimulado(null)
+  }
+
   const pageStyle = {
     minHeight: "calc(100vh - 72px)",
     backgroundColor: isDarkMode ? "#0b1220" : "#eef5ff",
@@ -299,7 +306,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                       <button type="submit" className="btn btn-primary fw-bold">
                         Simular pedido
                       </button>
-                      <button type="button" className="btn btn-outline-secondary fw-bold">
+                      <button type="button" className="btn btn-outline-secondary fw-bold" onClick={handleLimparFormulario}>
                         Limpar formulario
                       </button>
                     </div>
