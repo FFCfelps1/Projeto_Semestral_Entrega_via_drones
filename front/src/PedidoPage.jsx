@@ -22,6 +22,14 @@ const PedidoPage = ({ themeMode = "light" }) => {
     }))
   }
 
+  const handlePedidoSubmit = (event) => {
+    event.preventDefault()
+
+    if (!event.currentTarget.checkValidity()) {
+      event.currentTarget.reportValidity()
+    }
+  }
+
   const pageStyle = {
     minHeight: "calc(100vh - 72px)",
     backgroundColor: isDarkMode ? "#0b1220" : "#eef5ff",
@@ -65,7 +73,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
 
               <div className="row g-4 align-items-stretch">
                 <div className="col-12 col-lg-7">
-                  <form className="h-100">
+                  <form className="h-100" onSubmit={handlePedidoSubmit}>
                     <h2 className="h4 fw-bold mb-3">Detalhes da solicitacao</h2>
                     <p className={`mb-0 ${mutedClassName}`}>
                       Informe os dados do envio para visualizar a simulacao do pedido antes de confirmar.
@@ -84,6 +92,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           value={pedido.item}
                           onChange={handlePedidoChange}
                           placeholder="Ex.: medicamentos, documentos ou pequeno volume"
+                          required
                         />
                       </div>
 
@@ -102,6 +111,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                             value={pedido.peso}
                             onChange={handlePedidoChange}
                             placeholder="Ex.: 2.5"
+                            required
                           />
                           <span className={`input-group-text ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`}>
                             kg
@@ -121,6 +131,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           value={pedido.origem}
                           onChange={handlePedidoChange}
                           placeholder="Ex.: Rua das Flores, 120 - Centro"
+                          required
                         />
                       </div>
 
@@ -136,6 +147,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           value={pedido.destino}
                           onChange={handlePedidoChange}
                           placeholder="Ex.: Avenida Brasil, 850 - Jardim"
+                          required
                         />
                       </div>
 
@@ -149,6 +161,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           className={selectClassName}
                           value={pedido.tipoEntrega}
                           onChange={handlePedidoChange}
+                          required
                         >
                           <option value="" disabled>
                             Selecione uma modalidade
