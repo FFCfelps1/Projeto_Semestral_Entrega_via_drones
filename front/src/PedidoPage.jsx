@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import { criarPedidoEntrega } from "./pedidosEntregaService.js"
 
 const pedidoInicial = {
   item: "",
@@ -127,11 +128,25 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
       criadoEm: new Date().toISOString(),
     }
 
-    setStatusPedido("Pedido simulado")
-    setPedidoSimulado(novoPedido)
-    setPedidosSimulados((pedidosAtuais) => [novoPedido, ...pedidosAtuais])
-    setMensagemSucesso(`Pedido ${novoPedido.id} criado com sucesso para simulacao.`)
-    setProcessandoPedido(false)
+    try {
+      const respostaServico = await criarPedidoEntrega({
+        baseUrl: pedidosEntregaServiceUrl,
+        pedido: novoPedido,
+      })
+      const pedidoConfirmado = respostaServico?.pedido || novoPedido
+
+      setStatusPedido("Pedido simulado")
+      setPedidoSimulado(pedidoConfirmado)
+      setPedidosSimulados((pedidosAtuais) => [pedidoConfirmado, ...pedidosAtuais])
+      setMensagemSucesso(`Pedido ${pedidoConfirmado.id} criado com sucesso para simulacao.`)
+    } catch (error) {
+      setErros({
+        geral: "Nao foi possivel simular o pedido agora.",
+      })
+      setMensagemSucesso("")
+    } finally {
+      setProcessandoPedido(false)
+    }
   }
 
   const handleLimparFormulario = () => {
@@ -333,6 +348,12 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         Limpar formulario
                       </button>
                     </div>
+
+                    {erros.geral && (
+                      <div className="alert alert-danger mt-4 mb-0" role="alert">
+                        {erros.geral}
+                      </div>
+                    )}
 
                     {mensagemSucesso && (
                       <div className="alert alert-success mt-4 mb-0" role="alert">
