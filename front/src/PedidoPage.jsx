@@ -110,7 +110,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                         />
                       </div>
 
-                      <div>
+                      <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-tipo-entrega">
                           Tipo de entrega
                         </label>
@@ -122,6 +122,19 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           <option value="expressa">Expressa</option>
                           <option value="prioritaria">Prioritaria</option>
                         </select>
+                      </div>
+
+                      <div>
+                        <label className="form-label fw-semibold" htmlFor="pedido-observacoes">
+                          Observacoes
+                        </label>
+                        <textarea
+                          id="pedido-observacoes"
+                          name="observacoes"
+                          className={inputClassName}
+                          rows="3"
+                          placeholder="Ex.: entregar na portaria, pacote fragil ou melhor horario para retirada"
+                        ></textarea>
                       </div>
                     </div>
 
