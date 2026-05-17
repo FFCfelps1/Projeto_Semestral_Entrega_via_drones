@@ -218,7 +218,7 @@ const AccountPage = ({ themeMode = "light", usuario, onAtualizarPerfil, onAltera
       <div className="container">
         <div className="mb-4">
           <h1 className="fw-bold mb-2">Minha conta</h1>
-          <p className={mutedClassName}>Gerencie seus dados de acesso da SkySwift.</p>
+          <p className={mutedClassName}>Gerencie seus dados de acesso e mantenha sua conta SkySwift atualizada.</p>
         </div>
 
         <div className="row g-4">
