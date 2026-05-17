@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const pedidoInicial = {
   item: "",
@@ -28,6 +28,7 @@ const temposEntrega = {
 }
 
 const statusInicialPedido = "Aguardando solicitacao"
+const PEDIDOS_STORAGE_KEY = "skyswift-pedidos-simulados"
 
 const PedidoPage = ({ themeMode = "light" }) => {
   const isDarkMode = themeMode === "dark"
@@ -36,6 +37,16 @@ const PedidoPage = ({ themeMode = "light" }) => {
   const [statusPedido, setStatusPedido] = useState(statusInicialPedido)
   const [pedidoSimulado, setPedidoSimulado] = useState(null)
   const [pedidosSimulados, setPedidosSimulados] = useState([])
+  const pedidosJaPersistidos = useRef(false)
+
+  useEffect(() => {
+    if (!pedidosJaPersistidos.current) {
+      pedidosJaPersistidos.current = true
+      return
+    }
+
+    window.localStorage.setItem(PEDIDOS_STORAGE_KEY, JSON.stringify(pedidosSimulados))
+  }, [pedidosSimulados])
 
   const handlePedidoChange = (event) => {
     const { name, value } = event.target
