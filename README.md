@@ -58,6 +58,7 @@ http://localhost:5173
 ### Páginas do Frontend
 
 - `/` — Página inicial (hero, pedidos, vantagens, CTA)
+- `/pedido` — Simulação visual de pedido de entrega via drone com formulário, resumo e histórico local
 - `/precos` — Planos de preço (Pessoal, Empresarial, Corporativo) e FAQ
 - `/rastreamento` — Rastreamento de entrega por drone com mapa interativo
 - `/suporte` — Central de ajuda com busca e tópicos expansíveis
@@ -281,6 +282,7 @@ Se quiser sobrescrever manualmente no frontend:
 - `VITE_MAP_SERVICE_URL`
 - `VITE_EMAIL_SERVICE_URL`
 - `VITE_AUTH_SERVICE_URL`
+- `VITE_PEDIDOS_ENTREGA_SERVICE_URL`
 
 ## 📜 Scripts Disponíveis
 
