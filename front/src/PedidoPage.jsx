@@ -15,6 +15,12 @@ const tiposEntrega = {
   prioritaria: "Prioritaria",
 }
 
+const multiplicadoresEntrega = {
+  padrao: 1,
+  expressa: 1.35,
+  prioritaria: 1.65,
+}
+
 const PedidoPage = ({ themeMode = "light" }) => {
   const isDarkMode = themeMode === "dark"
   const [pedido, setPedido] = useState(pedidoInicial)
@@ -89,6 +95,11 @@ const PedidoPage = ({ themeMode = "light" }) => {
   const inputClassName = `form-control ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
   const selectClassName = `form-select ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
   const summaryItemClassName = `d-flex justify-content-between gap-3 py-2 border-bottom ${isDarkMode ? "border-secondary" : ""}`
+  const pesoNumerico = Number(pedido.peso)
+  const precoEstimado =
+    pesoNumerico > 0
+      ? 18 + pesoNumerico * 4.5 * (multiplicadoresEntrega[pedido.tipoEntrega] || 1)
+      : 0
   const subtitleStyle = {
     maxWidth: "620px",
     lineHeight: 1.7,
@@ -279,9 +290,15 @@ const PedidoPage = ({ themeMode = "light" }) => {
                         <span className={mutedClassName}>Destino</span>
                         <strong className="text-end">{pedido.destino.trim() || "Nao informado"}</strong>
                       </div>
-                      <div className="d-flex justify-content-between gap-3 py-2">
+                      <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Tipo</span>
                         <strong className="text-end">{tiposEntrega[pedido.tipoEntrega] || "Nao selecionado"}</strong>
+                      </div>
+                      <div className="d-flex justify-content-between gap-3 py-2">
+                        <span className={mutedClassName}>Preco estimado</span>
+                        <strong className="text-end text-primary">
+                          {precoEstimado > 0 ? `R$ ${precoEstimado.toFixed(2).replace(".", ",")}` : "Aguardando dados"}
+                        </strong>
                       </div>
                     </div>
                   </div>
