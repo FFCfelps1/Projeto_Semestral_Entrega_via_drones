@@ -182,6 +182,8 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
   const mutedClassName = isDarkMode ? "text-light opacity-75" : "text-secondary"
   const inputClassName = `form-control ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
   const selectClassName = `form-select ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
+  const borderedPanelClassName = `border rounded ${isDarkMode ? "border-secondary" : ""}`
+  const secondaryButtonClassName = `btn ${isDarkMode ? "btn-outline-light" : "btn-outline-secondary"} fw-bold flex-sm-fill`
   const summaryItemClassName = `d-flex flex-column flex-sm-row justify-content-sm-between gap-1 gap-sm-3 py-2 border-bottom ${isDarkMode ? "border-secondary" : ""}`
   const pesoNumerico = Number(pedido.peso)
   const precoEstimado =
@@ -221,7 +223,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       Informe o pacote, os enderecos e a modalidade para receber uma previa da entrega.
                     </p>
 
-                    <div className="border rounded p-4 mt-4">
+                    <div className={`${borderedPanelClassName} p-4 mt-4`}>
                       <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-item">
                           Item ou descricao do pacote
@@ -351,7 +353,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       </button>
                       <button
                         type="button"
-                        className="btn btn-outline-secondary fw-bold flex-sm-fill"
+                        className={secondaryButtonClassName}
                         onClick={handleLimparFormulario}
                         disabled={processandoPedido}
                       >
@@ -374,7 +376,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                 </div>
 
                 <div className="col-12 col-lg-5">
-                  <div className="border rounded p-4 h-100">
+                  <div className={`${borderedPanelClassName} p-4 h-100`}>
                     <div className="d-flex align-items-center gap-3 mb-3">
                       <div
                         className="d-flex align-items-center justify-content-center flex-shrink-0 bg-primary bg-opacity-10 text-primary"
@@ -446,7 +448,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                 </div>
 
                 {pedidosSimulados.length === 0 ? (
-                  <div className="border rounded p-4">
+                  <div className={`${borderedPanelClassName} p-4`}>
                     <p className={`mb-0 ${mutedClassName}`}>
                       Nenhum pedido simulado ainda. Preencha os dados do envio para montar a primeira solicitacao.
                     </p>
@@ -455,7 +457,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                   <div className="row g-3">
                     {pedidosSimulados.map((pedidoHistorico) => (
                       <div className="col-12 col-lg-6" key={pedidoHistorico.id}>
-                        <div className="border rounded p-3 h-100">
+                        <div className={`${borderedPanelClassName} p-3 h-100`}>
                           <div className="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start gap-3 mb-2">
                             <div>
                               <strong className="text-break">{pedidoHistorico.id}</strong>
