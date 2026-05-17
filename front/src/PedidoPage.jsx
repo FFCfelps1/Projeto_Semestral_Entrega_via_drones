@@ -204,12 +204,12 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
               </span>
 
               <div className="mb-4">
-                <h1 className="fw-bold mb-3">Solicite sua entrega SkySwift</h1>
+                <h1 className="fw-bold mb-3">Solicite uma entrega via drone</h1>
                 <p className={`fs-5 mb-2 ${mutedClassName}`} style={subtitleStyle}>
-                  Simule uma entrega via drone com origem, destino e detalhes do pacote em poucos passos.
+                  Planeje o envio, confira a estimativa e deixe o pedido pronto para a futura operacao SkySwift.
                 </p>
                 <p className={`mb-0 ${mutedClassName}`} style={subtitleStyle}>
-                  Esta tela representa o futuro microsservico de pedidos de entrega, preparado para conectar sua solicitacao a uma API dedicada nas proximas evolucoes.
+                  Esta experiencia antecipa o microsservico de pedidos de entrega, com fluxo local preparado para futura integracao com a API dedicada.
                 </p>
               </div>
 
@@ -218,7 +218,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                   <form className="h-100" onSubmit={handlePedidoSubmit} noValidate>
                     <h2 className="h4 fw-bold mb-3">Detalhes da solicitacao</h2>
                     <p className={`mb-0 ${mutedClassName}`}>
-                      Informe os dados do envio para visualizar a simulacao do pedido antes de confirmar.
+                      Informe o pacote, os enderecos e a modalidade para receber uma previa da entrega.
                     </p>
 
                     <div className="border rounded p-4 mt-4">
@@ -384,7 +384,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       </div>
                       <div>
                         <h2 className="h5 fw-bold mb-1">Resumo do pedido</h2>
-                        <p className={`mb-0 ${mutedClassName}`}>Previa da solicitacao de entrega.</p>
+                        <p className={`mb-0 ${mutedClassName}`}>Confira a previa antes de simular o pedido.</p>
                       </div>
                     </div>
 
@@ -440,7 +440,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                 <div className="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
                   <div>
                     <h2 className="h4 fw-bold mb-1">Pedidos simulados</h2>
-                    <p className={`mb-0 ${mutedClassName}`}>Historico local criado nesta sessao.</p>
+                    <p className={`mb-0 ${mutedClassName}`}>Acompanhe as simulacoes salvas neste navegador.</p>
                   </div>
                   <span className="badge bg-primary align-self-md-start">{pedidosSimulados.length} pedidos</span>
                 </div>
@@ -448,7 +448,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                 {pedidosSimulados.length === 0 ? (
                   <div className="border rounded p-4">
                     <p className={`mb-0 ${mutedClassName}`}>
-                      Nenhum pedido simulado ainda. Preencha o formulario para ver o historico local.
+                      Nenhum pedido simulado ainda. Preencha os dados do envio para montar a primeira solicitacao.
                     </p>
                   </div>
                 ) : (
