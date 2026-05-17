@@ -35,6 +35,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
   const [erros, setErros] = useState({})
   const [statusPedido, setStatusPedido] = useState(statusInicialPedido)
   const [pedidoSimulado, setPedidoSimulado] = useState(null)
+  const [pedidosSimulados, setPedidosSimulados] = useState([])
 
   const handlePedidoChange = (event) => {
     const { name, value } = event.target
@@ -88,15 +89,18 @@ const PedidoPage = ({ themeMode = "light" }) => {
       return
     }
 
-    setStatusPedido("Pedido simulado")
-    setPedidoSimulado({
+    const novoPedido = {
       id: `PED-${Date.now()}`,
       ...pedido,
       precoEstimado,
       tempoEstimado: temposEntrega[pedido.tipoEntrega],
       status: "Pedido simulado",
       criadoEm: new Date().toISOString(),
-    })
+    }
+
+    setStatusPedido("Pedido simulado")
+    setPedidoSimulado(novoPedido)
+    setPedidosSimulados((pedidosAtuais) => [novoPedido, ...pedidosAtuais])
   }
 
   const pageStyle = {
