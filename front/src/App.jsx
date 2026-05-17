@@ -424,7 +424,7 @@ const App = () => {
             icone="shopping-cart"
             titulo="Pedido"
             descricao="Escolha seus itens através do aplicativo SkySwift e defina seu ponto de entrega com precisão GPS."/>
-            <button className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</button>
+            <a href="/pedido" className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</a>
             </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
