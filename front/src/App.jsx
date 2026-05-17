@@ -27,8 +27,7 @@ const AUTH_SERVICE_URL =
   (import.meta.env.DEV ? "http://localhost:3004" : "/api/cadastro_usuario")
 
 const PEDIDOS_ENTREGA_SERVICE_URL =
-  import.meta.env.VITE_PEDIDOS_ENTREGA_SERVICE_URL ||
-  (import.meta.env.DEV ? "" : "/api/pedidos_entrega")
+  import.meta.env.VITE_PEDIDOS_ENTREGA_SERVICE_URL || ""
 
 const AUTH_STORAGE_KEY = "skyswift-auth"
 

@@ -73,8 +73,10 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
     setErros((errosAtuais) => ({
       ...errosAtuais,
       [name]: "",
+      geral: "",
     }))
     setStatusPedido(statusInicialPedido)
+    setPedidoSimulado(null)
     setMensagemSucesso("")
   }
 
