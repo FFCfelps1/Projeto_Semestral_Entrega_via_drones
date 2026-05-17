@@ -9,6 +9,12 @@ const pedidoInicial = {
   observacoes: "",
 }
 
+const tiposEntrega = {
+  padrao: "Padrao",
+  expressa: "Expressa",
+  prioritaria: "Prioritaria",
+}
+
 const PedidoPage = ({ themeMode = "light" }) => {
   const isDarkMode = themeMode === "dark"
   const [pedido, setPedido] = useState(pedidoInicial)
@@ -259,23 +265,23 @@ const PedidoPage = ({ themeMode = "light" }) => {
                     <div className="mt-4">
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Item</span>
-                        <strong className="text-end">Aguardando item</strong>
+                        <strong className="text-end">{pedido.item.trim() || "Aguardando item"}</strong>
                       </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Peso</span>
-                        <strong className="text-end">Aguardando peso</strong>
+                        <strong className="text-end">{pedido.peso ? `${pedido.peso} kg` : "Aguardando peso"}</strong>
                       </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Origem</span>
-                        <strong className="text-end">Nao informada</strong>
+                        <strong className="text-end">{pedido.origem.trim() || "Nao informada"}</strong>
                       </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Destino</span>
-                        <strong className="text-end">Nao informado</strong>
+                        <strong className="text-end">{pedido.destino.trim() || "Nao informado"}</strong>
                       </div>
                       <div className="d-flex justify-content-between gap-3 py-2">
                         <span className={mutedClassName}>Tipo</span>
-                        <strong className="text-end">Nao selecionado</strong>
+                        <strong className="text-end">{tiposEntrega[pedido.tipoEntrega] || "Nao selecionado"}</strong>
                       </div>
                     </div>
                   </div>
