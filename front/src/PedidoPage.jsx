@@ -15,6 +15,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
   }
 
   const mutedClassName = isDarkMode ? "text-light opacity-75" : "text-secondary"
+  const inputClassName = `form-control ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
   const subtitleStyle = {
     maxWidth: "620px",
     lineHeight: 1.7,
@@ -49,9 +50,18 @@ const PedidoPage = ({ themeMode = "light" }) => {
                     </p>
 
                     <div className="border rounded p-4 mt-4">
-                      <p className={`mb-0 ${mutedClassName}`}>
-                        Os campos do formulario de pedido serao adicionados nas proximas etapas.
-                      </p>
+                      <div>
+                        <label className="form-label fw-semibold" htmlFor="pedido-item">
+                          Item ou descricao do pacote
+                        </label>
+                        <input
+                          id="pedido-item"
+                          name="item"
+                          type="text"
+                          className={inputClassName}
+                          placeholder="Ex.: medicamentos, documentos ou pequeno volume"
+                        />
+                      </div>
                     </div>
 
                     <div className="d-flex flex-column flex-sm-row gap-2 mt-4">
