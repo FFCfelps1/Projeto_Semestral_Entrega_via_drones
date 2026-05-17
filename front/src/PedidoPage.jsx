@@ -133,6 +133,15 @@ const PedidoPage = ({ themeMode = "light" }) => {
     setPedidoSimulado(null)
   }
 
+  const handleRemoverPedido = (pedidoId) => {
+    setPedidosSimulados((pedidosAtuais) => pedidosAtuais.filter((pedidoAtual) => pedidoAtual.id !== pedidoId))
+
+    if (pedidoSimulado?.id === pedidoId) {
+      setPedidoSimulado(null)
+      setStatusPedido(statusInicialPedido)
+    }
+  }
+
   const pageStyle = {
     minHeight: "calc(100vh - 72px)",
     backgroundColor: isDarkMode ? "#0b1220" : "#eef5ff",
@@ -396,9 +405,22 @@ const PedidoPage = ({ themeMode = "light" }) => {
                     {pedidosSimulados.map((pedidoHistorico) => (
                       <div className="col-12 col-lg-6" key={pedidoHistorico.id}>
                         <div className="border rounded p-3 h-100">
-                          <div className="d-flex justify-content-between gap-3 mb-2">
-                            <strong>{pedidoHistorico.id}</strong>
-                            <span className="badge bg-success">{pedidoHistorico.status}</span>
+                          <div className="d-flex justify-content-between align-items-start gap-3 mb-2">
+                            <div>
+                              <strong>{pedidoHistorico.id}</strong>
+                              <div>
+                                <span className="badge bg-success mt-1">{pedidoHistorico.status}</span>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              className="btn btn-outline-danger btn-sm"
+                              onClick={() => handleRemoverPedido(pedidoHistorico.id)}
+                              aria-label={`Remover pedido ${pedidoHistorico.id}`}
+                              title="Remover pedido"
+                            >
+                              <i className="fa fa-trash" aria-hidden="true"></i>
+                            </button>
                           </div>
                           <p className="fw-semibold mb-1">{pedidoHistorico.item}</p>
                           <p className={`small mb-2 ${mutedClassName}`}>
