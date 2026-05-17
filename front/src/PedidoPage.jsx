@@ -15,6 +15,10 @@ const PedidoPage = ({ themeMode = "light" }) => {
   }
 
   const mutedClassName = isDarkMode ? "text-light opacity-75" : "text-secondary"
+  const subtitleStyle = {
+    maxWidth: "620px",
+    lineHeight: 1.7,
+  }
 
   return (
     <section className="py-5" style={pageStyle}>
@@ -26,12 +30,22 @@ const PedidoPage = ({ themeMode = "light" }) => {
                 Pedido de entrega
               </span>
 
+              <div className="mb-4">
+                <h1 className="fw-bold mb-3">Solicite sua entrega SkySwift</h1>
+                <p className={`fs-5 mb-2 ${mutedClassName}`} style={subtitleStyle}>
+                  Simule uma entrega via drone com origem, destino e detalhes do pacote em poucos passos.
+                </p>
+                <p className={`mb-0 ${mutedClassName}`} style={subtitleStyle}>
+                  Esta tela representa o futuro microsservico de pedidos de entrega, preparado para conectar sua solicitacao a uma API dedicada nas proximas evolucoes.
+                </p>
+              </div>
+
               <div className="row g-4 align-items-stretch">
                 <div className="col-12 col-lg-7">
                   <div className="h-100">
-                    <h1 className="fw-bold mb-3">Solicitar entrega via drone</h1>
+                    <h2 className="h4 fw-bold mb-3">Detalhes da solicitacao</h2>
                     <p className={`mb-0 ${mutedClassName}`}>
-                      Estrutura inicial da tela do futuro microsservico de pedidos de entrega SkySwift.
+                      Informe os dados do envio para visualizar a simulacao do pedido antes de confirmar.
                     </p>
                   </div>
                 </div>
