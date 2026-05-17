@@ -234,9 +234,11 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                           value={pedido.item}
                           onChange={handlePedidoChange}
                           placeholder="Ex.: medicamentos, documentos ou pequeno volume"
+                          aria-describedby={erros.item ? "pedido-item-erro" : undefined}
+                          aria-invalid={Boolean(erros.item)}
                           required
                         />
-                        {erros.item && <div className="invalid-feedback">{erros.item}</div>}
+                        {erros.item && <div id="pedido-item-erro" className="invalid-feedback">{erros.item}</div>}
                       </div>
 
                       <div className="mb-3">
@@ -254,13 +256,15 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                             value={pedido.peso}
                             onChange={handlePedidoChange}
                             placeholder="Ex.: 2.5"
+                            aria-describedby={erros.peso ? "pedido-peso-erro" : undefined}
+                            aria-invalid={Boolean(erros.peso)}
                             required
                           />
                           <span className={`input-group-text ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`}>
                             kg
                           </span>
                         </div>
-                        {erros.peso && <div className="invalid-feedback d-block">{erros.peso}</div>}
+                        {erros.peso && <div id="pedido-peso-erro" className="invalid-feedback d-block">{erros.peso}</div>}
                       </div>
 
                       <div className="mb-3">
@@ -275,9 +279,11 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                           value={pedido.origem}
                           onChange={handlePedidoChange}
                           placeholder="Ex.: Rua das Flores, 120 - Centro"
+                          aria-describedby={erros.origem ? "pedido-origem-erro" : undefined}
+                          aria-invalid={Boolean(erros.origem)}
                           required
                         />
-                        {erros.origem && <div className="invalid-feedback">{erros.origem}</div>}
+                        {erros.origem && <div id="pedido-origem-erro" className="invalid-feedback">{erros.origem}</div>}
                       </div>
 
                       <div className="mb-3">
@@ -292,9 +298,11 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                           value={pedido.destino}
                           onChange={handlePedidoChange}
                           placeholder="Ex.: Avenida Brasil, 850 - Jardim"
+                          aria-describedby={erros.destino ? "pedido-destino-erro" : undefined}
+                          aria-invalid={Boolean(erros.destino)}
                           required
                         />
-                        {erros.destino && <div className="invalid-feedback">{erros.destino}</div>}
+                        {erros.destino && <div id="pedido-destino-erro" className="invalid-feedback">{erros.destino}</div>}
                       </div>
 
                       <div className="mb-3">
@@ -307,6 +315,8 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                           className={`${selectClassName} ${erros.tipoEntrega ? "is-invalid" : ""}`}
                           value={pedido.tipoEntrega}
                           onChange={handlePedidoChange}
+                          aria-describedby={erros.tipoEntrega ? "pedido-tipo-entrega-erro" : undefined}
+                          aria-invalid={Boolean(erros.tipoEntrega)}
                           required
                         >
                           <option value="" disabled>
@@ -316,7 +326,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                           <option value="expressa">Expressa</option>
                           <option value="prioritaria">Prioritaria</option>
                         </select>
-                        {erros.tipoEntrega && <div className="invalid-feedback">{erros.tipoEntrega}</div>}
+                        {erros.tipoEntrega && <div id="pedido-tipo-entrega-erro" className="invalid-feedback">{erros.tipoEntrega}</div>}
                       </div>
 
                       <div>
@@ -350,13 +360,13 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                     </div>
 
                     {erros.geral && (
-                      <div className="alert alert-danger mt-4 mb-0" role="alert">
+                      <div className="alert alert-danger mt-4 mb-0" role="alert" aria-live="assertive">
                         {erros.geral}
                       </div>
                     )}
 
                     {mensagemSucesso && (
-                      <div className="alert alert-success mt-4 mb-0" role="alert">
+                      <div className="alert alert-success mt-4 mb-0" role="status" aria-live="polite">
                         {mensagemSucesso}
                       </div>
                     )}
@@ -378,7 +388,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       </div>
                     </div>
 
-                    <div className="mt-4">
+                    <div className="mt-4" aria-live="polite">
                       {pedidoSimulado?.id && (
                         <div className={summaryItemClassName}>
                           <span className={mutedClassName}>Identificador</span>
