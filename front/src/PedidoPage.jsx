@@ -82,6 +82,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
   const mutedClassName = isDarkMode ? "text-light opacity-75" : "text-secondary"
   const inputClassName = `form-control ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
   const selectClassName = `form-select ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
+  const summaryItemClassName = `d-flex justify-content-between gap-3 py-2 border-bottom ${isDarkMode ? "border-secondary" : ""}`
   const subtitleStyle = {
     maxWidth: "620px",
     lineHeight: 1.7,
@@ -242,10 +243,41 @@ const PedidoPage = ({ themeMode = "light" }) => {
 
                 <div className="col-12 col-lg-5">
                   <div className="border rounded p-4 h-100">
-                    <h2 className="h5 fw-bold mb-2">Resumo do pedido</h2>
-                    <p className={`mb-0 ${mutedClassName}`}>
-                      O formulario e a simulacao do pedido serao adicionados nas proximas etapas.
-                    </p>
+                    <div className="d-flex align-items-center gap-3 mb-3">
+                      <div
+                        className="d-flex align-items-center justify-content-center flex-shrink-0 bg-primary bg-opacity-10 text-primary"
+                        style={{ width: "44px", height: "44px", borderRadius: "8px" }}
+                      >
+                        <i className="fa fa-clipboard-list" aria-hidden="true"></i>
+                      </div>
+                      <div>
+                        <h2 className="h5 fw-bold mb-1">Resumo do pedido</h2>
+                        <p className={`mb-0 ${mutedClassName}`}>Previa da solicitacao de entrega.</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <div className={summaryItemClassName}>
+                        <span className={mutedClassName}>Item</span>
+                        <strong className="text-end">Aguardando item</strong>
+                      </div>
+                      <div className={summaryItemClassName}>
+                        <span className={mutedClassName}>Peso</span>
+                        <strong className="text-end">Aguardando peso</strong>
+                      </div>
+                      <div className={summaryItemClassName}>
+                        <span className={mutedClassName}>Origem</span>
+                        <strong className="text-end">Nao informada</strong>
+                      </div>
+                      <div className={summaryItemClassName}>
+                        <span className={mutedClassName}>Destino</span>
+                        <strong className="text-end">Nao informado</strong>
+                      </div>
+                      <div className="d-flex justify-content-between gap-3 py-2">
+                        <span className={mutedClassName}>Tipo</span>
+                        <strong className="text-end">Nao selecionado</strong>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
