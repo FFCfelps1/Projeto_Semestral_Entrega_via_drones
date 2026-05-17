@@ -42,12 +42,27 @@ const PedidoPage = ({ themeMode = "light" }) => {
 
               <div className="row g-4 align-items-stretch">
                 <div className="col-12 col-lg-7">
-                  <div className="h-100">
+                  <form className="h-100">
                     <h2 className="h4 fw-bold mb-3">Detalhes da solicitacao</h2>
                     <p className={`mb-0 ${mutedClassName}`}>
                       Informe os dados do envio para visualizar a simulacao do pedido antes de confirmar.
                     </p>
-                  </div>
+
+                    <div className="border rounded p-4 mt-4">
+                      <p className={`mb-0 ${mutedClassName}`}>
+                        Os campos do formulario de pedido serao adicionados nas proximas etapas.
+                      </p>
+                    </div>
+
+                    <div className="d-flex flex-column flex-sm-row gap-2 mt-4">
+                      <button type="submit" className="btn btn-primary fw-bold">
+                        Simular pedido
+                      </button>
+                      <button type="button" className="btn btn-outline-secondary fw-bold">
+                        Limpar formulario
+                      </button>
+                    </div>
+                  </form>
                 </div>
 
                 <div className="col-12 col-lg-5">
