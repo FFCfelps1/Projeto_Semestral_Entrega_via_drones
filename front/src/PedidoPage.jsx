@@ -49,6 +49,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
   const [statusPedido, setStatusPedido] = useState(statusInicialPedido)
   const [pedidoSimulado, setPedidoSimulado] = useState(null)
   const [pedidosSimulados, setPedidosSimulados] = useState(carregarPedidosSalvos)
+  const [mensagemSucesso, setMensagemSucesso] = useState("")
   const pedidosJaPersistidos = useRef(false)
 
   useEffect(() => {
@@ -72,6 +73,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
       [name]: "",
     }))
     setStatusPedido(statusInicialPedido)
+    setMensagemSucesso("")
   }
 
   const validarPedido = () => {
@@ -124,6 +126,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
     setStatusPedido("Pedido simulado")
     setPedidoSimulado(novoPedido)
     setPedidosSimulados((pedidosAtuais) => [novoPedido, ...pedidosAtuais])
+    setMensagemSucesso(`Pedido ${novoPedido.id} criado com sucesso para simulacao.`)
   }
 
   const handleLimparFormulario = () => {
@@ -131,6 +134,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
     setErros({})
     setStatusPedido(statusInicialPedido)
     setPedidoSimulado(null)
+    setMensagemSucesso("")
   }
 
   const handleRemoverPedido = (pedidoId) => {
@@ -319,6 +323,12 @@ const PedidoPage = ({ themeMode = "light" }) => {
                         Limpar formulario
                       </button>
                     </div>
+
+                    {mensagemSucesso && (
+                      <div className="alert alert-success mt-4 mb-0" role="alert">
+                        {mensagemSucesso}
+                      </div>
+                    )}
                   </form>
                 </div>
 
