@@ -17,4 +17,5 @@ WHERE NOT EXISTS (
     SELECT 1 FROM usuarios WHERE email = 'arthur@email.com'
 );
 
-SELECT id, nome, email, data_criacao FROM usuarios;
+SELECT id, nome, email, senha, data_criacao
+FROM skyswift.usuarios;
