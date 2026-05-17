@@ -34,6 +34,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
   const [pedido, setPedido] = useState(pedidoInicial)
   const [erros, setErros] = useState({})
   const [statusPedido, setStatusPedido] = useState(statusInicialPedido)
+  const [pedidoSimulado, setPedidoSimulado] = useState(null)
 
   const handlePedidoChange = (event) => {
     const { name, value } = event.target
@@ -88,6 +89,14 @@ const PedidoPage = ({ themeMode = "light" }) => {
     }
 
     setStatusPedido("Pedido simulado")
+    setPedidoSimulado({
+      id: `PED-${Date.now()}`,
+      ...pedido,
+      precoEstimado,
+      tempoEstimado: temposEntrega[pedido.tipoEntrega],
+      status: "Pedido simulado",
+      criadoEm: new Date().toISOString(),
+    })
   }
 
   const pageStyle = {
@@ -286,6 +295,12 @@ const PedidoPage = ({ themeMode = "light" }) => {
                     </div>
 
                     <div className="mt-4">
+                      {pedidoSimulado?.id && (
+                        <div className={summaryItemClassName}>
+                          <span className={mutedClassName}>Identificador</span>
+                          <strong className="text-end">{pedidoSimulado.id}</strong>
+                        </div>
+                      )}
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Status</span>
                         <span className={`badge ${statusPedido === statusInicialPedido ? "bg-warning text-dark" : "bg-success"}`}>
