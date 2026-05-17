@@ -1,5 +1,17 @@
+import { useState } from "react"
+
+const pedidoInicial = {
+  item: "",
+  peso: "",
+  origem: "",
+  destino: "",
+  tipoEntrega: "",
+  observacoes: "",
+}
+
 const PedidoPage = ({ themeMode = "light" }) => {
   const isDarkMode = themeMode === "dark"
+  const [pedido] = useState(pedidoInicial)
 
   const pageStyle = {
     minHeight: "calc(100vh - 72px)",
@@ -60,6 +72,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           name="item"
                           type="text"
                           className={inputClassName}
+                          defaultValue={pedido.item}
                           placeholder="Ex.: medicamentos, documentos ou pequeno volume"
                         />
                       </div>
@@ -76,6 +89,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                             className={inputClassName}
                             min="0"
                             step="0.1"
+                            defaultValue={pedido.peso}
                             placeholder="Ex.: 2.5"
                           />
                           <span className={`input-group-text ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`}>
@@ -93,6 +107,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           name="origem"
                           type="text"
                           className={inputClassName}
+                          defaultValue={pedido.origem}
                           placeholder="Ex.: Rua das Flores, 120 - Centro"
                         />
                       </div>
@@ -106,6 +121,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           name="destino"
                           type="text"
                           className={inputClassName}
+                          defaultValue={pedido.destino}
                           placeholder="Ex.: Avenida Brasil, 850 - Jardim"
                         />
                       </div>
@@ -114,7 +130,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                         <label className="form-label fw-semibold" htmlFor="pedido-tipo-entrega">
                           Tipo de entrega
                         </label>
-                        <select id="pedido-tipo-entrega" name="tipoEntrega" className={selectClassName} defaultValue="">
+                        <select id="pedido-tipo-entrega" name="tipoEntrega" className={selectClassName} defaultValue={pedido.tipoEntrega}>
                           <option value="" disabled>
                             Selecione uma modalidade
                           </option>
@@ -133,6 +149,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           name="observacoes"
                           className={inputClassName}
                           rows="3"
+                          defaultValue={pedido.observacoes}
                           placeholder="Ex.: entregar na portaria, pacote fragil ou melhor horario para retirada"
                         ></textarea>
                       </div>
