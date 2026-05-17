@@ -42,7 +42,7 @@ const carregarPedidosSalvos = () => {
   }
 }
 
-const PedidoPage = ({ themeMode = "light" }) => {
+const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
   const isDarkMode = themeMode === "dark"
   const [pedido, setPedido] = useState(pedidoInicial)
   const [erros, setErros] = useState({})
