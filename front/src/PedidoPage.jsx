@@ -83,7 +83,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                         </div>
                       </div>
 
-                      <div>
+                      <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-origem">
                           Endereco de retirada
                         </label>
@@ -93,6 +93,19 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           type="text"
                           className={inputClassName}
                           placeholder="Ex.: Rua das Flores, 120 - Centro"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="form-label fw-semibold" htmlFor="pedido-destino">
+                          Endereco de entrega
+                        </label>
+                        <input
+                          id="pedido-destino"
+                          name="destino"
+                          type="text"
+                          className={inputClassName}
+                          placeholder="Ex.: Avenida Brasil, 850 - Jardim"
                         />
                       </div>
                     </div>
