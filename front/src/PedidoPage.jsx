@@ -182,7 +182,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
   const mutedClassName = isDarkMode ? "text-light opacity-75" : "text-secondary"
   const inputClassName = `form-control ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
   const selectClassName = `form-select ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
-  const summaryItemClassName = `d-flex justify-content-between gap-3 py-2 border-bottom ${isDarkMode ? "border-secondary" : ""}`
+  const summaryItemClassName = `d-flex flex-column flex-sm-row justify-content-sm-between gap-1 gap-sm-3 py-2 border-bottom ${isDarkMode ? "border-secondary" : ""}`
   const pesoNumerico = Number(pedido.peso)
   const precoEstimado =
     pesoNumerico > 0
@@ -336,12 +336,12 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                     </div>
 
                     <div className="d-flex flex-column flex-sm-row gap-2 mt-4">
-                      <button type="submit" className="btn btn-primary fw-bold" disabled={processandoPedido}>
+                      <button type="submit" className="btn btn-primary fw-bold flex-sm-fill" disabled={processandoPedido}>
                         {processandoPedido ? "Processando..." : "Simular pedido"}
                       </button>
                       <button
                         type="button"
-                        className="btn btn-outline-secondary fw-bold"
+                        className="btn btn-outline-secondary fw-bold flex-sm-fill"
                         onClick={handleLimparFormulario}
                         disabled={processandoPedido}
                       >
@@ -382,7 +382,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       {pedidoSimulado?.id && (
                         <div className={summaryItemClassName}>
                           <span className={mutedClassName}>Identificador</span>
-                          <strong className="text-end">{pedidoSimulado.id}</strong>
+                          <strong className="text-sm-end text-break">{pedidoSimulado.id}</strong>
                         </div>
                       )}
                       <div className={summaryItemClassName}>
@@ -393,31 +393,31 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Item</span>
-                        <strong className="text-end">{pedido.item.trim() || "Aguardando item"}</strong>
+                        <strong className="text-sm-end text-break">{pedido.item.trim() || "Aguardando item"}</strong>
                       </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Peso</span>
-                        <strong className="text-end">{pedido.peso ? `${pedido.peso} kg` : "Aguardando peso"}</strong>
+                        <strong className="text-sm-end text-break">{pedido.peso ? `${pedido.peso} kg` : "Aguardando peso"}</strong>
                       </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Origem</span>
-                        <strong className="text-end">{pedido.origem.trim() || "Nao informada"}</strong>
+                        <strong className="text-sm-end text-break">{pedido.origem.trim() || "Nao informada"}</strong>
                       </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Destino</span>
-                        <strong className="text-end">{pedido.destino.trim() || "Nao informado"}</strong>
+                        <strong className="text-sm-end text-break">{pedido.destino.trim() || "Nao informado"}</strong>
                       </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Tipo</span>
-                        <strong className="text-end">{tiposEntrega[pedido.tipoEntrega] || "Nao selecionado"}</strong>
+                        <strong className="text-sm-end text-break">{tiposEntrega[pedido.tipoEntrega] || "Nao selecionado"}</strong>
                       </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Tempo estimado</span>
-                        <strong className="text-end">{temposEntrega[pedido.tipoEntrega] || "Aguardando tipo"}</strong>
+                        <strong className="text-sm-end text-break">{temposEntrega[pedido.tipoEntrega] || "Aguardando tipo"}</strong>
                       </div>
-                      <div className="d-flex justify-content-between gap-3 py-2">
+                      <div className="d-flex flex-column flex-sm-row justify-content-sm-between gap-1 gap-sm-3 py-2">
                         <span className={mutedClassName}>Preco estimado</span>
-                        <strong className="text-end text-primary">
+                        <strong className="text-sm-end text-primary">
                           {precoEstimado > 0 ? `R$ ${precoEstimado.toFixed(2).replace(".", ",")}` : "Aguardando dados"}
                         </strong>
                       </div>
@@ -446,16 +446,16 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                     {pedidosSimulados.map((pedidoHistorico) => (
                       <div className="col-12 col-lg-6" key={pedidoHistorico.id}>
                         <div className="border rounded p-3 h-100">
-                          <div className="d-flex justify-content-between align-items-start gap-3 mb-2">
+                          <div className="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start gap-3 mb-2">
                             <div>
-                              <strong>{pedidoHistorico.id}</strong>
+                              <strong className="text-break">{pedidoHistorico.id}</strong>
                               <div>
                                 <span className="badge bg-success mt-1">{pedidoHistorico.status}</span>
                               </div>
                             </div>
                             <button
                               type="button"
-                              className="btn btn-outline-danger btn-sm"
+                              className="btn btn-outline-danger btn-sm align-self-start align-self-sm-auto"
                               onClick={() => handleRemoverPedido(pedidoHistorico.id)}
                               aria-label={`Remover pedido ${pedidoHistorico.id}`}
                               title="Remover pedido"
@@ -463,9 +463,9 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                               <i className="fa fa-trash" aria-hidden="true"></i>
                             </button>
                           </div>
-                          <p className="fw-semibold mb-1">{pedidoHistorico.item}</p>
+                          <p className="fw-semibold mb-1 text-break">{pedidoHistorico.item}</p>
                           <p className={`small mb-2 ${mutedClassName}`}>
-                            {pedidoHistorico.origem} para {pedidoHistorico.destino}
+                            <span className="text-break d-block">{pedidoHistorico.origem} para {pedidoHistorico.destino}</span>
                           </p>
                           <div className="d-flex flex-wrap gap-2">
                             <span className="badge bg-primary bg-opacity-10 text-primary">
