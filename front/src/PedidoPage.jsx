@@ -27,6 +27,8 @@ const temposEntrega = {
   prioritaria: "15 a 25 min",
 }
 
+const statusInicialPedido = "Aguardando solicitacao"
+
 const PedidoPage = ({ themeMode = "light" }) => {
   const isDarkMode = themeMode === "dark"
   const [pedido, setPedido] = useState(pedidoInicial)
@@ -280,6 +282,10 @@ const PedidoPage = ({ themeMode = "light" }) => {
                     </div>
 
                     <div className="mt-4">
+                      <div className={summaryItemClassName}>
+                        <span className={mutedClassName}>Status</span>
+                        <span className="badge bg-warning text-dark">{statusInicialPedido}</span>
+                      </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Item</span>
                         <strong className="text-end">{pedido.item.trim() || "Aguardando item"}</strong>
