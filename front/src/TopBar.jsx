@@ -1,9 +1,7 @@
 const TopBar = ({ themeMode = "light", onToggleTheme, usuario, onLogout }) => {
   const isDarkMode = themeMode === "dark";
-  const isTrackingPage = typeof window !== "undefined" && window.location.pathname === "/rastreamento";
   const isSubPage = typeof window !== "undefined" && window.location.pathname !== "/";
   const isPrecosPage = typeof window !== "undefined" && window.location.pathname === "/precos";
-  const isSuportePage = typeof window !== "undefined" && window.location.pathname === "/suporte";
   const isLoginPage = typeof window !== "undefined" && window.location.pathname === "/login";
   const isContaPage = typeof window !== "undefined" && window.location.pathname === "/conta";
   const isHomePage = !isSubPage;

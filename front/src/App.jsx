@@ -40,7 +40,7 @@ const App = () => {
     try {
       const savedSession = window.localStorage.getItem(AUTH_STORAGE_KEY)
       return savedSession ? JSON.parse(savedSession) : null
-    } catch (error) {
+    } catch {
       window.localStorage.removeItem(AUTH_STORAGE_KEY)
       return null
     }
@@ -95,7 +95,7 @@ const App = () => {
           window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessaoAtualizada))
           return sessaoAtualizada
         })
-      } catch (error) {
+      } catch {
         if (!sessaoAtiva) return
 
         setAuthSession((sessaoAtual) => {
