@@ -50,7 +50,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                     </p>
 
                     <div className="border rounded p-4 mt-4">
-                      <div>
+                      <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-item">
                           Item ou descricao do pacote
                         </label>
@@ -61,6 +61,26 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           className={inputClassName}
                           placeholder="Ex.: medicamentos, documentos ou pequeno volume"
                         />
+                      </div>
+
+                      <div>
+                        <label className="form-label fw-semibold" htmlFor="pedido-peso">
+                          Peso aproximado
+                        </label>
+                        <div className="input-group">
+                          <input
+                            id="pedido-peso"
+                            name="peso"
+                            type="number"
+                            className={inputClassName}
+                            min="0"
+                            step="0.1"
+                            placeholder="Ex.: 2.5"
+                          />
+                          <span className={`input-group-text ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`}>
+                            kg
+                          </span>
+                        </div>
                       </div>
                     </div>
 
