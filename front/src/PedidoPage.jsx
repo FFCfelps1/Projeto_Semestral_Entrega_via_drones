@@ -50,6 +50,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
   const [pedidoSimulado, setPedidoSimulado] = useState(null)
   const [pedidosSimulados, setPedidosSimulados] = useState(carregarPedidosSalvos)
   const [mensagemSucesso, setMensagemSucesso] = useState("")
+  const [processandoPedido, setProcessandoPedido] = useState(false)
   const pedidosJaPersistidos = useRef(false)
 
   useEffect(() => {
@@ -104,7 +105,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
     return novosErros
   }
 
-  const handlePedidoSubmit = (event) => {
+  const handlePedidoSubmit = async (event) => {
     event.preventDefault()
 
     const errosValidacao = validarPedido()
@@ -113,6 +114,9 @@ const PedidoPage = ({ themeMode = "light" }) => {
     if (Object.keys(errosValidacao).length > 0) {
       return
     }
+
+    setProcessandoPedido(true)
+    await new Promise((resolve) => setTimeout(resolve, 500))
 
     const novoPedido = {
       id: `PED-${Date.now()}`,
@@ -127,6 +131,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
     setPedidoSimulado(novoPedido)
     setPedidosSimulados((pedidosAtuais) => [novoPedido, ...pedidosAtuais])
     setMensagemSucesso(`Pedido ${novoPedido.id} criado com sucesso para simulacao.`)
+    setProcessandoPedido(false)
   }
 
   const handleLimparFormulario = () => {
@@ -316,10 +321,15 @@ const PedidoPage = ({ themeMode = "light" }) => {
                     </div>
 
                     <div className="d-flex flex-column flex-sm-row gap-2 mt-4">
-                      <button type="submit" className="btn btn-primary fw-bold">
-                        Simular pedido
+                      <button type="submit" className="btn btn-primary fw-bold" disabled={processandoPedido}>
+                        {processandoPedido ? "Processando..." : "Simular pedido"}
                       </button>
-                      <button type="button" className="btn btn-outline-secondary fw-bold" onClick={handleLimparFormulario}>
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary fw-bold"
+                        onClick={handleLimparFormulario}
+                        disabled={processandoPedido}
+                      >
                         Limpar formulario
                       </button>
                     </div>
