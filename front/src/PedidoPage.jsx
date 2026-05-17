@@ -33,6 +33,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
   const isDarkMode = themeMode === "dark"
   const [pedido, setPedido] = useState(pedidoInicial)
   const [erros, setErros] = useState({})
+  const [statusPedido, setStatusPedido] = useState(statusInicialPedido)
 
   const handlePedidoChange = (event) => {
     const { name, value } = event.target
@@ -45,6 +46,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
       ...errosAtuais,
       [name]: "",
     }))
+    setStatusPedido(statusInicialPedido)
   }
 
   const validarPedido = () => {
@@ -84,6 +86,8 @@ const PedidoPage = ({ themeMode = "light" }) => {
     if (Object.keys(errosValidacao).length > 0) {
       return
     }
+
+    setStatusPedido("Pedido simulado")
   }
 
   const pageStyle = {
@@ -284,7 +288,9 @@ const PedidoPage = ({ themeMode = "light" }) => {
                     <div className="mt-4">
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Status</span>
-                        <span className="badge bg-warning text-dark">{statusInicialPedido}</span>
+                        <span className={`badge ${statusPedido === statusInicialPedido ? "bg-warning text-dark" : "bg-success"}`}>
+                          {statusPedido}
+                        </span>
                       </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Item</span>
