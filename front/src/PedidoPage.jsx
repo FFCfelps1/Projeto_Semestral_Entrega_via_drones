@@ -37,7 +37,7 @@ const carregarPedidosSalvos = () => {
   try {
     const pedidosSalvos = window.localStorage.getItem(PEDIDOS_STORAGE_KEY)
     return pedidosSalvos ? JSON.parse(pedidosSalvos) : []
-  } catch (error) {
+  } catch {
     window.localStorage.removeItem(PEDIDOS_STORAGE_KEY)
     return []
   }
@@ -139,7 +139,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
       setPedidoSimulado(pedidoConfirmado)
       setPedidosSimulados((pedidosAtuais) => [pedidoConfirmado, ...pedidosAtuais])
       setMensagemSucesso(`Pedido ${pedidoConfirmado.id} criado com sucesso para simulacao.`)
-    } catch (error) {
+    } catch {
       setErros({
         geral: "Nao foi possivel simular o pedido agora.",
       })
