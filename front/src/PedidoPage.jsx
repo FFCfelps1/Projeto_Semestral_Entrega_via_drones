@@ -21,6 +21,12 @@ const multiplicadoresEntrega = {
   prioritaria: 1.65,
 }
 
+const temposEntrega = {
+  padrao: "45 a 60 min",
+  expressa: "25 a 35 min",
+  prioritaria: "15 a 25 min",
+}
+
 const PedidoPage = ({ themeMode = "light" }) => {
   const isDarkMode = themeMode === "dark"
   const [pedido, setPedido] = useState(pedidoInicial)
@@ -293,6 +299,10 @@ const PedidoPage = ({ themeMode = "light" }) => {
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Tipo</span>
                         <strong className="text-end">{tiposEntrega[pedido.tipoEntrega] || "Nao selecionado"}</strong>
+                      </div>
+                      <div className={summaryItemClassName}>
+                        <span className={mutedClassName}>Tempo estimado</span>
+                        <strong className="text-end">{temposEntrega[pedido.tipoEntrega] || "Aguardando tipo"}</strong>
                       </div>
                       <div className="d-flex justify-content-between gap-3 py-2">
                         <span className={mutedClassName}>Preco estimado</span>
