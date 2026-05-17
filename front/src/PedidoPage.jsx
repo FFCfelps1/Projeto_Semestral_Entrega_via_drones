@@ -30,13 +30,25 @@ const temposEntrega = {
 const statusInicialPedido = "Aguardando solicitacao"
 const PEDIDOS_STORAGE_KEY = "skyswift-pedidos-simulados"
 
+const carregarPedidosSalvos = () => {
+  if (typeof window === "undefined") return []
+
+  try {
+    const pedidosSalvos = window.localStorage.getItem(PEDIDOS_STORAGE_KEY)
+    return pedidosSalvos ? JSON.parse(pedidosSalvos) : []
+  } catch (error) {
+    window.localStorage.removeItem(PEDIDOS_STORAGE_KEY)
+    return []
+  }
+}
+
 const PedidoPage = ({ themeMode = "light" }) => {
   const isDarkMode = themeMode === "dark"
   const [pedido, setPedido] = useState(pedidoInicial)
   const [erros, setErros] = useState({})
   const [statusPedido, setStatusPedido] = useState(statusInicialPedido)
   const [pedidoSimulado, setPedidoSimulado] = useState(null)
-  const [pedidosSimulados, setPedidosSimulados] = useState([])
+  const [pedidosSimulados, setPedidosSimulados] = useState(carregarPedidosSalvos)
   const pedidosJaPersistidos = useRef(false)
 
   useEffect(() => {
