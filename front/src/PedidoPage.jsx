@@ -16,6 +16,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
 
   const mutedClassName = isDarkMode ? "text-light opacity-75" : "text-secondary"
   const inputClassName = `form-control ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
+  const selectClassName = `form-select ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
   const subtitleStyle = {
     maxWidth: "620px",
     lineHeight: 1.7,
@@ -96,7 +97,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                         />
                       </div>
 
-                      <div>
+                      <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-destino">
                           Endereco de entrega
                         </label>
@@ -107,6 +108,20 @@ const PedidoPage = ({ themeMode = "light" }) => {
                           className={inputClassName}
                           placeholder="Ex.: Avenida Brasil, 850 - Jardim"
                         />
+                      </div>
+
+                      <div>
+                        <label className="form-label fw-semibold" htmlFor="pedido-tipo-entrega">
+                          Tipo de entrega
+                        </label>
+                        <select id="pedido-tipo-entrega" name="tipoEntrega" className={selectClassName} defaultValue="">
+                          <option value="" disabled>
+                            Selecione uma modalidade
+                          </option>
+                          <option value="padrao">Padrao</option>
+                          <option value="expressa">Expressa</option>
+                          <option value="prioritaria">Prioritaria</option>
+                        </select>
                       </div>
                     </div>
 
