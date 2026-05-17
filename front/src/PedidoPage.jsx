@@ -345,6 +345,52 @@ const PedidoPage = ({ themeMode = "light" }) => {
                   </div>
                 </div>
               </div>
+
+              <div className="mt-5">
+                <div className="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+                  <div>
+                    <h2 className="h4 fw-bold mb-1">Pedidos simulados</h2>
+                    <p className={`mb-0 ${mutedClassName}`}>Historico local criado nesta sessao.</p>
+                  </div>
+                  <span className="badge bg-primary align-self-md-start">{pedidosSimulados.length} pedidos</span>
+                </div>
+
+                {pedidosSimulados.length === 0 ? (
+                  <div className="border rounded p-4">
+                    <p className={`mb-0 ${mutedClassName}`}>
+                      Nenhum pedido simulado ainda. Preencha o formulario para ver o historico local.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="row g-3">
+                    {pedidosSimulados.map((pedidoHistorico) => (
+                      <div className="col-12 col-lg-6" key={pedidoHistorico.id}>
+                        <div className="border rounded p-3 h-100">
+                          <div className="d-flex justify-content-between gap-3 mb-2">
+                            <strong>{pedidoHistorico.id}</strong>
+                            <span className="badge bg-success">{pedidoHistorico.status}</span>
+                          </div>
+                          <p className="fw-semibold mb-1">{pedidoHistorico.item}</p>
+                          <p className={`small mb-2 ${mutedClassName}`}>
+                            {pedidoHistorico.origem} para {pedidoHistorico.destino}
+                          </p>
+                          <div className="d-flex flex-wrap gap-2">
+                            <span className="badge bg-primary bg-opacity-10 text-primary">
+                              {tiposEntrega[pedidoHistorico.tipoEntrega]}
+                            </span>
+                            <span className="badge bg-primary bg-opacity-10 text-primary">
+                              {pedidoHistorico.peso} kg
+                            </span>
+                            <span className="badge bg-primary bg-opacity-10 text-primary">
+                              R$ {pedidoHistorico.precoEstimado.toFixed(2).replace(".", ",")}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
