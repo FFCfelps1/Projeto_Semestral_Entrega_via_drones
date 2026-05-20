@@ -29,6 +29,14 @@ const STATUS = {
 app.post("/pedidos", (req, res) => {
   const { item, peso, origem, destino, tipo, observacoes, usuarioId } = req.body;
 
+   // Validação de campos obrigatórios
+  if (!item || !peso || !origem || !destino || !tipo) {
+    return res.status(400).json({
+      erro: "Campos obrigatórios: item, peso, origem, destino, tipo",
+    });
+  }
+
+  // Criação do novo pedido
   const novoPedido = {
     id: uuidv4(),
     item,
