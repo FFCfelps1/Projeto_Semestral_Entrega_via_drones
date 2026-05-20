@@ -24,6 +24,13 @@ const STATUS = {
 };
 
 // ─────────────────────────────────────────
+// HEALTH CHECK
+// ─────────────────────────────────────────
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", servico: "gestao_pedidos" });
+});
+
+// ─────────────────────────────────────────
 // CRIAR PEDIDO
 // ─────────────────────────────────────────
 app.post("/pedidos", (req, res) => {
@@ -170,7 +177,6 @@ app.patch("/pedidos/:id", (req, res) => {
     });
   }
 
-
   // Atualiza o status e registra o horário da mudança
   pedidos[index] = {
     ...pedidos[index],
@@ -183,10 +189,29 @@ app.patch("/pedidos/:id", (req, res) => {
 });
 
 // ─────────────────────────────────────────
-// HEALTH CHECK
+// CANCELAR PEDIDO
 // ─────────────────────────────────────────
-app.get("/health", (req, res) => {
-  res.json({ status: "ok", servico: "gestao_pedidos" });
+app.delete("/pedidos/:id", (req, res) => {
+  // Procura a posição do pedido no array pelo id passado na URL
+  const index = pedidos.findIndex((p) => p.id === req.params.id);
+
+  // Se não encontrou, retorna 404
+  if (index === -1) {
+    return res.status(404).json({ erro: "Pedido não encontrado" });
+  }
+
+  // Cancela o pedido atualizando o status
+  pedidos[index] = {
+    ...pedidos[index],
+    status: STATUS.CANCELADO,
+    atualizadoEm: new Date().toISOString(),
+  };
+
+  // Retorna mensagem de sucesso com o pedido cancelado
+  return res.json({
+    mensagem: "Pedido cancelado com sucesso",
+    pedido: pedidos[index],
+  });
 });
 
 app.listen(PORT, () => {
