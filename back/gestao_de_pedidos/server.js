@@ -9,7 +9,6 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3005;
 
-
 // Banco em memória (substituir por DB futuramente)
 let pedidos = [];
 
@@ -24,9 +23,36 @@ const STATUS = {
 };
 
 // ─────────────────────────────────────────
+// CÁLCULO DE PREÇO
+// ─────────────────────────────────────────
+const calcularPreco = (peso, tipo) => {
+  // Preço base fixo para qualquer entrega
+  const precoBase = 10.00;
+
+  // Taxa adicional por kg
+  const taxaPorKg = 5.00;
+
+  // Multiplicador por tipo de entrega:
+  // expressa = 2x mais caro, padrão = preço normal, econômica = metade do preço
+  const taxaTipo = {
+    expressa: 2.0,
+    padrao: 1.0,
+    economica: 0.5,
+  };
+
+  // Se o tipo não existir, usa 1.0 como padrão (sem multiplicador)
+  const multiplicador = taxaTipo[tipo] || 1.0;
+
+  // Fórmula: (precoBase + peso * taxaPorKg) * multiplicador
+  // .toFixed(2) garante que o resultado tenha 2 casas decimais (ex: 15.00)
+  return ((precoBase + peso * taxaPorKg) * multiplicador).toFixed(2);
+};
+
+// ─────────────────────────────────────────
 // HEALTH CHECK
 // ─────────────────────────────────────────
 app.get("/health", (req, res) => {
+  // Retorna status ok e nome do serviço
   res.json({ status: "ok", servico: "gestao_pedidos" });
 });
 
@@ -34,35 +60,36 @@ app.get("/health", (req, res) => {
 // CRIAR PEDIDO
 // ─────────────────────────────────────────
 app.post("/pedidos", (req, res) => {
+  // Desestrutura os campos enviados pelo front no body da requisição
   const { item, peso, origem, destino, tipo, observacoes, usuarioId } = req.body;
 
-   // Validação de campos obrigatórios
+  // Validação de campos obrigatórios — retorna 400 se algum estiver faltando
   if (!item || !peso || !origem || !destino || !tipo) {
     return res.status(400).json({
       erro: "Campos obrigatórios: item, peso, origem, destino, tipo",
     });
   }
 
-  // Criação do novo pedido
+  // Monta o objeto do novo pedido com todos os campos
   const novoPedido = {
-    id: uuidv4(),
+    id: uuidv4(),                          // ID único gerado automaticamente
     item,
     peso,
     origem,
     destino,
     tipo,
-    observacoes: observacoes || "",
-    usuarioId: usuarioId || null,
-    status: STATUS.RASCUNHO,
-    /*new Date().toISOString() — gera a data/hora atual
-    22:25 O new Date() cria um objeto com a data e hora atual. O .toISOString() converte esse objeto para uma string no formato padrão internacional:
-    2026-05-19T22:35:10.123Z*/
-    criadoEm: new Date().toISOString(),
-    atualizadoEm: new Date().toISOString(),
+    observacoes: observacoes || "",        // campo opcional, padrão vazio
+    usuarioId: usuarioId || null,          // campo opcional, padrão null
+    status: STATUS.RASCUNHO,              // todo pedido começa como rascunho
+    precoEstimado: calcularPreco(peso, tipo), // calcula o preço com base no peso e tipo
+    criadoEm: new Date().toISOString(),   // data/hora de criação
+    atualizadoEm: new Date().toISOString(), // data/hora da última atualização
   };
 
+  // Adiciona o pedido ao array em memória
   pedidos.push(novoPedido);
 
+  // Retorna o pedido criado com status 201 (Created)
   return res.status(201).json(novoPedido);
 });
 
@@ -70,7 +97,7 @@ app.post("/pedidos", (req, res) => {
 // CONFIRMAR PEDIDO
 // ─────────────────────────────────────────
 app.post("/pedidos/:id/confirmar", (req, res) => {
-  // Procura o índice do pedido no array pelo id passado na URL  
+  // Procura o índice do pedido no array pelo id passado na URL
   const index = pedidos.findIndex((p) => p.id === req.params.id);
 
   // Se não encontrou, retorna 404
@@ -87,11 +114,12 @@ app.post("/pedidos/:id/confirmar", (req, res) => {
   // Atualiza o status para confirmado e registra o horário da mudança
   // O ...pedidos[index] mantém todos os outros campos intactos
   pedidos[index] = {
-    ...pedidos[index], // copia TUDO que já estava no pedido
-    status: STATUS.CONFIRMADO,  // sobrescreve só o status
-    atualizadoEm: new Date().toISOString(), // sobrescreve só o atualizadoEm
+    ...pedidos[index],
+    status: STATUS.CONFIRMADO,
+    atualizadoEm: new Date().toISOString(),
   };
 
+  // Retorna o pedido atualizado
   return res.json(pedidos[index]);
 });
 
@@ -158,7 +186,7 @@ app.patch("/pedidos/:id", (req, res) => {
     });
   }
 
-   // Define a ordem válida de transição de status
+  // Define a ordem válida de transição de status
   const ordemStatus = [
     STATUS.RASCUNHO,
     STATUS.CONFIRMADO,
@@ -167,10 +195,12 @@ app.patch("/pedidos/:id", (req, res) => {
     STATUS.ENTREGUE,
   ];
 
+  // Pega a posição do status atual e do novo status na ordem
   const indexAtual = ordemStatus.indexOf(pedidos[index].status);
   const indexNovo = ordemStatus.indexOf(status);
 
   // Não permite voltar o status nem pular etapas
+  // Exceção: cancelado pode ser aplicado de qualquer status
   if (indexNovo <= indexAtual && status !== STATUS.CANCELADO) {
     return res.status(400).json({
       erro: "Transição de status inválida",
@@ -200,7 +230,6 @@ app.delete("/pedidos/:id", (req, res) => {
     return res.status(404).json({ erro: "Pedido não encontrado" });
   }
 
-
   // Não permite cancelar pedido que já está em rota ou entregue
   if (
     pedidos[index].status === STATUS.EM_ROTA ||
@@ -210,7 +239,13 @@ app.delete("/pedidos/:id", (req, res) => {
       erro: "Não é possível cancelar um pedido que já está em rota ou entregue",
     });
   }
-  
+
+  // Cancela o pedido atualizando o status
+  pedidos[index] = {
+    ...pedidos[index],
+    status: STATUS.CANCELADO,
+    atualizadoEm: new Date().toISOString(),
+  };
 
   // Retorna mensagem de sucesso com o pedido cancelado
   return res.json({
@@ -219,6 +254,8 @@ app.delete("/pedidos/:id", (req, res) => {
   });
 });
 
+// Inicia o servidor na porta definida no .env (ou 3005 como padrão)
+// Quando o servidor estiver pronto, exibe uma mensagem no terminal confirmando
 app.listen(PORT, () => {
   console.log(`✅ gestao_pedidos rodando na porta ${PORT}`);
 });
