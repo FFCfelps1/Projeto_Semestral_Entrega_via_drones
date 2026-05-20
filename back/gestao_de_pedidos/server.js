@@ -204,7 +204,7 @@ app.patch("/pedidos/:id", (req, res) => {
     return res.status(404).json({ erro: "Pedido não encontrado" });
   }
 
-  const { status } = req.body;
+  const { status, observacoes } = req.body;
 
   // Valida se o status informado é um dos status permitidos
   const statusPermitidos = Object.values(STATUS);
