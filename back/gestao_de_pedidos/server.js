@@ -292,6 +292,27 @@ app.delete("/pedidos/:id", (req, res) => {
   });
 });
 
+// ─────────────────────────────────────────
+// HISTÓRICO DE STATUS DO PEDIDO
+// ─────────────────────────────────────────
+app.get("/pedidos/:id/historico", (req, res) => {
+  // Procura o pedido no array pelo id passado na URL
+  const pedido = pedidos.find((p) => p.id === req.params.id);
+
+  // Se não encontrou, retorna 404
+  if (!pedido) {
+    return res.status(404).json({ erro: "Pedido não encontrado" });
+  }
+
+  // Retorna apenas o histórico de status do pedido
+  return res.json({
+    pedidoId: pedido.id,
+    item: pedido.item,
+    statusAtual: pedido.status,
+    historico: pedido.statusHistorico,
+  });
+});
+
 // Inicia o servidor na porta definida no .env (ou 3005 como padrão)
 // Quando o servidor estiver pronto, exibe uma mensagem no terminal confirmando
 app.listen(PORT, () => {
