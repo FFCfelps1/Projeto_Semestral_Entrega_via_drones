@@ -151,6 +151,26 @@ app.patch("/pedidos/:id", (req, res) => {
     });
   }
 
+   // Define a ordem válida de transição de status
+  const ordemStatus = [
+    STATUS.RASCUNHO,
+    STATUS.CONFIRMADO,
+    STATUS.EM_PROCESSAMENTO,
+    STATUS.EM_ROTA,
+    STATUS.ENTREGUE,
+  ];
+
+  const indexAtual = ordemStatus.indexOf(pedidos[index].status);
+  const indexNovo = ordemStatus.indexOf(status);
+
+  // Não permite voltar o status nem pular etapas
+  if (indexNovo <= indexAtual && status !== STATUS.CANCELADO) {
+    return res.status(400).json({
+      erro: "Transição de status inválida",
+    });
+  }
+
+
   // Atualiza o status e registra o horário da mudança
   pedidos[index] = {
     ...pedidos[index],
