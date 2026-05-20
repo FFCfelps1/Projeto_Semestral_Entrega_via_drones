@@ -143,6 +143,14 @@ app.patch("/pedidos/:id", (req, res) => {
 
   const { status } = req.body;
 
+  // Valida se o status informado é um dos status permitidos
+  const statusPermitidos = Object.values(STATUS);
+  if (!statusPermitidos.includes(status)) {
+    return res.status(400).json({
+      erro: `Status inválido. Use: ${statusPermitidos.join(", ")}`,
+    });
+  }
+
   // Atualiza o status e registra o horário da mudança
   pedidos[index] = {
     ...pedidos[index],
