@@ -87,6 +87,14 @@ app.post("/pedidos/:id/confirmar", (req, res) => {
 
   return res.json(pedidos[index]);
 });
+
+// ─────────────────────────────────────────
+// LISTAR PEDIDOS
+// ─────────────────────────────────────────
+app.get("/pedidos", (req, res) => {
+  return res.json(pedidos);
+});
+
 // ─────────────────────────────────────────
 // HEALTH CHECK
 // ─────────────────────────────────────────
