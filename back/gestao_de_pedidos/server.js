@@ -92,7 +92,19 @@ app.post("/pedidos/:id/confirmar", (req, res) => {
 // LISTAR PEDIDOS
 // ─────────────────────────────────────────
 app.get("/pedidos", (req, res) => {
-  return res.json(pedidos);
+  // Pega o usuarioId passado na URL após o "?"
+  // Exemplo: GET /pedidos?usuarioId=f47ac10b
+  const { usuarioId } = req.query;
+
+  // Se o usuarioId foi informado, filtra o array retornando
+  // apenas os pedidos que pertencem àquele usuário.
+  // Se não foi informado, retorna todos os pedidos.
+  const resultado = usuarioId
+    ? pedidos.filter((p) => p.usuarioId === usuarioId)
+    : pedidos;
+
+  // Retorna o resultado para o front
+  return res.json(resultado);
 });
 
 // ─────────────────────────────────────────
