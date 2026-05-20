@@ -200,12 +200,17 @@ app.delete("/pedidos/:id", (req, res) => {
     return res.status(404).json({ erro: "Pedido não encontrado" });
   }
 
-  // Cancela o pedido atualizando o status
-  pedidos[index] = {
-    ...pedidos[index],
-    status: STATUS.CANCELADO,
-    atualizadoEm: new Date().toISOString(),
-  };
+
+  // Não permite cancelar pedido que já está em rota ou entregue
+  if (
+    pedidos[index].status === STATUS.EM_ROTA ||
+    pedidos[index].status === STATUS.ENTREGUE
+  ) {
+    return res.status(400).json({
+      erro: "Não é possível cancelar um pedido que já está em rota ou entregue",
+    });
+  }
+  
 
   // Retorna mensagem de sucesso com o pedido cancelado
   return res.json({
