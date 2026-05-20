@@ -98,6 +98,13 @@ app.post("/pedidos", (req, res) => {
     status: STATUS.RASCUNHO,              // todo pedido começa como rascunho
     precoEstimado: calcularPreco(peso, tipo), // calcula o preço com base no peso e tipo
     tempoEstimado: calcularTempo(tipo),   // calcula o tempo com base no tipo
+     // Inicia o histórico com o status rascunho
+    statusHistorico: [
+      {
+        status: STATUS.RASCUNHO,
+        momento: new Date().toISOString(),
+      },
+    ],
     criadoEm: new Date().toISOString(),   // data/hora de criação
     atualizadoEm: new Date().toISOString(), // data/hora da última atualização
   };
@@ -132,6 +139,11 @@ app.post("/pedidos/:id/confirmar", (req, res) => {
   pedidos[index] = {
     ...pedidos[index],
     status: STATUS.CONFIRMADO,
+     // Adiciona o novo status ao histórico
+    statusHistorico: [
+      ...pedidos[index].statusHistorico,
+      { status: STATUS.CONFIRMADO, momento: new Date().toISOString() },
+    ],
     atualizadoEm: new Date().toISOString(),
   };
 
@@ -227,6 +239,11 @@ app.patch("/pedidos/:id", (req, res) => {
   pedidos[index] = {
     ...pedidos[index],
     status,
+     // Adiciona o novo status ao histórico
+    statusHistorico: [
+      ...pedidos[index].statusHistorico,
+      { status, momento: new Date().toISOString() },
+    ],
     atualizadoEm: new Date().toISOString(),
   };
 
@@ -260,6 +277,11 @@ app.delete("/pedidos/:id", (req, res) => {
   pedidos[index] = {
     ...pedidos[index],
     status: STATUS.CANCELADO,
+     // Registra o cancelamento no histórico
+    statusHistorico: [
+      ...pedidos[index].statusHistorico,
+      { status: STATUS.CANCELADO, momento: new Date().toISOString() },
+    ],
     atualizadoEm: new Date().toISOString(),
   };
 
