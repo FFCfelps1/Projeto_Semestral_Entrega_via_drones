@@ -49,6 +49,21 @@ const calcularPreco = (peso, tipo) => {
 };
 
 // ─────────────────────────────────────────
+// CÁLCULO DE TEMPO ESTIMADO
+// ─────────────────────────────────────────
+const calcularTempo = (tipo) => {
+  // Tempo estimado em minutos por tipo de entrega
+  const tempoPorTipo = {
+    expressa: 15,   // drone prioritário, entrega rápida
+    padrao: 45,     // entrega normal
+    economica: 90,  // entrega agendada, menor prioridade
+  };
+
+  // Se o tipo não existir, usa 45 minutos como padrão
+  return tempoPorTipo[tipo] || 45;
+};
+
+// ─────────────────────────────────────────
 // HEALTH CHECK
 // ─────────────────────────────────────────
 app.get("/health", (req, res) => {
@@ -82,6 +97,7 @@ app.post("/pedidos", (req, res) => {
     usuarioId: usuarioId || null,          // campo opcional, padrão null
     status: STATUS.RASCUNHO,              // todo pedido começa como rascunho
     precoEstimado: calcularPreco(peso, tipo), // calcula o preço com base no peso e tipo
+    tempoEstimado: calcularTempo(tipo),   // calcula o tempo com base no tipo
     criadoEm: new Date().toISOString(),   // data/hora de criação
     atualizadoEm: new Date().toISOString(), // data/hora da última atualização
   };
