@@ -130,6 +130,31 @@ app.get("/pedidos/:id", (req, res) => {
 });
 
 // ─────────────────────────────────────────
+// ATUALIZAR STATUS DO PEDIDO
+// ─────────────────────────────────────────
+app.patch("/pedidos/:id", (req, res) => {
+  // Procura a posição do pedido no array pelo id passado na URL
+  const index = pedidos.findIndex((p) => p.id === req.params.id);
+
+  // Se não encontrou, retorna 404
+  if (index === -1) {
+    return res.status(404).json({ erro: "Pedido não encontrado" });
+  }
+
+  const { status } = req.body;
+
+  // Atualiza o status e registra o horário da mudança
+  pedidos[index] = {
+    ...pedidos[index],
+    status,
+    atualizadoEm: new Date().toISOString(),
+  };
+
+  // Retorna o pedido atualizado
+  return res.json(pedidos[index]);
+});
+
+// ─────────────────────────────────────────
 // HEALTH CHECK
 // ─────────────────────────────────────────
 app.get("/health", (req, res) => {
