@@ -114,6 +114,22 @@ app.get("/pedidos", (req, res) => {
 });
 
 // ─────────────────────────────────────────
+// BUSCAR PEDIDO POR ID
+// ─────────────────────────────────────────
+app.get("/pedidos/:id", (req, res) => {
+  // Procura o pedido no array pelo id passado na URL
+  const pedido = pedidos.find((p) => p.id === req.params.id);
+
+  // Se não encontrou, retorna 404
+  if (!pedido) {
+    return res.status(404).json({ erro: "Pedido não encontrado" });
+  }
+
+  // Retorna o pedido encontrado
+  return res.json(pedido);
+});
+
+// ─────────────────────────────────────────
 // HEALTH CHECK
 // ─────────────────────────────────────────
 app.get("/health", (req, res) => {
