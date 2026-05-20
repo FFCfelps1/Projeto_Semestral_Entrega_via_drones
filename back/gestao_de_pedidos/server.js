@@ -92,16 +92,22 @@ app.post("/pedidos/:id/confirmar", (req, res) => {
 // LISTAR PEDIDOS
 // ─────────────────────────────────────────
 app.get("/pedidos", (req, res) => {
-  // Pega o usuarioId passado na URL após o "?"
-  // Exemplo: GET /pedidos?usuarioId=f47ac10b
-  const { usuarioId } = req.query;
+  // Pega os parâmetros passados na URL após o "?"
+  // Exemplo: GET /pedidos?usuarioId=f47ac10b&status=em_rota
+  const { usuarioId, status } = req.query;
 
-  // Se o usuarioId foi informado, filtra o array retornando
-  // apenas os pedidos que pertencem àquele usuário.
-  // Se não foi informado, retorna todos os pedidos.
-  const resultado = usuarioId
-    ? pedidos.filter((p) => p.usuarioId === usuarioId)
-    : pedidos;
+  // Começa com todos os pedidos
+  let resultado = pedidos;
+
+  // Se passou usuarioId, filtra só os pedidos daquele usuário
+  if (usuarioId) {
+    resultado = resultado.filter((p) => p.usuarioId === usuarioId);
+  }
+
+  // Se passou status, filtra só os pedidos com aquele status
+  if (status) {
+    resultado = resultado.filter((p) => p.status === status);
+  }
 
   // Retorna o resultado para o front
   return res.json(resultado);
