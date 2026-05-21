@@ -66,6 +66,18 @@ const calcularTempo = (tipo) => {
 };
 
 // ─────────────────────────────────────────
+// FUNÇÃO UTILITÁRIA — BARRAMENTO
+// ─────────────────────────────────────────
+const emitirEvento = (tipo, payload) => {
+  // Envia o evento para o barramento de forma assíncrona
+  // O .catch evita que um erro no barramento derrube o servidor
+  axios.post(`${BARRAMENTO_URL}/eventos`, { tipo, payload })
+    .catch((err) => {
+      console.warn(`⚠️ Erro ao emitir evento ${tipo}:`, err.message);
+    });
+};
+
+// ─────────────────────────────────────────
 // HEALTH CHECK
 // ─────────────────────────────────────────
 app.get("/health", (req, res) => {
@@ -115,11 +127,7 @@ app.post("/pedidos", (req, res) => {
   pedidos.push(novoPedido);
 
   // Notifica o barramento que um novo pedido foi criado
-  axios.post(`${BARRAMENTO_URL}/eventos`, {
-    tipo: "PEDIDO_CRIADO",
-    payload: novoPedido,
- });
-
+  emitirEvento("PEDIDO_CRIADO", novoPedido);
 
   // Retorna o pedido criado com status 201 (Created)
   return res.status(201).json(novoPedido);
@@ -157,11 +165,9 @@ app.post("/pedidos/:id/confirmar", (req, res) => {
   };
 
     // Notifica o barramento que o pedido foi confirmado
-    axios.post(`${BARRAMENTO_URL}/eventos`, {
-        tipo: "PEDIDO_CONFIRMADO",
-        payload: pedidos[index],
-    });
+    emitirEvento("PEDIDO_CONFIRMADO", pedidos[index]);
 
+    
   // Retorna o pedido atualizado
   return res.json(pedidos[index]);
 });
@@ -263,11 +269,7 @@ app.patch("/pedidos/:id", (req, res) => {
   };
 
   // Notifica o barramento que o pedido foi atualizado
-    axios.post(`${BARRAMENTO_URL}/eventos`, {
-        tipo: "PEDIDO_ATUALIZADO",
-        payload: pedidos[index],
-    });
-
+    emitirEvento("PEDIDO_ATUALIZADO", pedidos[index]);
 
   // Retorna o pedido atualizado
   return res.json(pedidos[index]);
@@ -308,10 +310,7 @@ app.delete("/pedidos/:id", (req, res) => {
   };
 
   // Notifica o barramento que o pedido foi cancelado
-    axios.post(`${BARRAMENTO_URL}/eventos`, {
-        tipo: "PEDIDO_CANCELADO",
-        payload: pedidos[index],
-    });
+    emitirEvento("PEDIDO_CANCELADO", pedidos[index]);
 
   // Retorna mensagem de sucesso com o pedido cancelado
   return res.json({
