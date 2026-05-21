@@ -262,6 +262,13 @@ app.patch("/pedidos/:id", (req, res) => {
     atualizadoEm: new Date().toISOString(),
   };
 
+  // Notifica o barramento que o pedido foi atualizado
+    axios.post(`${BARRAMENTO_URL}/eventos`, {
+        tipo: "PEDIDO_ATUALIZADO",
+        payload: pedidos[index],
+    });
+
+
   // Retorna o pedido atualizado
   return res.json(pedidos[index]);
 });
