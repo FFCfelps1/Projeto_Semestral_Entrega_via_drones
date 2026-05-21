@@ -156,6 +156,12 @@ app.post("/pedidos/:id/confirmar", (req, res) => {
     atualizadoEm: new Date().toISOString(),
   };
 
+    // Notifica o barramento que o pedido foi confirmado
+    axios.post(`${BARRAMENTO_URL}/eventos`, {
+        tipo: "PEDIDO_CONFIRMADO",
+        payload: pedidos[index],
+    });
+
   // Retorna o pedido atualizado
   return res.json(pedidos[index]);
 });
