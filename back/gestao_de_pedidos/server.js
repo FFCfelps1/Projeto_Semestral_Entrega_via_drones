@@ -307,6 +307,12 @@ app.delete("/pedidos/:id", (req, res) => {
     atualizadoEm: new Date().toISOString(),
   };
 
+  // Notifica o barramento que o pedido foi cancelado
+    axios.post(`${BARRAMENTO_URL}/eventos`, {
+        tipo: "PEDIDO_CANCELADO",
+        payload: pedidos[index],
+    });
+
   // Retorna mensagem de sucesso com o pedido cancelado
   return res.json({
     mensagem: "Pedido cancelado com sucesso",
