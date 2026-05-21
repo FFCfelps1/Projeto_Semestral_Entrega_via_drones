@@ -2,12 +2,14 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
+const axios = require("axios");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3005;
+const BARRAMENTO_URL = process.env.BARRAMENTO_URL || "http://localhost:3001";
 
 // Banco em memória (substituir por DB futuramente)
 let pedidos = [];
@@ -111,6 +113,13 @@ app.post("/pedidos", (req, res) => {
 
   // Adiciona o pedido ao array em memória
   pedidos.push(novoPedido);
+
+  // Notifica o barramento que um novo pedido foi criado
+  axios.post(`${BARRAMENTO_URL}/eventos`, {
+    tipo: "PEDIDO_CRIADO",
+    payload: novoPedido,
+ });
+
 
   // Retorna o pedido criado com status 201 (Created)
   return res.status(201).json(novoPedido);
