@@ -72,6 +72,9 @@ const emitirEvento = (tipo, payload) => {
   // Envia o evento para o barramento de forma assíncrona
   // O .catch evita que um erro no barramento derrube o servidor
   axios.post(`${BARRAMENTO_URL}/eventos`, { tipo, payload })
+   .then(() => {
+      console.log(`✅ Evento emitido: ${tipo}`);
+    })
     .catch((err) => {
       console.warn(`⚠️ Erro ao emitir evento ${tipo}:`, err.message);
     });
