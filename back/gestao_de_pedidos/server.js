@@ -343,6 +343,39 @@ app.get("/pedidos/:id/historico", (req, res) => {
   });
 });
 
+// ─────────────────────────────────────────
+// RECEBER EVENTOS DO BARRAMENTO
+// ─────────────────────────────────────────
+app.post("/eventos/receber", (req, res) => {
+  const { tipo, payload } = req.body;
+
+  console.log(`📨 Evento recebido: ${tipo}`);
+
+  // Quando o drone sair para entrega, atualiza o status do pedido
+  if (tipo === "RotaCalculada" && payload.pedidoId) {
+    const index = pedidos.findIndex((p) => p.id === payload.pedidoId);
+
+    // Se encontrou o pedido, atualiza o status para em_rota
+    if (index !== -1) {
+      pedidos[index] = {
+        ...pedidos[index],
+        status: STATUS.EM_ROTA,
+        // Registra a mudança de status no histórico com timestamp
+        statusHistorico: [
+          ...pedidos[index].statusHistorico,
+          { status: STATUS.EM_ROTA, momento: new Date().toISOString() },
+        ],
+        atualizadoEm: new Date().toISOString(),
+      };
+
+      // Confirma no terminal que o pedido foi atualizado
+      console.log(`🚁 Pedido ${payload.pedidoId} atualizado para em_rota`);
+    }
+  }
+
+  return res.status(200).json({ recebido: true });
+});
+
 // Inicia o servidor na porta definida no .env (ou 3005 como padrão)
 // Quando o servidor estiver pronto, exibe uma mensagem no terminal confirmando
 app.listen(PORT, () => {
