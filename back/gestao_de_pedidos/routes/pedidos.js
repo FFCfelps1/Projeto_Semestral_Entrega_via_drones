@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { v4: uuidv4 } = require("uuid");
 const axios = require("axios");
+const { validarCamposObrigatorios } = require("../middleware/validarPedido");
 
 const BARRAMENTO_URL = process.env.BARRAMENTO_URL || "http://localhost:3001";
 
@@ -84,16 +85,10 @@ router.get("/health", (req, res) => {
 // ─────────────────────────────────────────
 // CRIAR PEDIDO
 // ─────────────────────────────────────────
-router.post("/pedidos", (req, res) => {
+// validarCamposObrigatorios é o middleware que valida os campos antes de criar o pedido
+router.post("/pedidos", validarCamposObrigatorios, (req, res) => {
   // Desestrutura os campos enviados pelo front no body da requisição
   const { item, peso, origem, destino, tipo, observacoes, usuarioId } = req.body;
-
-  // Validação de campos obrigatórios — retorna 400 se algum estiver faltando
-  if (!item || !peso || !origem || !destino || !tipo) {
-    return res.status(400).json({
-      erro: "Campos obrigatórios: item, peso, origem, destino, tipo",
-    });
-  }
 
   // Monta o objeto do novo pedido com todos os campos
   const novoPedido = {
@@ -105,7 +100,7 @@ router.post("/pedidos", (req, res) => {
     tipo,
     observacoes: observacoes || "",           // campo opcional, padrão vazio
     usuarioId: usuarioId || null,             // campo opcional, padrão null
-    status: STATUS.RASCUNHO,                 // todo pedido começa como rascunho
+    status: STATUS.RASCUNHO,                  // todo pedido começa como rascunho
     precoEstimado: calcularPreco(peso, tipo), // calcula o preço com base no peso e tipo
     tempoEstimado: calcularTempo(tipo),       // calcula o tempo com base no tipo
     // Inicia o histórico com o status rascunho
