@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { v4: uuidv4 } = require("uuid");
 const axios = require("axios");
-const { validarCamposObrigatorios } = require("../middleware/validarPedido");
+const { validarCamposObrigatorios , responderErro} = require("../middleware/validarPedido");
 
 const BARRAMENTO_URL = process.env.BARRAMENTO_URL || "http://localhost:3001";
 
@@ -130,12 +130,12 @@ router.post("/pedidos/:id/confirmar", (req, res) => {
 
   // Se não encontrou, retorna 404
   if (index === -1) {
-    return res.status(404).json({ erro: "Pedido não encontrado" });
+    return responderErro(res, 404, "Pedido não encontrado");
   }
 
   // Só confirma se o pedido ainda estiver em rascunho
   if (pedidos[index].status !== STATUS.RASCUNHO) {
-    return res.status(400).json({ erro: "Apenas pedidos em rascunho podem ser confirmados" });
+    return responderErro(res, 400, "Apenas pedidos em rascunho podem ser confirmados");
   }
 
   // Atualiza o status para confirmado e registra o horário da mudança
@@ -191,7 +191,7 @@ router.get("/pedidos/:id", (req, res) => {
 
   // Se não encontrou, retorna 404
   if (!pedido) {
-    return res.status(404).json({ erro: "Pedido não encontrado" });
+    return responderErro(res, 404, "Pedido não encontrado");
   }
 
   // Retorna o pedido encontrado
@@ -207,7 +207,7 @@ router.patch("/pedidos/:id", (req, res) => {
 
   // Se não encontrou, retorna 404
   if (index === -1) {
-    return res.status(404).json({ erro: "Pedido não encontrado" });
+    return responderErro(res, 404, "Pedido não encontrado");
   }
 
   // Desestrutura status e observacoes do body
@@ -216,9 +216,7 @@ router.patch("/pedidos/:id", (req, res) => {
   // Valida se o status informado é um dos status permitidos
   const statusPermitidos = Object.values(STATUS);
   if (!statusPermitidos.includes(status)) {
-    return res.status(400).json({
-      erro: `Status inválido. Use: ${statusPermitidos.join(", ")}`,
-    });
+   return responderErro(res, 400, `Status inválido. Use: ${statusPermitidos.join(", ")}`);
   }
 
   // Define a ordem válida de transição de status
@@ -237,9 +235,7 @@ router.patch("/pedidos/:id", (req, res) => {
   // Não permite voltar o status nem pular etapas
   // Exceção: cancelado pode ser aplicado de qualquer status
   if (indexNovo <= indexAtual && status !== STATUS.CANCELADO) {
-    return res.status(400).json({
-      erro: "Transição de status inválida",
-    });
+    return responderErro(res, 400, "Transição de status inválida");
   }
 
   // Atualiza o status, observacoes e registra o horário da mudança
@@ -280,9 +276,8 @@ router.delete("/pedidos/:id", (req, res) => {
     pedidos[index].status === STATUS.EM_ROTA ||
     pedidos[index].status === STATUS.ENTREGUE
   ) {
-    return res.status(400).json({
-      erro: "Não é possível cancelar um pedido que já está em rota ou entregue",
-    });
+    return responderErro(res, 400, "Não é possível cancelar um pedido que já está em rota ou entregue");
+
   }
 
   // Cancela o pedido atualizando o status
@@ -316,7 +311,7 @@ router.get("/pedidos/:id/historico", (req, res) => {
 
   // Se não encontrou, retorna 404
   if (!pedido) {
-    return res.status(404).json({ erro: "Pedido não encontrado" });
+    return responderErro(res, 404, "Pedido não encontrado");
   }
 
   // Retorna apenas o histórico de status do pedido
