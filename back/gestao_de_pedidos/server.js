@@ -263,6 +263,7 @@ app.patch("/pedidos/:id", (req, res) => {
   pedidos[index] = {
     ...pedidos[index],
     status,
+    observacoes: observacoes !== undefined ? observacoes : pedidos[index].observacoes,
      // Adiciona o novo status ao histórico
     statusHistorico: [
       ...pedidos[index].statusHistorico,
