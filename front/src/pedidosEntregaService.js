@@ -46,3 +46,10 @@ export const cancelarPedido = async (id) => {
   const response = await api.delete(`/pedidos/${id}`)
   return response.data
 }
+
+// Busca o histórico de status de um pedido via GET /pedidos/:id/historico
+// Retorna o pedidoId, item, statusAtual e array de statusHistorico com timestamps
+export const buscarHistorico = async (id) => {
+  const response = await api.get(`/pedidos/${id}/historico`)
+  return response.data
+}
