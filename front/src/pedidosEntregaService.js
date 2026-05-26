@@ -23,3 +23,13 @@ export const confirmarPedido = async (id) => {
   const response = await api.post(`/pedidos/${id}/confirmar`)
   return response.data
 }
+
+// Lista os pedidos via GET /pedidos
+// Aceita filtros opcionais por usuarioId e status
+// Exemplo: listarPedidos({ status: "rascunho" })
+export const listarPedidos = async (filtros = {}) => {
+  const params = new URLSearchParams(filtros)
+  const response = await api.get(`/pedidos?${params}`)
+  return response.data
+}
+
