@@ -39,3 +39,10 @@ export const buscarPedido = async (id) => {
   const response = await api.get(`/pedidos/${id}`)
   return response.data
 }
+
+// Cancela um pedido via DELETE /pedidos/:id
+// Só funciona se o pedido não estiver em_rota ou entregue
+export const cancelarPedido = async (id) => {
+  const response = await api.delete(`/pedidos/${id}`)
+  return response.data
+}
