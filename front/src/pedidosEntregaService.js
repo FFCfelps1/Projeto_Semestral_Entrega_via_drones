@@ -33,3 +33,9 @@ export const listarPedidos = async (filtros = {}) => {
   return response.data
 }
 
+// Busca um pedido específico via GET /pedidos/:id
+// Retorna os dados completos do pedido incluindo statusHistorico
+export const buscarPedido = async (id) => {
+  const response = await api.get(`/pedidos/${id}`)
+  return response.data
+}
