@@ -1,13 +1,18 @@
 import axios from "axios"
 
-export const criarPedidoEntrega = async ({ baseUrl, pedido }) => {
-  if (!baseUrl) {
-    return {
-      origem: "local",
-      pedido,
-    }
-  }
+// Lê a URL base do arquivo .env
+// Se não encontrar, usa o localhost:3005 como padrão
+const BASE_URL = import.meta.env.VITE_PEDIDOS_ENTREGA_SERVICE_URL || "http://localhost:3005"
 
-  const response = await axios.post(`${baseUrl}/pedidos`, pedido)
+// Cria um cliente axios com a URL base configurada
+// Todas as requisições feitas com "api" já usam essa URL automaticamente
+const api = axios.create({
+  baseURL: BASE_URL
+})
+
+// Envia os dados do pedido para o back via POST /pedidos
+// Retorna os dados da resposta (o pedido criado com id, status, preço, etc)
+export const criarPedidoEntrega = async (pedido) => {
+  const response = await api.post("/pedidos", pedido)
   return response.data
 }
