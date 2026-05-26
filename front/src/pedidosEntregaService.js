@@ -16,3 +16,10 @@ export const criarPedidoEntrega = async (pedido) => {
   const response = await api.post("/pedidos", pedido)
   return response.data
 }
+
+// Confirma um pedido existente via POST /pedidos/:id/confirmar
+// Muda o status de rascunho para confirmado
+export const confirmarPedido = async (id) => {
+  const response = await api.post(`/pedidos/${id}/confirmar`)
+  return response.data
+}
