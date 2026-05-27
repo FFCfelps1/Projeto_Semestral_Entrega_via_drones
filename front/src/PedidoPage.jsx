@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { criarPedidoEntrega } from "./pedidosEntregaService.js"
 
+// Estado inicial do formulário — todos os campos vazios
 const pedidoInicial = {
   item: "",
   peso: "",
@@ -10,18 +11,21 @@ const pedidoInicial = {
   observacoes: "",
 }
 
+// Mapeamento dos tipos de entrega para exibição na tela
 const tiposEntrega = {
   padrao: "Padrao",
   expressa: "Expressa",
   prioritaria: "Prioritaria",
 }
 
+// Multiplicadores de preço por tipo de entrega
 const multiplicadoresEntrega = {
   padrao: 1,
   expressa: 1.35,
   prioritaria: 1.65,
 }
 
+// Tempos estimados por tipo de entrega (exibição local antes do back responder)
 const temposEntrega = {
   padrao: "45 a 60 min",
   expressa: "25 a 35 min",
@@ -43,14 +47,23 @@ const carregarPedidosSalvos = () => {
   }
 }
 
+// Componente principal da página de pedidos
+// themeMode controla o tema claro/escuro
 const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
   const isDarkMode = themeMode === "dark"
+  // Estado do formulário
   const [pedido, setPedido] = useState(pedidoInicial)
+  // Estado dos erros de validação
   const [erros, setErros] = useState({})
+  // Status exibido no resumo do pedido
   const [statusPedido, setStatusPedido] = useState(statusInicialPedido)
+  // Pedido mais recente criado — exibido no resumo
   const [pedidoSimulado, setPedidoSimulado] = useState(null)
+  // Lista de pedidos criados na sessão atual
   const [pedidosSimulados, setPedidosSimulados] = useState(carregarPedidosSalvos)
+   // Mensagem de sucesso exibida após criar o pedido
   const [mensagemSucesso, setMensagemSucesso] = useState("")
+  // Controla o estado de loading durante a requisição
   const [processandoPedido, setProcessandoPedido] = useState(false)
   const pedidosJaPersistidos = useRef(false)
 
@@ -63,13 +76,16 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
     window.localStorage.setItem(PEDIDOS_STORAGE_KEY, JSON.stringify(pedidosSimulados))
   }, [pedidosSimulados])
 
+  // Atualiza o campo correspondente no estado do formulário a cada digitação
   const handlePedidoChange = (event) => {
     const { name, value } = event.target
 
+    // Spread operator mantém os outros campos intactos
     setPedido((dadosAtuais) => ({
       ...dadosAtuais,
       [name]: value,
     }))
+      // Limpa o erro do campo alterado e reseta o resumo
     setErros((errosAtuais) => ({
       ...errosAtuais,
       [name]: "",
@@ -80,6 +96,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
     setMensagemSucesso("")
   }
 
+  // Valida os campos obrigatórios antes de enviar
   const validarPedido = () => {
     const novosErros = {}
 
@@ -109,47 +126,50 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
   }
 
   const handlePedidoSubmit = async (event) => {
+    // Previne o comportamento padrão do form (recarregar a página)
     event.preventDefault()
 
+    // Valida os campos e exibe erros se houver
     const errosValidacao = validarPedido()
     setErros(errosValidacao)
 
+    // Se houver erros, não envia
     if (Object.keys(errosValidacao).length > 0) {
       return
     }
-
+    // Ativa o estado de loading — desabilita o botão e exibe "Processando..."
     setProcessandoPedido(true)
-    await new Promise((resolve) => setTimeout(resolve, 500))
 
-    const novoPedido = {
-      id: `PED-${Date.now()}`,
-      ...pedido,
-      precoEstimado,
-      tempoEstimado: temposEntrega[pedido.tipoEntrega],
-      status: "Pedido simulado",
-      criadoEm: new Date().toISOString(),
+
+    // Monta o objeto no formato que o back espera
+    // "tipo" em vez de "tipoEntrega" — padrão do microsserviço gestao_pedidos
+    // Number(pedido.peso) converte a string do input para número
+    const dadosPedido = {
+      item: pedido.item,
+      peso: Number(pedido.peso),
+      origem: pedido.origem,
+      destino: pedido.destino,
+      tipo: pedido.tipoEntrega,
+      observacoes: pedido.observacoes,
+    }
+    // O handler não pode ser totalmente async por causa do event.preventDefault()
+    const aux = async () => {
+      // Chama o serviço que faz POST /pedidos no microsserviço gestao_pedidos
+      const pedidoCriado = await criarPedidoEntrega(dadosPedido)
+      // Atualiza o resumo com os dados reais vindos do back
+      // (precoEstimado e tempoEstimado agora vêm do back, não são calculados localmente)
+      setStatusPedido("Pedido criado")
+      setPedidoSimulado(pedidoCriado)
+      // Adiciona o novo pedido no início da lista
+      setPedidosSimulados((pedidosAtuais) => [pedidoCriado, ...pedidosAtuais])
+      setMensagemSucesso(`Pedido ${pedidoCriado.id} criado com sucesso!`)
     }
 
-    try {
-      const respostaServico = await criarPedidoEntrega({
-        baseUrl: pedidosEntregaServiceUrl,
-        pedido: novoPedido,
-      })
-      const pedidoConfirmado = respostaServico?.pedido || novoPedido
+    aux()
+      .catch(() => setErros({ geral: "Nao foi possivel criar o pedido agora." }))
+      .finally(() => setProcessandoPedido(false))
 
-      setStatusPedido("Pedido simulado")
-      setPedidoSimulado(pedidoConfirmado)
-      setPedidosSimulados((pedidosAtuais) => [pedidoConfirmado, ...pedidosAtuais])
-      setMensagemSucesso(`Pedido ${pedidoConfirmado.id} criado com sucesso para simulacao.`)
-    } catch {
-      setErros({
-        geral: "Nao foi possivel simular o pedido agora.",
-      })
-      setMensagemSucesso("")
-    } finally {
-      setProcessandoPedido(false)
-    }
-  }
+
 
   const handleLimparFormulario = () => {
     setPedido(pedidoInicial)
