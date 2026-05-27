@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { criarPedidoEntrega, buscarHistorico } from "./pedidosEntregaService.js"
+import { criarPedidoEntrega, buscarHistorico, cancelarPedido } from "./pedidosEntregaService.js"
 
 // Estado inicial do formulário — todos os campos vazios
 const pedidoInicial = {
@@ -202,6 +202,21 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
       const historico = await buscarHistorico(pedidoId)
       setDadosHistorico(historico)
       setPedidoHistoricoSelecionado(pedidoId)
+    }
+    aux()
+  }
+
+  // Cancela o pedido no back e atualiza o status na lista
+  const handleCancelarPedido = (pedidoId) => {
+    const aux = async () => {
+      const resposta = await cancelarPedido(pedidoId)
+
+      // Atualiza o status do pedido na lista sem recarregar
+      setPedidosSimulados((pedidosAtuais) =>
+        pedidosAtuais.map((p) =>
+          p.id === pedidoId ? { ...p, status: resposta.pedido.status } : p
+        )
+      )
     }
     aux()
   }
@@ -572,6 +587,19 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                               <i className="fa fa-history me-1" aria-hidden="true"></i>
                               Ver historico
                             </button>
+                            {/* Botão cancelar — só aparece se o pedido puder ser cancelado */}
+                            {pedidoHistorico.status !== "em_rota" &&
+                            pedidoHistorico.status !== "entregue" &&
+                            pedidoHistorico.status !== "cancelado" && (
+                              <button
+                                type="button"
+                                className="btn btn-outline-danger btn-sm"
+                                onClick={() => handleCancelarPedido(pedidoHistorico.id)}
+                              >
+                                <i className="fa fa-times me-1" aria-hidden="true"></i>
+                                Cancelar
+                              </button>
+                            )}
                             <button
                               type="button"
                               className="btn btn-outline-danger btn-sm align-self-start align-self-sm-auto"
