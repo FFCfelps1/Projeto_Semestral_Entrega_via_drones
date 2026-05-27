@@ -173,9 +173,13 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
     }
 
     aux()
-      .catch(() => setErros({ geral: "Nao foi possivel criar o pedido agora." }))
+      .catch((err) => {
+        // Exibe o erro real vindo do back se disponível
+        // Senão exibe mensagem genérica
+        const mensagemErro = err?.response?.data?.erro || "Nao foi possivel criar o pedido agora."
+        setErros({ geral: mensagemErro })
+      })
       .finally(() => setProcessandoPedido(false))
-
   }
 
 
