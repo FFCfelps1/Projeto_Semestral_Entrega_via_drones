@@ -221,6 +221,11 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
           p.id === pedidoId ? { ...p, status: resposta.pedido.status } : p
         )
       )
+      // Se o historico do pedido cancelado estiver aberto, fecha
+      if (pedidoHistoricoSelecionado === pedidoId) {
+        setDadosHistorico(null)
+        setPedidoHistoricoSelecionado(null)
+      }
     }
     aux()
   }
