@@ -448,12 +448,22 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Tempo estimado</span>
-                        <strong className="text-sm-end text-break">{temposEntrega[pedido.tipoEntrega] || "Aguardando tipo"}</strong>
+                        {/* Se o pedido foi criado, exibe o tempo real do back. Senão, exibe o estimado local */}
+                        <strong className="text-sm-end text-break">
+                          {pedidoSimulado?.tempoEstimado
+                            ? `${pedidoSimulado.tempoEstimado} min`
+                            : temposEntrega[pedido.tipoEntrega] || "Aguardando tipo"}
+                        </strong>
                       </div>
                       <div className="d-flex flex-column flex-sm-row justify-content-sm-between gap-1 gap-sm-3 py-2">
                         <span className={mutedClassName}>Preco estimado</span>
+                        {/* Se o pedido foi criado, exibe o preço real do back. Senão, exibe o estimado local */}
                         <strong className="text-sm-end text-primary">
-                          {precoEstimado > 0 ? `R$ ${precoEstimado.toFixed(2).replace(".", ",")}` : "Aguardando dados"}
+                          {pedidoSimulado?.precoEstimado
+                            ? `R$ ${Number(pedidoSimulado.precoEstimado).toFixed(2).replace(".", ",")}`
+                            : precoEstimado > 0
+                            ? `R$ ${precoEstimado.toFixed(2).replace(".", ",")}`
+                            : "Aguardando dados"}
                         </strong>
                       </div>
                     </div>
