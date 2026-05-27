@@ -32,6 +32,7 @@ const temposEntrega = {
   prioritaria: "15 a 25 min",
 }
 
+
 const statusInicialPedido = "Aguardando solicitacao"
 const PEDIDOS_STORAGE_KEY = "skyswift-pedidos-simulados"
 
@@ -46,6 +47,9 @@ const carregarPedidosSalvos = () => {
     return []
   }
 }
+
+// Estado do filtro de status — vazio significa "todos"
+const [filtroStatus, setFiltroStatus] = useState("")
 
 // Componente principal da página de pedidos
 // themeMode controla o tema claro/escuro
@@ -480,6 +484,23 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                   <span className="badge bg-primary align-self-md-start">{pedidosSimulados.length} pedidos</span>
                 </div>
 
+                {/* Filtro por status — filtra a lista localmente sem chamar o back */}
+                <div className="mb-3">
+                  <select
+                    className={selectClassName}
+                    value={filtroStatus}
+                    onChange={(e) => setFiltroStatus(e.target.value)}
+                  >
+                    <option value="">Todos os status</option>
+                    <option value="rascunho">Rascunho</option>
+                    <option value="confirmado">Confirmado</option>
+                    <option value="em_processamento">Em processamento</option>
+                    <option value="em_rota">Em rota</option>
+                    <option value="entregue">Entregue</option>
+                    <option value="cancelado">Cancelado</option>
+                  </select>
+                </div>
+
                 {pedidosSimulados.length === 0 ? (
                   <div className={`${borderedPanelClassName} p-4`}>
                     <p className={`mb-0 ${mutedClassName}`}>
@@ -488,7 +509,9 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                   </div>
                 ) : (
                   <div className="row g-3">
-                    {pedidosSimulados.map((pedidoHistorico) => (
+                    {pedidosSimulados
+                      .filter((p) => filtroStatus === "" || p.status === filtroStatus)
+                      .map((pedidoHistorico) => (
                       <div className="col-12 col-lg-6" key={pedidoHistorico.id}>
                         <div className={`${borderedPanelClassName} p-3 h-100`}>
                           <div className="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start gap-3 mb-2">
