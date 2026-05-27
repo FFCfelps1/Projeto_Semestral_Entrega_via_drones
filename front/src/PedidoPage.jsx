@@ -169,6 +169,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
       .catch(() => setErros({ geral: "Nao foi possivel criar o pedido agora." }))
       .finally(() => setProcessandoPedido(false))
 
+  }
 
 
   const handleLimparFormulario = () => {
