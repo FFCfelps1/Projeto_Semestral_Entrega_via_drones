@@ -401,11 +401,19 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         ></textarea>
                       </div>
                     </div>
-
+                    <button type="submit" className="btn btn-primary fw-bold flex-sm-fill" disabled={processandoPedido}>
+                      {processandoPedido ? (
+                        <>
+                          {/* Spinner animado do Bootstrap durante o loading */}
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                          Processando...
+                        </>
+                      ) : (
+                        "Criar pedido"
+                      )}
+                    </button>
                     <div className="d-flex flex-column flex-sm-row gap-2 mt-4">
-                      <button type="submit" className="btn btn-primary fw-bold flex-sm-fill" disabled={processandoPedido}>
-                        {processandoPedido ? "Processando..." : "Simular pedido"}
-                      </button>
+                      
                       <button
                         type="button"
                         className={secondaryButtonClassName}
