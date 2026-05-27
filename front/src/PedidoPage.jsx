@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { criarPedidoEntrega } from "./pedidosEntregaService.js"
+import { criarPedidoEntrega, buscarHistorico } from "./pedidosEntregaService.js"
 
 // Estado inicial do formulário — todos os campos vazios
 const pedidoInicial = {
@@ -48,9 +48,6 @@ const carregarPedidosSalvos = () => {
   }
 }
 
-// Estado do filtro de status — vazio significa "todos"
-const [filtroStatus, setFiltroStatus] = useState("")
-
 // Componente principal da página de pedidos
 // themeMode controla o tema claro/escuro
 const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
@@ -69,6 +66,12 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
   const [mensagemSucesso, setMensagemSucesso] = useState("")
   // Controla o estado de loading durante a requisição
   const [processandoPedido, setProcessandoPedido] = useState(false)
+  // Estado do filtro de status — vazio significa "todos"
+  const [filtroStatus, setFiltroStatus] = useState("")
+  // ID do pedido cujo histórico está sendo exibido — null = nenhum
+  const [pedidoHistoricoSelecionado, setPedidoHistoricoSelecionado] = useState(null)
+  // Dados do histórico retornados pelo back
+  const [dadosHistorico, setDadosHistorico] = useState(null)
   const pedidosJaPersistidos = useRef(false)
 
   useEffect(() => {
@@ -191,6 +194,16 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
       setPedidoSimulado(null)
       setStatusPedido(statusInicialPedido)
     }
+  }
+
+  // Busca o histórico de status de um pedido pelo id
+  const handleVerHistorico = (pedidoId) => {
+    const aux = async () => {
+      const historico = await buscarHistorico(pedidoId)
+      setDadosHistorico(historico)
+      setPedidoHistoricoSelecionado(pedidoId)
+    }
+    aux()
   }
 
   const pageStyle = {
@@ -484,6 +497,36 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                   <span className="badge bg-primary align-self-md-start">{pedidosSimulados.length} pedidos</span>
                 </div>
 
+                {/* Exibe o histórico do pedido selecionado */}
+                {dadosHistorico && pedidoHistoricoSelecionado && (
+                  <div className={`${borderedPanelClassName} p-4 mb-4`}>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <h5 className="mb-0 fw-bold">Histórico do pedido</h5>
+                      <button
+                        className="btn btn-outline-secondary btn-sm"
+                        onClick={() => {
+                          setDadosHistorico(null)
+                          setPedidoHistoricoSelecionado(null)
+                        }}
+                      >
+                        Fechar
+                      </button>
+                    </div>
+                    <p className={`mb-1 ${mutedClassName}`}><strong>Item:</strong> {dadosHistorico.item}</p>
+                    <p className={`mb-3 ${mutedClassName}`}><strong>Status atual:</strong> {dadosHistorico.statusAtual}</p>
+                    <ul className="list-group list-group-flush">
+                      {dadosHistorico.historico.map((entrada, index) => (
+                        <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                          <span className="badge bg-primary">{entrada.status}</span>
+                          <small className={mutedClassName}>
+                            {new Date(entrada.momento).toLocaleString('pt-BR')}
+                          </small>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 {/* Filtro por status — filtra a lista localmente sem chamar o back */}
                 <div className="mb-3">
                   <select
@@ -521,6 +564,14 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                                 <span className="badge bg-success mt-1">{pedidoHistorico.status}</span>
                               </div>
                             </div>
+                            <button
+                              type="button"
+                              className="btn btn-outline-primary btn-sm"
+                              onClick={() => handleVerHistorico(pedidoHistorico.id)}
+                            >
+                              <i className="fa fa-history me-1" aria-hidden="true"></i>
+                              Ver historico
+                            </button>
                             <button
                               type="button"
                               className="btn btn-outline-danger btn-sm align-self-start align-self-sm-auto"
