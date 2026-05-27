@@ -513,14 +513,16 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                             <span className="text-break d-block">{pedidoHistorico.origem} para {pedidoHistorico.destino}</span>
                           </p>
                           <div className="d-flex flex-wrap gap-2">
+                            {/* tipo vem do back — usa tiposEntrega para exibir o nome amigável */}
                             <span className="badge bg-primary bg-opacity-10 text-primary">
-                              {tiposEntrega[pedidoHistorico.tipoEntrega]}
+                              {tiposEntrega[pedidoHistorico.tipo] || pedidoHistorico.tipo}
                             </span>
                             <span className="badge bg-primary bg-opacity-10 text-primary">
                               {pedidoHistorico.peso} kg
                             </span>
+                            {/* precoEstimado vem como string do back — converte para número antes do toFixed */}
                             <span className="badge bg-primary bg-opacity-10 text-primary">
-                              R$ {pedidoHistorico.precoEstimado.toFixed(2).replace(".", ",")}
+                              R$ {Number(pedidoHistorico.precoEstimado).toFixed(2).replace(".", ",")}
                             </span>
                           </div>
                         </div>
