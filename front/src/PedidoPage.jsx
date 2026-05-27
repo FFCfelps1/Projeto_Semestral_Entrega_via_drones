@@ -572,7 +572,9 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                 </div>
 
                 {pedidosSimulados.length === 0 ? (
-                  <div className={`${borderedPanelClassName} p-4`}>
+                  <div className={`${borderedPanelClassName} p-4 text-center`}>
+                     {/* Ícone de caixa vazia do FontAwesome */}
+                     <i className="fa fa-box-open fa-2x mb-3 text-muted" aria-hidden="true"></i>
                     <p className={`mb-0 ${mutedClassName}`}>
                       Nenhum pedido simulado ainda. Preencha os dados do envio para montar a primeira solicitacao.
                     </p>
