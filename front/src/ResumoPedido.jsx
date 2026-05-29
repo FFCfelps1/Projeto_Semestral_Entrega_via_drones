@@ -1,24 +1,9 @@
-import React from 'react'
-import StatusPedido from './StatusPedido'
-import { confirmarPedido } from './pedidosEntregaService'
-
-// Exibe o resumo do pedido recém criado com preço e tempo estimado
-const ResumoPedido = ({ pedido, onPedidoConfirmado }) => {
-
-  // Confirma o pedido chamando o back e avisa o componente pai
-  const handleConfirmar = async () => {
-    const aux = async () => {
-      const pedidoConfirmado = await confirmarPedido(pedido.id)
-      onPedidoConfirmado(pedidoConfirmado)
-    }
-    aux()
-  }
-
-  return (
+return (
     <div className="card mb-4">
       <div className="card-body">
         <h5 className="card-title">Resumo do pedido</h5>
 
+        {/* Lista com todos os dados do pedido vindos do back */}
         <ul className="list-group list-group-flush mb-3">
           <li className="list-group-item d-flex justify-content-between">
             <span>Item</span>
@@ -40,6 +25,7 @@ const ResumoPedido = ({ pedido, onPedidoConfirmado }) => {
             <span>Tipo</span>
             <strong>{pedido.tipo}</strong>
           </li>
+          {/* precoEstimado e tempoEstimado calculados pelo back */}
           <li className="list-group-item d-flex justify-content-between">
             <span>Preço estimado</span>
             <strong className="text-success">R$ {pedido.precoEstimado}</strong>
@@ -48,12 +34,14 @@ const ResumoPedido = ({ pedido, onPedidoConfirmado }) => {
             <span>Tempo estimado</span>
             <strong>{pedido.tempoEstimado} min</strong>
           </li>
+          {/* Badge colorido com o status atual do pedido */}
           <li className="list-group-item d-flex justify-content-between">
             <span>Status</span>
             <StatusPedido status={pedido.status} />
           </li>
         </ul>
 
+        {/* Botão que muda o status de rascunho para confirmado */}
         <button
           className="btn btn-success w-100"
           onClick={handleConfirmar}
@@ -63,6 +51,3 @@ const ResumoPedido = ({ pedido, onPedidoConfirmado }) => {
       </div>
     </div>
   )
-}
-
-export default ResumoPedido
