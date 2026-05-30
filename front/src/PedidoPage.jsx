@@ -67,6 +67,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
     pedidoHistoricoSelecionado,
     adicionarPedido,
     removerPedido,
+    handleConfirmarPedido,
     handleCancelarPedido,
     handleVerHistorico,
     fecharHistorico,
@@ -609,6 +610,17 @@ const PedidoPage = ({ themeMode = "light" }) => {
                                 <i className="fa fa-history me-1" aria-hidden="true"></i>
                                 Ver historico
                               </button>
+                              {/* Botão confirmar — só aparece enquanto o pedido for rascunho */}
+                              {pedidoHistorico.status === "rascunho" && (
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-success btn-sm"
+                                  onClick={() => handleConfirmarPedido(pedidoHistorico.id)}
+                                >
+                                  <i className="fa fa-check me-1" aria-hidden="true"></i>
+                                  Confirmar
+                                </button>
+                              )}
                               {/* Botão cancelar — só aparece se o pedido puder ser cancelado */}
                               {pedidoHistorico.status !== "em_rota" &&
                                pedidoHistorico.status !== "entregue" &&

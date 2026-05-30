@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { cancelarPedido, buscarHistorico } from "./pedidosEntregaService.js"
+import { cancelarPedido, confirmarPedido, buscarHistorico } from "./pedidosEntregaService.js"
 
 // Custom hook que centraliza a lógica de manipulação da lista de pedidos
 // Separa a lógica de negócio da interface visual do PedidoPage
@@ -57,6 +57,23 @@ const usePedidos = (carregarIniciais) => {
     aux()
   }
 
+  // Confirma o pedido no back e atualiza o status na lista
+  // Só faz sentido para pedidos em "rascunho" (regra validada pelo back).
+  const handleConfirmarPedido = (pedidoId) => {
+    const aux = async () => {
+      // POST /pedidos/:id/confirmar retorna o pedido já confirmado
+      const confirmado = await confirmarPedido(pedidoId)
+
+      // Atualiza o status na lista sem recarregar a página
+      setPedidos((atual) =>
+        atual.map((p) =>
+          p.id === pedidoId ? { ...p, status: confirmado.status } : p
+        )
+      )
+    }
+    aux()
+  }
+
   // Busca o histórico de status de um pedido pelo id
   const handleVerHistorico = (pedidoId) => {
     const aux = async () => {
@@ -82,6 +99,7 @@ const usePedidos = (carregarIniciais) => {
     pedidoHistoricoSelecionado,
     adicionarPedido,
     removerPedido,
+    handleConfirmarPedido,
     handleCancelarPedido,
     handleVerHistorico,
     fecharHistorico,
