@@ -1,8 +1,15 @@
 import axios from "axios"
 
-// Lê a URL base do arquivo .env
-// Se não encontrar, usa o localhost:3005 como padrão
-const BASE_URL = import.meta.env.VITE_PEDIDOS_ENTREGA_SERVICE_URL || "http://localhost:3005"
+// Define a URL base do microsserviço de pedidos.
+// CORREÇÃO: antes o fallback era sempre "http://localhost:3005", o que quebrava
+// em produção (a Vercel não tem esse servidor local). Agora segue o mesmo padrão
+// dos outros micros do App.jsx:
+//   1) usa VITE_PEDIDOS_ENTREGA_SERVICE_URL se definida;
+//   2) em desenvolvimento (vite dev) cai no localhost:3005;
+//   3) em produção usa a função serverless em /api/gestao_de_pedidos.
+const BASE_URL =
+  import.meta.env.VITE_PEDIDOS_ENTREGA_SERVICE_URL ||
+  (import.meta.env.DEV ? "http://localhost:3005" : "/api/gestao_de_pedidos")
 
 // Cria um cliente axios com a URL base configurada
 // Todas as requisições feitas com "api" já usam essa URL automaticamente
