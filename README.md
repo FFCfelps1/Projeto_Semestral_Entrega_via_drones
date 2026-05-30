@@ -58,7 +58,7 @@ http://localhost:5173
 ### Páginas do Frontend
 
 - `/` — Página inicial (hero, pedidos, vantagens, CTA)
-- `/pedido` — Simulação visual de pedido de entrega via drone com formulário, resumo e histórico local
+- `/pedido` — Pedido de entrega via drone integrado ao microsservico `gestao_de_pedidos`: formulário, resumo com preço/tempo, lista de pedidos, histórico de status e cancelamento
 - `/precos` — Planos de preço (Pessoal, Empresarial, Corporativo) e FAQ
 - `/rastreamento` — Rastreamento de entrega por drone com mapa interativo
 - `/suporte` — Central de ajuda com busca e tópicos expansíveis
@@ -73,6 +73,7 @@ O projeto utiliza uma arquitetura de microsservicos Node.js no diretorio `back`,
   - abrir cliente de e-mail com `mailto`;
   - enviar mensagem direto no site (backend envia para `entrega.drones@gmail.com`).
 4. `back/cadastro_usuario` (porta `3004`): autentica usuarios, cria cadastro, gerencia perfil e emite token JWT.
+5. `back/gestao_de_pedidos` (porta `3005`): gerencia o ciclo de vida dos pedidos de entrega via drone — criacao, confirmacao, listagem, atualizacao de status, cancelamento e historico. Calcula preco e tempo estimados e emite eventos no barramento.
 
 ### Barramento de Eventos (porta 3001)
 
@@ -84,9 +85,10 @@ O barramento de eventos e o componente central da arquitetura de microsservicos.
 3. O barramento distribui o evento para todos os inscritos via `POST /eventos/receber`
 
 **Eventos do sistema:**
-- `RotaCalculada` — publicado pelo servico de rotas quando uma rota e calculada
+- `RotaCalculada` — publicado pelo servico de rotas quando uma rota e calculada. O servico de pedidos consome este evento e move o pedido correspondente para o status `em_rota`.
 - `ContatoSolicitado` — publicado pelo servico de email quando um link mailto e gerado
 - `EmailEnviado` — publicado pelo servico de email quando uma mensagem e enviada
+- `PEDIDO_CRIADO`, `PEDIDO_CONFIRMADO`, `PEDIDO_ATUALIZADO`, `PEDIDO_CANCELADO` — publicados pelo servico de pedidos a cada mudanca no ciclo de vida do pedido
 
 **Ordem de inicializacao:** O barramento deve ser iniciado ANTES dos demais servicos.
 
@@ -154,6 +156,51 @@ No frontend local, a autenticacao usa `http://localhost:3004` por padrao. Para s
 VITE_AUTH_SERVICE_URL=http://localhost:3004
 ```
 
+### Como iniciar o microsservico de pedidos (3005)
+
+Este microsservico persiste os pedidos no MySQL (banco `skyswift`). Garanta que o banco
+e a tabela `pedidos` existem rodando o script (o mesmo arquivo ja cria a tabela):
+
+```sql
+source back/banco/script.sql;
+```
+
+Configure `back/gestao_de_pedidos/.env` a partir de `back/gestao_de_pedidos/.env.example`:
+
+```env
+PORT=3005
+SERVICE_URL=http://localhost:3005
+BARRAMENTO_URL=http://localhost:3001
+
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=sua_senha_mysql
+DB_NAME=skyswift
+DB_PORT=3306
+```
+
+Inicie o microsservico (em um terminal separado, com o servidor rodando):
+
+```bash
+cd back/gestao_de_pedidos
+npm install
+npm run dev
+```
+
+Voce deve ver `✅ gestao_pedidos rodando na porta 3005`. No frontend local, a pagina de
+pedidos usa `http://localhost:3005` por padrao. Para sobrescrever:
+
+```env
+VITE_PEDIDOS_ENTREGA_SERVICE_URL=http://localhost:3005
+```
+
+**Tipos de entrega e regra de preco:** `padrao` (x1,0 / 45 min), `expressa` (x1,35 / 30 min)
+e `prioritaria` (x1,65 / 20 min). O preco segue a formula `(10 + peso * 5) * multiplicador`.
+
+**Status do pedido:** `rascunho` -> `confirmado` -> `em_processamento` -> `em_rota` ->
+`entregue` (transicao so avanca; `cancelado` pode ser aplicado de qualquer estado, exceto
+quando o pedido ja esta `em_rota` ou `entregue`).
+
 ### Endpoints principais
 
 - `GET http://localhost:3001/health`
@@ -175,6 +222,15 @@ VITE_AUTH_SERVICE_URL=http://localhost:3004
 - `PATCH http://localhost:3004/auth/me`
 - `PATCH http://localhost:3004/auth/me/senha`
 - `DELETE http://localhost:3004/auth/me`
+- `GET http://localhost:3005/health`
+- `POST http://localhost:3005/pedidos` — cria um pedido
+- `GET http://localhost:3005/pedidos` — lista pedidos (filtros: `?usuarioId=...&status=...`)
+- `GET http://localhost:3005/pedidos/:id` — busca um pedido
+- `POST http://localhost:3005/pedidos/:id/confirmar` — confirma um pedido em rascunho
+- `PATCH http://localhost:3005/pedidos/:id` — atualiza o status do pedido
+- `DELETE http://localhost:3005/pedidos/:id` — cancela um pedido
+- `GET http://localhost:3005/pedidos/:id/historico` — historico de status do pedido
+- `POST http://localhost:3005/eventos/receber` — recebe eventos do barramento
 
 ### Resposta do endpoint de contato por `mailto`
 
@@ -219,12 +275,56 @@ Para envio real de e-mail, configure variaveis de ambiente no microsservico `bac
 
 Mesmo no envio direto, o destinatario final permanece fixo em `entrega.drones@gmail.com`.
 
+### Criacao de pedido (`POST /pedidos`)
+
+Corpo esperado:
+
+```json
+{
+  "item": "Documentos",
+  "peso": 2,
+  "origem": "Rua das Flores, 120 - Centro",
+  "destino": "Avenida Brasil, 850 - Jardim",
+  "tipo": "prioritaria",
+  "observacoes": "Entregar na portaria",
+  "usuarioId": null
+}
+```
+
+Campos obrigatorios: `item`, `peso`, `origem`, `destino`, `tipo`.
+
+Exemplo de resposta (`201 Created`):
+
+```json
+{
+  "id": "1305bf98-af2b-47bd-a8a6-ccd6eca33821",
+  "item": "Documentos",
+  "peso": 2,
+  "origem": "Rua das Flores, 120 - Centro",
+  "destino": "Avenida Brasil, 850 - Jardim",
+  "tipo": "prioritaria",
+  "observacoes": "Entregar na portaria",
+  "usuarioId": null,
+  "status": "rascunho",
+  "precoEstimado": "33.00",
+  "tempoEstimado": 20,
+  "statusHistorico": [
+    { "status": "rascunho", "momento": "2026-05-29T23:53:47.584Z" }
+  ],
+  "criadoEm": "2026-05-29T23:53:47.584Z",
+  "atualizadoEm": "2026-05-29T23:53:47.584Z"
+}
+```
+
+No frontend, a pagina `/pedido` consome esse endpoint: o formulario cria o pedido, o
+resumo exibe preco/tempo retornados pelo back e a lista permite ver historico e cancelar.
+
 ## Deploy na Vercel (frontend + APIs)
 
 Este repositorio esta preparado para deploy unico na Vercel com:
 
 - frontend React em `front`;
-- funcoes serverless em `api/entrega_via_drone`, `api/contato_email` e `api/cadastro_usuario`.
+- funcoes serverless em `api/entrega_via_drone`, `api/contato_email`, `api/cadastro_usuario` e `api/gestao_de_pedidos`.
 
 ### Endpoints em producao
 
@@ -240,6 +340,14 @@ Este repositorio esta preparado para deploy unico na Vercel com:
 - `PATCH /api/cadastro_usuario/auth/me`
 - `PATCH /api/cadastro_usuario/auth/me/senha`
 - `DELETE /api/cadastro_usuario/auth/me`
+- `GET /api/gestao_de_pedidos/health`
+- `POST /api/gestao_de_pedidos/pedidos`
+- `GET /api/gestao_de_pedidos/pedidos`
+- `GET /api/gestao_de_pedidos/pedidos/:id`
+- `POST /api/gestao_de_pedidos/pedidos/:id/confirmar`
+- `PATCH /api/gestao_de_pedidos/pedidos/:id`
+- `DELETE /api/gestao_de_pedidos/pedidos/:id`
+- `GET /api/gestao_de_pedidos/pedidos/:id/historico`
 
 ### Variaveis de ambiente na Vercel
 
@@ -263,6 +371,10 @@ Para habilitar autenticacao em producao, configure as variaveis do banco MySQL e
 - `DB_CONNECTION_LIMIT` (opcional, padrao `10`)
 - `JWT_SECRET`
 
+O microsservico de pedidos (`api/gestao_de_pedidos`) usa as **mesmas** variaveis de banco
+(`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT`) — nao exige variaveis extras,
+mas a tabela `pedidos` precisa existir no banco (criada por `back/banco/script.sql`).
+
 Opcional para integracao com barramento externo:
 
 - `BARRAMENTO_URL`
@@ -274,6 +386,7 @@ No ambiente de desenvolvimento local, o frontend continua usando:
 - `http://localhost:3002` para rota;
 - `http://localhost:3003` para contato.
 - `http://localhost:3004` para autenticacao.
+- `http://localhost:3005` para pedidos.
 
 Em producao, o frontend usa automaticamente as rotas serverless em `/api/...`.
 
