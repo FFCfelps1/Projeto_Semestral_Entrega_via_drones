@@ -5,7 +5,7 @@ const {
   query,
   readRequestBody,
   sendJson,
-} = require("../../_utils");
+} = require("../_utils");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "PATCH") {
