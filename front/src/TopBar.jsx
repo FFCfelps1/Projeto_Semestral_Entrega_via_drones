@@ -2,6 +2,7 @@ const TopBar = ({ themeMode = "light", onToggleTheme, usuario, onLogout }) => {
   const isDarkMode = themeMode === "dark";
   const isSubPage = typeof window !== "undefined" && window.location.pathname !== "/";
   const isPrecosPage = typeof window !== "undefined" && window.location.pathname === "/precos";
+  const isPedidoPage = typeof window !== "undefined" && window.location.pathname === "/pedido";
   const isLoginPage = typeof window !== "undefined" && window.location.pathname === "/login";
   const isContaPage = typeof window !== "undefined" && window.location.pathname === "/conta";
   const isHomePage = !isSubPage;
@@ -45,13 +46,17 @@ const TopBar = ({ themeMode = "light", onToggleTheme, usuario, onLogout }) => {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#pedidos">
+              <a className={`nav-link ${isPedidoPage ? "active" : ""}`} aria-current={isPedidoPage ? "page" : undefined} href="/pedido">
                 <i className="fa fa-box me-1"></i>
                 Pedidos
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#contato">
+              {/* CORREÇÃO: o link apontava para "#contato", âncora que não existe.
+                  O formulário de contato fica na CallToAction (home) com id
+                  "mensagem-direta" e abre ao detectar esse hash. Usamos
+                  "/#mensagem-direta" para funcionar a partir de qualquer página. */}
+              <a className="nav-link" href="/#mensagem-direta">
                 <i className="fa fa-envelope me-1"></i>
                 Contato
               </a>
