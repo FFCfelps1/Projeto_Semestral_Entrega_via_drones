@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
-import { criarPedidoEntrega, buscarHistorico, cancelarPedido } from "./pedidosEntregaService.js"
+import { criarPedidoEntrega } from "./pedidosEntregaService.js"
+import usePedidos from "./usePedidos.js"
 
 // Estado inicial do formulário — todos os campos vazios
 const pedidoInicial = {
@@ -32,7 +33,6 @@ const temposEntrega = {
   prioritaria: "15 a 25 min",
 }
 
-
 const statusInicialPedido = "Aguardando solicitacao"
 const PEDIDOS_STORAGE_KEY = "skyswift-pedidos-simulados"
 
@@ -52,6 +52,21 @@ const carregarPedidosSalvos = () => {
 // themeMode controla o tema claro/escuro
 const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
   const isDarkMode = themeMode === "dark"
+
+  // Hook que centraliza a lógica de manipulação da lista de pedidos
+  const {
+    pedidos: pedidosSimulados,
+    filtroStatus,
+    setFiltroStatus,
+    dadosHistorico,
+    pedidoHistoricoSelecionado,
+    adicionarPedido,
+    removerPedido,
+    handleCancelarPedido,
+    handleVerHistorico,
+    fecharHistorico,
+  } = usePedidos()
+
   // Estado do formulário
   const [pedido, setPedido] = useState(pedidoInicial)
   // Estado dos erros de validação
@@ -60,18 +75,10 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
   const [statusPedido, setStatusPedido] = useState(statusInicialPedido)
   // Pedido mais recente criado — exibido no resumo
   const [pedidoSimulado, setPedidoSimulado] = useState(null)
-  // Lista de pedidos criados na sessão atual
-  const [pedidosSimulados, setPedidosSimulados] = useState(carregarPedidosSalvos)
-   // Mensagem de sucesso exibida após criar o pedido
+  // Mensagem de sucesso exibida após criar o pedido
   const [mensagemSucesso, setMensagemSucesso] = useState("")
   // Controla o estado de loading durante a requisição
   const [processandoPedido, setProcessandoPedido] = useState(false)
-  // Estado do filtro de status — vazio significa "todos"
-  const [filtroStatus, setFiltroStatus] = useState("")
-  // ID do pedido cujo histórico está sendo exibido — null = nenhum
-  const [pedidoHistoricoSelecionado, setPedidoHistoricoSelecionado] = useState(null)
-  // Dados do histórico retornados pelo back
-  const [dadosHistorico, setDadosHistorico] = useState(null)
   const pedidosJaPersistidos = useRef(false)
 
   useEffect(() => {
@@ -79,7 +86,6 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
       pedidosJaPersistidos.current = true
       return
     }
-
     window.localStorage.setItem(PEDIDOS_STORAGE_KEY, JSON.stringify(pedidosSimulados))
   }, [pedidosSimulados])
 
@@ -92,7 +98,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
       ...dadosAtuais,
       [name]: value,
     }))
-      // Limpa o erro do campo alterado e reseta o resumo
+    // Limpa o erro do campo alterado e reseta o resumo
     setErros((errosAtuais) => ({
       ...errosAtuais,
       [name]: "",
@@ -110,21 +116,17 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
     if (!pedido.item.trim()) {
       novosErros.item = "Informe o item ou a descricao do pacote."
     }
-
     if (!pedido.peso) {
       novosErros.peso = "Informe o peso aproximado."
     } else if (Number(pedido.peso) <= 0) {
       novosErros.peso = "O peso deve ser maior que zero."
     }
-
     if (!pedido.origem.trim()) {
       novosErros.origem = "Informe o endereco de retirada."
     }
-
     if (!pedido.destino.trim()) {
       novosErros.destino = "Informe o endereco de entrega."
     }
-
     if (!pedido.tipoEntrega) {
       novosErros.tipoEntrega = "Selecione o tipo de entrega."
     }
@@ -141,16 +143,13 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
     setErros(errosValidacao)
 
     // Se houver erros, não envia
-    if (Object.keys(errosValidacao).length > 0) {
-      return
-    }
-    // Ativa o estado de loading — desabilita o botão e exibe "Processando..."
-    setProcessandoPedido(true)
+    if (Object.keys(errosValidacao).length > 0) return
 
+    // Ativa o estado de loading — desabilita o botão e exibe spinner
+    setProcessandoPedido(true)
 
     // Monta o objeto no formato que o back espera
     // "tipo" em vez de "tipoEntrega" — padrão do microsserviço gestao_pedidos
-    // Number(pedido.peso) converte a string do input para número
     const dadosPedido = {
       item: pedido.item,
       peso: Number(pedido.peso),
@@ -159,29 +158,29 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
       tipo: pedido.tipoEntrega,
       observacoes: pedido.observacoes,
     }
-    // O handler não pode ser totalmente async por causa do event.preventDefault()
+
+    // Padrão das apostilas: função aux para usar async dentro do handler
     const aux = async () => {
       // Chama o serviço que faz POST /pedidos no microsserviço gestao_pedidos
       const pedidoCriado = await criarPedidoEntrega(dadosPedido)
+
       // Atualiza o resumo com os dados reais vindos do back
-      // (precoEstimado e tempoEstimado agora vêm do back, não são calculados localmente)
       setStatusPedido("Pedido criado")
       setPedidoSimulado(pedidoCriado)
-      // Adiciona o novo pedido no início da lista
-      setPedidosSimulados((pedidosAtuais) => [pedidoCriado, ...pedidosAtuais])
+
+      // Adiciona o novo pedido no início da lista via hook
+      adicionarPedido(pedidoCriado)
       setMensagemSucesso(`Pedido ${pedidoCriado.id} criado com sucesso!`)
     }
 
     aux()
       .catch((err) => {
         // Exibe o erro real vindo do back se disponível
-        // Senão exibe mensagem genérica
         const mensagemErro = err?.response?.data?.erro || "Nao foi possivel criar o pedido agora."
         setErros({ geral: mensagemErro })
       })
       .finally(() => setProcessandoPedido(false))
   }
-
 
   const handleLimparFormulario = () => {
     setPedido(pedidoInicial)
@@ -191,45 +190,19 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
     setMensagemSucesso("")
   }
 
+  // Remove um pedido da lista pelo id
   const handleRemoverPedido = (pedidoId) => {
-    setPedidosSimulados((pedidosAtuais) => pedidosAtuais.filter((pedidoAtual) => pedidoAtual.id !== pedidoId))
+    // Usa a função do hook em vez de manipular o estado diretamente
+    removerPedido(pedidoId)
 
+    // Se o pedido removido for o que está no resumo, limpa o resumo também
     if (pedidoSimulado?.id === pedidoId) {
       setPedidoSimulado(null)
       setStatusPedido(statusInicialPedido)
     }
   }
 
-  // Busca o histórico de status de um pedido pelo id
-  const handleVerHistorico = (pedidoId) => {
-    const aux = async () => {
-      const historico = await buscarHistorico(pedidoId)
-      setDadosHistorico(historico)
-      setPedidoHistoricoSelecionado(pedidoId)
-    }
-    aux()
-  }
-
-  // Cancela o pedido no back e atualiza o status na lista
-  const handleCancelarPedido = (pedidoId) => {
-    const aux = async () => {
-      const resposta = await cancelarPedido(pedidoId)
-
-      // Atualiza o status do pedido na lista sem recarregar
-      setPedidosSimulados((pedidosAtuais) =>
-        pedidosAtuais.map((p) =>
-          p.id === pedidoId ? { ...p, status: resposta.pedido.status } : p
-        )
-      )
-      // Se o historico do pedido cancelado estiver aberto, fecha
-      if (pedidoHistoricoSelecionado === pedidoId) {
-        setDadosHistorico(null)
-        setPedidoHistoricoSelecionado(null)
-      }
-    }
-    aux()
-  }
-
+  // Estilos dinâmicos baseados no tema claro/escuro
   const pageStyle = {
     minHeight: "calc(100vh - 72px)",
     backgroundColor: isDarkMode ? "#0b1220" : "#eef5ff",
@@ -243,17 +216,21 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
     boxShadow: isDarkMode ? "0 16px 32px rgba(0,0,0,0.22)" : "0 16px 32px rgba(30,64,175,0.10)",
   }
 
+  // Classes CSS dinâmicas baseadas no tema
   const mutedClassName = isDarkMode ? "text-light opacity-75" : "text-secondary"
   const inputClassName = `form-control ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
   const selectClassName = `form-select ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
   const borderedPanelClassName = `border rounded ${isDarkMode ? "border-secondary" : ""}`
   const secondaryButtonClassName = `btn ${isDarkMode ? "btn-outline-light" : "btn-outline-secondary"} fw-bold flex-sm-fill`
   const summaryItemClassName = `d-flex flex-column flex-sm-row justify-content-sm-between gap-1 gap-sm-3 py-2 border-bottom ${isDarkMode ? "border-secondary" : ""}`
+
+  // Cálculo local do preço estimado para exibição no resumo antes do back responder
   const pesoNumerico = Number(pedido.peso)
   const precoEstimado =
     pesoNumerico > 0
       ? 18 + pesoNumerico * 4.5 * (multiplicadoresEntrega[pedido.tipoEntrega] || 1)
       : 0
+
   const subtitleStyle = {
     maxWidth: "620px",
     lineHeight: 1.7,
@@ -279,6 +256,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                 </p>
               </div>
 
+              {/* Formulário à esquerda e resumo à direita */}
               <div className="row g-4 align-items-stretch">
                 <div className="col-12 col-lg-7">
                   <form className="h-100" onSubmit={handlePedidoSubmit} noValidate>
@@ -288,6 +266,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                     </p>
 
                     <div className={`${borderedPanelClassName} p-4 mt-4`}>
+                      {/* Campo item */}
                       <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-item">
                           Item ou descricao do pacote
@@ -307,6 +286,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         {erros.item && <div id="pedido-item-erro" className="invalid-feedback">{erros.item}</div>}
                       </div>
 
+                      {/* Campo peso */}
                       <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-peso">
                           Peso aproximado
@@ -333,6 +313,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         {erros.peso && <div id="pedido-peso-erro" className="invalid-feedback d-block">{erros.peso}</div>}
                       </div>
 
+                      {/* Campo origem */}
                       <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-origem">
                           Endereco de retirada
@@ -352,6 +333,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         {erros.origem && <div id="pedido-origem-erro" className="invalid-feedback">{erros.origem}</div>}
                       </div>
 
+                      {/* Campo destino */}
                       <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-destino">
                           Endereco de entrega
@@ -371,6 +353,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         {erros.destino && <div id="pedido-destino-erro" className="invalid-feedback">{erros.destino}</div>}
                       </div>
 
+                      {/* Campo tipo de entrega */}
                       <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-tipo-entrega">
                           Tipo de entrega
@@ -395,6 +378,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         {erros.tipoEntrega && <div id="pedido-tipo-entrega-erro" className="invalid-feedback">{erros.tipoEntrega}</div>}
                       </div>
 
+                      {/* Campo observações — opcional */}
                       <div>
                         <label className="form-label fw-semibold" htmlFor="pedido-observacoes">
                           Observacoes
@@ -410,19 +394,20 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         ></textarea>
                       </div>
                     </div>
-                    <button type="submit" className="btn btn-primary fw-bold flex-sm-fill" disabled={processandoPedido}>
-                      {processandoPedido ? (
-                        <>
-                          {/* Spinner animado do Bootstrap durante o loading */}
-                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
-                          Processando...
-                        </>
-                      ) : (
-                        "Criar pedido"
-                      )}
-                    </button>
+
+                    {/* Botões de ação */}
                     <div className="d-flex flex-column flex-sm-row gap-2 mt-4">
-                      
+                      <button type="submit" className="btn btn-primary fw-bold flex-sm-fill" disabled={processandoPedido}>
+                        {processandoPedido ? (
+                          <>
+                            {/* Spinner animado do Bootstrap durante o loading */}
+                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                            Processando...
+                          </>
+                        ) : (
+                          "Criar pedido"
+                        )}
+                      </button>
                       <button
                         type="button"
                         className={secondaryButtonClassName}
@@ -433,12 +418,14 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       </button>
                     </div>
 
+                    {/* Alerta de erro geral */}
                     {erros.geral && (
                       <div className="alert alert-danger mt-4 mb-0" role="alert" aria-live="assertive">
                         {erros.geral}
                       </div>
                     )}
 
+                    {/* Alerta de sucesso após criar o pedido */}
                     {mensagemSucesso && (
                       <div className="alert alert-success mt-4 mb-0" role="status" aria-live="polite">
                         {mensagemSucesso}
@@ -447,6 +434,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                   </form>
                 </div>
 
+                {/* Resumo do pedido — atualiza em tempo real enquanto o usuário preenche */}
                 <div className="col-12 col-lg-5">
                   <div className={`${borderedPanelClassName} p-4 h-100`}>
                     <div className="d-flex align-items-center gap-3 mb-3">
@@ -462,7 +450,9 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       </div>
                     </div>
 
+                    {/* Dados do resumo — aria-live anuncia mudanças para leitores de tela */}
                     <div className="mt-4" aria-live="polite">
+                      {/* ID do pedido — só aparece após criar */}
                       {pedidoSimulado?.id && (
                         <div className={summaryItemClassName}>
                           <span className={mutedClassName}>Identificador</span>
@@ -520,12 +510,14 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                 </div>
               </div>
 
+              {/* Lista de pedidos criados na sessão */}
               <div className="mt-5">
                 <div className="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
                   <div>
                     <h2 className="h4 fw-bold mb-1">Pedidos simulados</h2>
                     <p className={`mb-0 ${mutedClassName}`}>Acompanhe as simulacoes salvas neste navegador.</p>
                   </div>
+                  {/* Contador de pedidos */}
                   <span className="badge bg-primary align-self-md-start">{pedidosSimulados.length} pedidos</span>
                 </div>
 
@@ -534,18 +526,17 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                   <div className={`${borderedPanelClassName} p-4 mb-4`}>
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <h5 className="mb-0 fw-bold">Histórico do pedido</h5>
+                      {/* Usa fecharHistorico do hook em vez de setar estados manualmente */}
                       <button
                         className="btn btn-outline-secondary btn-sm"
-                        onClick={() => {
-                          setDadosHistorico(null)
-                          setPedidoHistoricoSelecionado(null)
-                        }}
+                        onClick={fecharHistorico}
                       >
                         Fechar
                       </button>
                     </div>
                     <p className={`mb-1 ${mutedClassName}`}><strong>Item:</strong> {dadosHistorico.item}</p>
                     <p className={`mb-3 ${mutedClassName}`}><strong>Status atual:</strong> {dadosHistorico.statusAtual}</p>
+                    {/* Linha do tempo de status */}
                     <ul className="list-group list-group-flush">
                       {dadosHistorico.historico.map((entrada, index) => (
                         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
@@ -576,79 +567,84 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                   </select>
                 </div>
 
+                {/* Estado vazio — nenhum pedido criado ainda */}
                 {pedidosSimulados.length === 0 ? (
                   <div className={`${borderedPanelClassName} p-4 text-center`}>
-                     {/* Ícone de caixa vazia do FontAwesome */}
-                     <i className="fa fa-box-open fa-2x mb-3 text-muted" aria-hidden="true"></i>
+                    <i className="fa fa-box-open fa-2x mb-3 text-muted" aria-hidden="true"></i>
                     <p className={`mb-0 ${mutedClassName}`}>
-                      Nenhum pedido simulado ainda. Preencha os dados do envio para montar a primeira solicitacao.
+                      Nenhum pedido criado ainda. Preencha os dados do envio para montar a primeira solicitacao.
                     </p>
                   </div>
                 ) : (
+                  // Lista de cards com os pedidos criados
                   <div className="row g-3">
                     {pedidosSimulados
                       .filter((p) => filtroStatus === "" || p.status === filtroStatus)
                       .map((pedidoHistorico) => (
-                      <div className="col-12 col-lg-6" key={pedidoHistorico.id}>
-                        <div className={`${borderedPanelClassName} p-3 h-100`}>
-                          <div className="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start gap-3 mb-2">
-                            <div>
-                              <strong className="text-break">{pedidoHistorico.id}</strong>
+                        <div className="col-12 col-lg-6" key={pedidoHistorico.id}>
+                          <div className={`${borderedPanelClassName} p-3 h-100`}>
+                            <div className="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start gap-3 mb-2">
                               <div>
-                                <span className="badge bg-success mt-1">{pedidoHistorico.status}</span>
+                                <strong className="text-break">{pedidoHistorico.id}</strong>
+                                <div>
+                                  {/* Badge com o status do pedido */}
+                                  <span className="badge bg-success mt-1">{pedidoHistorico.status}</span>
+                                </div>
                               </div>
-                            </div>
-                            <button
-                              type="button"
-                              className="btn btn-outline-primary btn-sm"
-                              onClick={() => handleVerHistorico(pedidoHistorico.id)}
-                            >
-                              <i className="fa fa-history me-1" aria-hidden="true"></i>
-                              Ver historico
-                            </button>
-                            {/* Botão cancelar — só aparece se o pedido puder ser cancelado */}
-                            {pedidoHistorico.status !== "em_rota" &&
-                            pedidoHistorico.status !== "entregue" &&
-                            pedidoHistorico.status !== "cancelado" && (
+                              {/* Botão para ver o histórico de status */}
                               <button
                                 type="button"
-                                className="btn btn-outline-danger btn-sm"
-                                onClick={() => handleCancelarPedido(pedidoHistorico.id)}
+                                className="btn btn-outline-primary btn-sm"
+                                onClick={() => handleVerHistorico(pedidoHistorico.id)}
                               >
-                                <i className="fa fa-times me-1" aria-hidden="true"></i>
-                                Cancelar
+                                <i className="fa fa-history me-1" aria-hidden="true"></i>
+                                Ver historico
                               </button>
-                            )}
-                            <button
-                              type="button"
-                              className="btn btn-outline-danger btn-sm align-self-start align-self-sm-auto"
-                              onClick={() => handleRemoverPedido(pedidoHistorico.id)}
-                              aria-label={`Remover pedido ${pedidoHistorico.id}`}
-                              title="Remover pedido"
-                            >
-                              <i className="fa fa-trash" aria-hidden="true"></i>
-                            </button>
-                          </div>
-                          <p className="fw-semibold mb-1 text-break">{pedidoHistorico.item}</p>
-                          <p className={`small mb-2 ${mutedClassName}`}>
-                            <span className="text-break d-block">{pedidoHistorico.origem} para {pedidoHistorico.destino}</span>
-                          </p>
-                          <div className="d-flex flex-wrap gap-2">
-                            {/* tipo vem do back — usa tiposEntrega para exibir o nome amigável */}
-                            <span className="badge bg-primary bg-opacity-10 text-primary">
-                              {tiposEntrega[pedidoHistorico.tipo] || pedidoHistorico.tipo}
-                            </span>
-                            <span className="badge bg-primary bg-opacity-10 text-primary">
-                              {pedidoHistorico.peso} kg
-                            </span>
-                            {/* precoEstimado vem como string do back — converte para número antes do toFixed */}
-                            <span className="badge bg-primary bg-opacity-10 text-primary">
-                              R$ {Number(pedidoHistorico.precoEstimado).toFixed(2).replace(".", ",")}
-                            </span>
+                              {/* Botão cancelar — só aparece se o pedido puder ser cancelado */}
+                              {pedidoHistorico.status !== "em_rota" &&
+                               pedidoHistorico.status !== "entregue" &&
+                               pedidoHistorico.status !== "cancelado" && (
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-danger btn-sm"
+                                  onClick={() => handleCancelarPedido(pedidoHistorico.id)}
+                                >
+                                  <i className="fa fa-times me-1" aria-hidden="true"></i>
+                                  Cancelar
+                                </button>
+                              )}
+                              {/* Botão para remover o pedido da lista local */}
+                              <button
+                                type="button"
+                                className="btn btn-outline-danger btn-sm align-self-start align-self-sm-auto"
+                                onClick={() => handleRemoverPedido(pedidoHistorico.id)}
+                                aria-label={`Remover pedido ${pedidoHistorico.id}`}
+                                title="Remover pedido"
+                              >
+                                <i className="fa fa-trash" aria-hidden="true"></i>
+                              </button>
+                            </div>
+                            <p className="fw-semibold mb-1 text-break">{pedidoHistorico.item}</p>
+                            <p className={`small mb-2 ${mutedClassName}`}>
+                              <span className="text-break d-block">{pedidoHistorico.origem} para {pedidoHistorico.destino}</span>
+                            </p>
+                            {/* Badges com tipo, peso e preço */}
+                            <div className="d-flex flex-wrap gap-2">
+                              {/* tipo vem do back — usa tiposEntrega para exibir o nome amigável */}
+                              <span className="badge bg-primary bg-opacity-10 text-primary">
+                                {tiposEntrega[pedidoHistorico.tipo] || pedidoHistorico.tipo}
+                              </span>
+                              <span className="badge bg-primary bg-opacity-10 text-primary">
+                                {pedidoHistorico.peso} kg
+                              </span>
+                              {/* precoEstimado vem como string do back — converte para número antes do toFixed */}
+                              <span className="badge bg-primary bg-opacity-10 text-primary">
+                                R$ {Number(pedidoHistorico.precoEstimado).toFixed(2).replace(".", ",")}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 )}
               </div>

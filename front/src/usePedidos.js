@@ -2,6 +2,7 @@ import { useState } from "react"
 import { cancelarPedido, buscarHistorico } from "./pedidosEntregaService.js"
 
 // Custom hook que centraliza a lógica de manipulação da lista de pedidos
+// Separa a lógica de negócio da interface visual do PedidoPage
 const usePedidos = () => {
 
   // Lista de pedidos da sessão
@@ -10,7 +11,7 @@ const usePedidos = () => {
   // Filtro de status aplicado na lista
   const [filtroStatus, setFiltroStatus] = useState("")
 
-  // ID do pedido com histórico aberto
+  // ID do pedido com histórico aberto — null = nenhum
   const [pedidoHistoricoSelecionado, setPedidoHistoricoSelecionado] = useState(null)
 
   // Dados do histórico retornados pelo back
@@ -31,7 +32,7 @@ const usePedidos = () => {
     const aux = async () => {
       const resposta = await cancelarPedido(pedidoId)
 
-      // Atualiza o status na lista sem recarregar
+      // Atualiza o status na lista sem recarregar a página
       setPedidos((atual) =>
         atual.map((p) =>
           p.id === pedidoId ? { ...p, status: resposta.pedido.status } : p
@@ -63,6 +64,7 @@ const usePedidos = () => {
     setPedidoHistoricoSelecionado(null)
   }
 
+  // Retorna tudo que o PedidoPage precisa usar
   return {
     pedidos,
     filtroStatus,
