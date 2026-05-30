@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react"
 import { criarPedidoEntrega } from "./pedidosEntregaService.js"
+import usePedidos from "./usePedidos.js"
 
+// Estado inicial do formulário — todos os campos vazios
 const pedidoInicial = {
   item: "",
   peso: "",
@@ -10,18 +12,21 @@ const pedidoInicial = {
   observacoes: "",
 }
 
+// Mapeamento dos tipos de entrega para exibição na tela
 const tiposEntrega = {
   padrao: "Padrao",
   expressa: "Expressa",
   prioritaria: "Prioritaria",
 }
 
+// Multiplicadores de preço por tipo de entrega
 const multiplicadoresEntrega = {
   padrao: 1,
   expressa: 1.35,
   prioritaria: 1.65,
 }
 
+// Tempos estimados por tipo de entrega (exibição local antes do back responder)
 const temposEntrega = {
   padrao: "45 a 60 min",
   expressa: "25 a 35 min",
@@ -43,14 +48,41 @@ const carregarPedidosSalvos = () => {
   }
 }
 
-const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
+// Componente principal da página de pedidos
+// themeMode controla o tema claro/escuro
+// CORREÇÃO: removida a prop pedidosEntregaServiceUrl, que era recebida mas nunca
+// usada. A URL base do microsserviço é lida diretamente da env
+// (VITE_PEDIDOS_ENTREGA_SERVICE_URL) dentro de pedidosEntregaService.js.
+const PedidoPage = ({ themeMode = "light" }) => {
   const isDarkMode = themeMode === "dark"
+
+  // Hook que centraliza a lógica de manipulação da lista de pedidos.
+  // CORREÇÃO: passa carregarPedidosSalvos como inicializador para restaurar os
+  // pedidos persistidos no localStorage ao abrir/recarregar a página.
+  const {
+    pedidos: pedidosSimulados,
+    filtroStatus,
+    setFiltroStatus,
+    dadosHistorico,
+    pedidoHistoricoSelecionado,
+    adicionarPedido,
+    removerPedido,
+    handleCancelarPedido,
+    handleVerHistorico,
+    fecharHistorico,
+  } = usePedidos(carregarPedidosSalvos)
+
+  // Estado do formulário
   const [pedido, setPedido] = useState(pedidoInicial)
+  // Estado dos erros de validação
   const [erros, setErros] = useState({})
+  // Status exibido no resumo do pedido
   const [statusPedido, setStatusPedido] = useState(statusInicialPedido)
+  // Pedido mais recente criado — exibido no resumo
   const [pedidoSimulado, setPedidoSimulado] = useState(null)
-  const [pedidosSimulados, setPedidosSimulados] = useState(carregarPedidosSalvos)
+  // Mensagem de sucesso exibida após criar o pedido
   const [mensagemSucesso, setMensagemSucesso] = useState("")
+  // Controla o estado de loading durante a requisição
   const [processandoPedido, setProcessandoPedido] = useState(false)
   const pedidosJaPersistidos = useRef(false)
 
@@ -59,17 +91,19 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
       pedidosJaPersistidos.current = true
       return
     }
-
     window.localStorage.setItem(PEDIDOS_STORAGE_KEY, JSON.stringify(pedidosSimulados))
   }, [pedidosSimulados])
 
+  // Atualiza o campo correspondente no estado do formulário a cada digitação
   const handlePedidoChange = (event) => {
     const { name, value } = event.target
 
+    // Spread operator mantém os outros campos intactos
     setPedido((dadosAtuais) => ({
       ...dadosAtuais,
       [name]: value,
     }))
+    // Limpa o erro do campo alterado e reseta o resumo
     setErros((errosAtuais) => ({
       ...errosAtuais,
       [name]: "",
@@ -80,27 +114,24 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
     setMensagemSucesso("")
   }
 
+  // Valida os campos obrigatórios antes de enviar
   const validarPedido = () => {
     const novosErros = {}
 
     if (!pedido.item.trim()) {
       novosErros.item = "Informe o item ou a descricao do pacote."
     }
-
     if (!pedido.peso) {
       novosErros.peso = "Informe o peso aproximado."
     } else if (Number(pedido.peso) <= 0) {
       novosErros.peso = "O peso deve ser maior que zero."
     }
-
     if (!pedido.origem.trim()) {
       novosErros.origem = "Informe o endereco de retirada."
     }
-
     if (!pedido.destino.trim()) {
       novosErros.destino = "Informe o endereco de entrega."
     }
-
     if (!pedido.tipoEntrega) {
       novosErros.tipoEntrega = "Selecione o tipo de entrega."
     }
@@ -109,46 +140,51 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
   }
 
   const handlePedidoSubmit = async (event) => {
+    // Previne o comportamento padrão do form (recarregar a página)
     event.preventDefault()
 
+    // Valida os campos e exibe erros se houver
     const errosValidacao = validarPedido()
     setErros(errosValidacao)
 
-    if (Object.keys(errosValidacao).length > 0) {
-      return
-    }
+    // Se houver erros, não envia
+    if (Object.keys(errosValidacao).length > 0) return
 
+    // Ativa o estado de loading — desabilita o botão e exibe spinner
     setProcessandoPedido(true)
-    await new Promise((resolve) => setTimeout(resolve, 500))
 
-    const novoPedido = {
-      id: `PED-${Date.now()}`,
-      ...pedido,
-      precoEstimado,
-      tempoEstimado: temposEntrega[pedido.tipoEntrega],
-      status: "Pedido simulado",
-      criadoEm: new Date().toISOString(),
+    // Monta o objeto no formato que o back espera
+    // "tipo" em vez de "tipoEntrega" — padrão do microsserviço gestao_pedidos
+    const dadosPedido = {
+      item: pedido.item,
+      peso: Number(pedido.peso),
+      origem: pedido.origem,
+      destino: pedido.destino,
+      tipo: pedido.tipoEntrega,
+      observacoes: pedido.observacoes,
     }
 
-    try {
-      const respostaServico = await criarPedidoEntrega({
-        baseUrl: pedidosEntregaServiceUrl,
-        pedido: novoPedido,
-      })
-      const pedidoConfirmado = respostaServico?.pedido || novoPedido
+    // Padrão das apostilas: função aux para usar async dentro do handler
+    const aux = async () => {
+      // Chama o serviço que faz POST /pedidos no microsserviço gestao_pedidos
+      const pedidoCriado = await criarPedidoEntrega(dadosPedido)
 
-      setStatusPedido("Pedido simulado")
-      setPedidoSimulado(pedidoConfirmado)
-      setPedidosSimulados((pedidosAtuais) => [pedidoConfirmado, ...pedidosAtuais])
-      setMensagemSucesso(`Pedido ${pedidoConfirmado.id} criado com sucesso para simulacao.`)
-    } catch {
-      setErros({
-        geral: "Nao foi possivel simular o pedido agora.",
-      })
-      setMensagemSucesso("")
-    } finally {
-      setProcessandoPedido(false)
+      // Atualiza o resumo com os dados reais vindos do back
+      setStatusPedido("Pedido criado")
+      setPedidoSimulado(pedidoCriado)
+
+      // Adiciona o novo pedido no início da lista via hook
+      adicionarPedido(pedidoCriado)
+      setMensagemSucesso(`Pedido ${pedidoCriado.id} criado com sucesso!`)
     }
+
+    aux()
+      .catch((err) => {
+        // Exibe o erro real vindo do back se disponível
+        const mensagemErro = err?.response?.data?.erro || "Nao foi possivel criar o pedido agora."
+        setErros({ geral: mensagemErro })
+      })
+      .finally(() => setProcessandoPedido(false))
   }
 
   const handleLimparFormulario = () => {
@@ -159,15 +195,19 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
     setMensagemSucesso("")
   }
 
+  // Remove um pedido da lista pelo id
   const handleRemoverPedido = (pedidoId) => {
-    setPedidosSimulados((pedidosAtuais) => pedidosAtuais.filter((pedidoAtual) => pedidoAtual.id !== pedidoId))
+    // Usa a função do hook em vez de manipular o estado diretamente
+    removerPedido(pedidoId)
 
+    // Se o pedido removido for o que está no resumo, limpa o resumo também
     if (pedidoSimulado?.id === pedidoId) {
       setPedidoSimulado(null)
       setStatusPedido(statusInicialPedido)
     }
   }
 
+  // Estilos dinâmicos baseados no tema claro/escuro
   const pageStyle = {
     minHeight: "calc(100vh - 72px)",
     backgroundColor: isDarkMode ? "#0b1220" : "#eef5ff",
@@ -181,17 +221,25 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
     boxShadow: isDarkMode ? "0 16px 32px rgba(0,0,0,0.22)" : "0 16px 32px rgba(30,64,175,0.10)",
   }
 
+  // Classes CSS dinâmicas baseadas no tema
   const mutedClassName = isDarkMode ? "text-light opacity-75" : "text-secondary"
   const inputClassName = `form-control ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
   const selectClassName = `form-select ${isDarkMode ? "bg-dark text-light border-secondary" : ""}`
   const borderedPanelClassName = `border rounded ${isDarkMode ? "border-secondary" : ""}`
   const secondaryButtonClassName = `btn ${isDarkMode ? "btn-outline-light" : "btn-outline-secondary"} fw-bold flex-sm-fill`
   const summaryItemClassName = `d-flex flex-column flex-sm-row justify-content-sm-between gap-1 gap-sm-3 py-2 border-bottom ${isDarkMode ? "border-secondary" : ""}`
+
+  // Cálculo local do preço estimado para exibição no resumo antes do back responder.
+  // CORREÇÃO: usa a MESMA fórmula do microsserviço gestao_pedidos
+  // (precoBase 10 + peso * 5) * multiplicador, para que a prévia bata com o
+  // preço real retornado pelo back. Antes usava (18 + peso * 4.5 * mult), o que
+  // dava um valor diferente do cobrado de fato.
   const pesoNumerico = Number(pedido.peso)
   const precoEstimado =
     pesoNumerico > 0
-      ? 18 + pesoNumerico * 4.5 * (multiplicadoresEntrega[pedido.tipoEntrega] || 1)
+      ? (10 + pesoNumerico * 5) * (multiplicadoresEntrega[pedido.tipoEntrega] || 1)
       : 0
+
   const subtitleStyle = {
     maxWidth: "620px",
     lineHeight: 1.7,
@@ -217,6 +265,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                 </p>
               </div>
 
+              {/* Formulário à esquerda e resumo à direita */}
               <div className="row g-4 align-items-stretch">
                 <div className="col-12 col-lg-7">
                   <form className="h-100" onSubmit={handlePedidoSubmit} noValidate>
@@ -226,6 +275,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                     </p>
 
                     <div className={`${borderedPanelClassName} p-4 mt-4`}>
+                      {/* Campo item */}
                       <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-item">
                           Item ou descricao do pacote
@@ -245,6 +295,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         {erros.item && <div id="pedido-item-erro" className="invalid-feedback">{erros.item}</div>}
                       </div>
 
+                      {/* Campo peso */}
                       <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-peso">
                           Peso aproximado
@@ -271,6 +322,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         {erros.peso && <div id="pedido-peso-erro" className="invalid-feedback d-block">{erros.peso}</div>}
                       </div>
 
+                      {/* Campo origem */}
                       <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-origem">
                           Endereco de retirada
@@ -290,6 +342,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         {erros.origem && <div id="pedido-origem-erro" className="invalid-feedback">{erros.origem}</div>}
                       </div>
 
+                      {/* Campo destino */}
                       <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-destino">
                           Endereco de entrega
@@ -309,6 +362,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         {erros.destino && <div id="pedido-destino-erro" className="invalid-feedback">{erros.destino}</div>}
                       </div>
 
+                      {/* Campo tipo de entrega */}
                       <div className="mb-3">
                         <label className="form-label fw-semibold" htmlFor="pedido-tipo-entrega">
                           Tipo de entrega
@@ -333,6 +387,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                         {erros.tipoEntrega && <div id="pedido-tipo-entrega-erro" className="invalid-feedback">{erros.tipoEntrega}</div>}
                       </div>
 
+                      {/* Campo observações — opcional */}
                       <div>
                         <label className="form-label fw-semibold" htmlFor="pedido-observacoes">
                           Observacoes
@@ -349,9 +404,18 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       </div>
                     </div>
 
+                    {/* Botões de ação */}
                     <div className="d-flex flex-column flex-sm-row gap-2 mt-4">
                       <button type="submit" className="btn btn-primary fw-bold flex-sm-fill" disabled={processandoPedido}>
-                        {processandoPedido ? "Processando..." : "Simular pedido"}
+                        {processandoPedido ? (
+                          <>
+                            {/* Spinner animado do Bootstrap durante o loading */}
+                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                            Processando...
+                          </>
+                        ) : (
+                          "Criar pedido"
+                        )}
                       </button>
                       <button
                         type="button"
@@ -363,12 +427,14 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       </button>
                     </div>
 
+                    {/* Alerta de erro geral */}
                     {erros.geral && (
                       <div className="alert alert-danger mt-4 mb-0" role="alert" aria-live="assertive">
                         {erros.geral}
                       </div>
                     )}
 
+                    {/* Alerta de sucesso após criar o pedido */}
                     {mensagemSucesso && (
                       <div className="alert alert-success mt-4 mb-0" role="status" aria-live="polite">
                         {mensagemSucesso}
@@ -377,6 +443,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                   </form>
                 </div>
 
+                {/* Resumo do pedido — atualiza em tempo real enquanto o usuário preenche */}
                 <div className="col-12 col-lg-5">
                   <div className={`${borderedPanelClassName} p-4 h-100`}>
                     <div className="d-flex align-items-center gap-3 mb-3">
@@ -392,7 +459,9 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       </div>
                     </div>
 
+                    {/* Dados do resumo — aria-live anuncia mudanças para leitores de tela */}
                     <div className="mt-4" aria-live="polite">
+                      {/* ID do pedido — só aparece após criar */}
                       {pedidoSimulado?.id && (
                         <div className={summaryItemClassName}>
                           <span className={mutedClassName}>Identificador</span>
@@ -427,12 +496,22 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                       </div>
                       <div className={summaryItemClassName}>
                         <span className={mutedClassName}>Tempo estimado</span>
-                        <strong className="text-sm-end text-break">{temposEntrega[pedido.tipoEntrega] || "Aguardando tipo"}</strong>
+                        {/* Se o pedido foi criado, exibe o tempo real do back. Senão, exibe o estimado local */}
+                        <strong className="text-sm-end text-break">
+                          {pedidoSimulado?.tempoEstimado
+                            ? `${pedidoSimulado.tempoEstimado} min`
+                            : temposEntrega[pedido.tipoEntrega] || "Aguardando tipo"}
+                        </strong>
                       </div>
                       <div className="d-flex flex-column flex-sm-row justify-content-sm-between gap-1 gap-sm-3 py-2">
                         <span className={mutedClassName}>Preco estimado</span>
+                        {/* Se o pedido foi criado, exibe o preço real do back. Senão, exibe o estimado local */}
                         <strong className="text-sm-end text-primary">
-                          {precoEstimado > 0 ? `R$ ${precoEstimado.toFixed(2).replace(".", ",")}` : "Aguardando dados"}
+                          {pedidoSimulado?.precoEstimado
+                            ? `R$ ${Number(pedidoSimulado.precoEstimado).toFixed(2).replace(".", ",")}`
+                            : precoEstimado > 0
+                            ? `R$ ${precoEstimado.toFixed(2).replace(".", ",")}`
+                            : "Aguardando dados"}
                         </strong>
                       </div>
                     </div>
@@ -440,61 +519,141 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
                 </div>
               </div>
 
+              {/* Lista de pedidos criados na sessão */}
               <div className="mt-5">
                 <div className="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
                   <div>
                     <h2 className="h4 fw-bold mb-1">Pedidos simulados</h2>
                     <p className={`mb-0 ${mutedClassName}`}>Acompanhe as simulacoes salvas neste navegador.</p>
                   </div>
+                  {/* Contador de pedidos */}
                   <span className="badge bg-primary align-self-md-start">{pedidosSimulados.length} pedidos</span>
                 </div>
 
+                {/* Exibe o histórico do pedido selecionado */}
+                {dadosHistorico && pedidoHistoricoSelecionado && (
+                  <div className={`${borderedPanelClassName} p-4 mb-4`}>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <h5 className="mb-0 fw-bold">Histórico do pedido</h5>
+                      {/* Usa fecharHistorico do hook em vez de setar estados manualmente */}
+                      <button
+                        className="btn btn-outline-secondary btn-sm"
+                        onClick={fecharHistorico}
+                      >
+                        Fechar
+                      </button>
+                    </div>
+                    <p className={`mb-1 ${mutedClassName}`}><strong>Item:</strong> {dadosHistorico.item}</p>
+                    <p className={`mb-3 ${mutedClassName}`}><strong>Status atual:</strong> {dadosHistorico.statusAtual}</p>
+                    {/* Linha do tempo de status */}
+                    <ul className="list-group list-group-flush">
+                      {dadosHistorico.historico.map((entrada, index) => (
+                        <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                          <span className="badge bg-primary">{entrada.status}</span>
+                          <small className={mutedClassName}>
+                            {new Date(entrada.momento).toLocaleString('pt-BR')}
+                          </small>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Filtro por status — filtra a lista localmente sem chamar o back */}
+                <div className="mb-3">
+                  <select
+                    className={selectClassName}
+                    value={filtroStatus}
+                    onChange={(e) => setFiltroStatus(e.target.value)}
+                  >
+                    <option value="">Todos os status</option>
+                    <option value="rascunho">Rascunho</option>
+                    <option value="confirmado">Confirmado</option>
+                    <option value="em_processamento">Em processamento</option>
+                    <option value="em_rota">Em rota</option>
+                    <option value="entregue">Entregue</option>
+                    <option value="cancelado">Cancelado</option>
+                  </select>
+                </div>
+
+                {/* Estado vazio — nenhum pedido criado ainda */}
                 {pedidosSimulados.length === 0 ? (
-                  <div className={`${borderedPanelClassName} p-4`}>
+                  <div className={`${borderedPanelClassName} p-4 text-center`}>
+                    <i className="fa fa-box-open fa-2x mb-3 text-muted" aria-hidden="true"></i>
                     <p className={`mb-0 ${mutedClassName}`}>
-                      Nenhum pedido simulado ainda. Preencha os dados do envio para montar a primeira solicitacao.
+                      Nenhum pedido criado ainda. Preencha os dados do envio para montar a primeira solicitacao.
                     </p>
                   </div>
                 ) : (
+                  // Lista de cards com os pedidos criados
                   <div className="row g-3">
-                    {pedidosSimulados.map((pedidoHistorico) => (
-                      <div className="col-12 col-lg-6" key={pedidoHistorico.id}>
-                        <div className={`${borderedPanelClassName} p-3 h-100`}>
-                          <div className="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start gap-3 mb-2">
-                            <div>
-                              <strong className="text-break">{pedidoHistorico.id}</strong>
+                    {pedidosSimulados
+                      .filter((p) => filtroStatus === "" || p.status === filtroStatus)
+                      .map((pedidoHistorico) => (
+                        <div className="col-12 col-lg-6" key={pedidoHistorico.id}>
+                          <div className={`${borderedPanelClassName} p-3 h-100`}>
+                            <div className="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start gap-3 mb-2">
                               <div>
-                                <span className="badge bg-success mt-1">{pedidoHistorico.status}</span>
+                                <strong className="text-break">{pedidoHistorico.id}</strong>
+                                <div>
+                                  {/* Badge com o status do pedido */}
+                                  <span className="badge bg-success mt-1">{pedidoHistorico.status}</span>
+                                </div>
                               </div>
+                              {/* Botão para ver o histórico de status */}
+                              <button
+                                type="button"
+                                className="btn btn-outline-primary btn-sm"
+                                onClick={() => handleVerHistorico(pedidoHistorico.id)}
+                              >
+                                <i className="fa fa-history me-1" aria-hidden="true"></i>
+                                Ver historico
+                              </button>
+                              {/* Botão cancelar — só aparece se o pedido puder ser cancelado */}
+                              {pedidoHistorico.status !== "em_rota" &&
+                               pedidoHistorico.status !== "entregue" &&
+                               pedidoHistorico.status !== "cancelado" && (
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-danger btn-sm"
+                                  onClick={() => handleCancelarPedido(pedidoHistorico.id)}
+                                >
+                                  <i className="fa fa-times me-1" aria-hidden="true"></i>
+                                  Cancelar
+                                </button>
+                              )}
+                              {/* Botão para remover o pedido da lista local */}
+                              <button
+                                type="button"
+                                className="btn btn-outline-danger btn-sm align-self-start align-self-sm-auto"
+                                onClick={() => handleRemoverPedido(pedidoHistorico.id)}
+                                aria-label={`Remover pedido ${pedidoHistorico.id}`}
+                                title="Remover pedido"
+                              >
+                                <i className="fa fa-trash" aria-hidden="true"></i>
+                              </button>
                             </div>
-                            <button
-                              type="button"
-                              className="btn btn-outline-danger btn-sm align-self-start align-self-sm-auto"
-                              onClick={() => handleRemoverPedido(pedidoHistorico.id)}
-                              aria-label={`Remover pedido ${pedidoHistorico.id}`}
-                              title="Remover pedido"
-                            >
-                              <i className="fa fa-trash" aria-hidden="true"></i>
-                            </button>
-                          </div>
-                          <p className="fw-semibold mb-1 text-break">{pedidoHistorico.item}</p>
-                          <p className={`small mb-2 ${mutedClassName}`}>
-                            <span className="text-break d-block">{pedidoHistorico.origem} para {pedidoHistorico.destino}</span>
-                          </p>
-                          <div className="d-flex flex-wrap gap-2">
-                            <span className="badge bg-primary bg-opacity-10 text-primary">
-                              {tiposEntrega[pedidoHistorico.tipoEntrega]}
-                            </span>
-                            <span className="badge bg-primary bg-opacity-10 text-primary">
-                              {pedidoHistorico.peso} kg
-                            </span>
-                            <span className="badge bg-primary bg-opacity-10 text-primary">
-                              R$ {pedidoHistorico.precoEstimado.toFixed(2).replace(".", ",")}
-                            </span>
+                            <p className="fw-semibold mb-1 text-break">{pedidoHistorico.item}</p>
+                            <p className={`small mb-2 ${mutedClassName}`}>
+                              <span className="text-break d-block">{pedidoHistorico.origem} para {pedidoHistorico.destino}</span>
+                            </p>
+                            {/* Badges com tipo, peso e preço */}
+                            <div className="d-flex flex-wrap gap-2">
+                              {/* tipo vem do back — usa tiposEntrega para exibir o nome amigável */}
+                              <span className="badge bg-primary bg-opacity-10 text-primary">
+                                {tiposEntrega[pedidoHistorico.tipo] || pedidoHistorico.tipo}
+                              </span>
+                              <span className="badge bg-primary bg-opacity-10 text-primary">
+                                {pedidoHistorico.peso} kg
+                              </span>
+                              {/* precoEstimado vem como string do back — converte para número antes do toFixed */}
+                              <span className="badge bg-primary bg-opacity-10 text-primary">
+                                R$ {Number(pedidoHistorico.precoEstimado).toFixed(2).replace(".", ",")}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 )}
               </div>

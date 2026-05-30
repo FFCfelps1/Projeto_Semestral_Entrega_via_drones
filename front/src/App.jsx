@@ -26,8 +26,9 @@ const AUTH_SERVICE_URL =
   import.meta.env.VITE_AUTH_SERVICE_URL ||
   (import.meta.env.DEV ? "http://localhost:3004" : "/api/cadastro_usuario")
 
-const PEDIDOS_ENTREGA_SERVICE_URL =
-  import.meta.env.VITE_PEDIDOS_ENTREGA_SERVICE_URL || ""
+// Obs.: a URL do microsserviço de pedidos é lida diretamente da env dentro de
+// pedidosEntregaService.js (VITE_PEDIDOS_ENTREGA_SERVICE_URL), por isso não é
+// mais necessário ler/repassar essa constante por aqui.
 
 const AUTH_STORAGE_KEY = "skyswift-auth"
 
@@ -336,7 +337,7 @@ const App = () => {
       <div style={appShellStyle}>
         <TopBar {...topBarProps} />
         <main>
-          <PedidoPage themeMode={themeMode} pedidosEntregaServiceUrl={PEDIDOS_ENTREGA_SERVICE_URL} />
+          <PedidoPage themeMode={themeMode} />
         </main>
         <Footer themeMode={themeMode} />
       </div>
