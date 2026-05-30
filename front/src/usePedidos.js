@@ -3,10 +3,19 @@ import { cancelarPedido, buscarHistorico } from "./pedidosEntregaService.js"
 
 // Custom hook que centraliza a lógica de manipulação da lista de pedidos
 // Separa a lógica de negócio da interface visual do PedidoPage
-const usePedidos = () => {
+//
+// CORREÇÃO: agora aceita um inicializador (carregarIniciais) para restaurar os
+// pedidos salvos no localStorage. Antes a lista começava sempre vazia e a função
+// carregarPedidosSalvos do PedidoPage nunca era usada, então os pedidos eram
+// gravados mas sumiam ao recarregar a página.
+const usePedidos = (carregarIniciais) => {
 
-  // Lista de pedidos da sessão
-  const [pedidos, setPedidos] = useState([])
+  // Lista de pedidos da sessão.
+  // useState com função = inicialização "preguiçosa": só roda uma vez, no
+  // primeiro render, evitando ler o localStorage a cada renderização.
+  const [pedidos, setPedidos] = useState(() =>
+    typeof carregarIniciais === "function" ? carregarIniciais() : []
+  )
 
   // Filtro de status aplicado na lista
   const [filtroStatus, setFiltroStatus] = useState("")

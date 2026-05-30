@@ -50,10 +50,15 @@ const carregarPedidosSalvos = () => {
 
 // Componente principal da página de pedidos
 // themeMode controla o tema claro/escuro
-const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
+// CORREÇÃO: removida a prop pedidosEntregaServiceUrl, que era recebida mas nunca
+// usada. A URL base do microsserviço é lida diretamente da env
+// (VITE_PEDIDOS_ENTREGA_SERVICE_URL) dentro de pedidosEntregaService.js.
+const PedidoPage = ({ themeMode = "light" }) => {
   const isDarkMode = themeMode === "dark"
 
-  // Hook que centraliza a lógica de manipulação da lista de pedidos
+  // Hook que centraliza a lógica de manipulação da lista de pedidos.
+  // CORREÇÃO: passa carregarPedidosSalvos como inicializador para restaurar os
+  // pedidos persistidos no localStorage ao abrir/recarregar a página.
   const {
     pedidos: pedidosSimulados,
     filtroStatus,
@@ -65,7 +70,7 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
     handleCancelarPedido,
     handleVerHistorico,
     fecharHistorico,
-  } = usePedidos()
+  } = usePedidos(carregarPedidosSalvos)
 
   // Estado do formulário
   const [pedido, setPedido] = useState(pedidoInicial)
@@ -224,11 +229,15 @@ const PedidoPage = ({ themeMode = "light", pedidosEntregaServiceUrl = "" }) => {
   const secondaryButtonClassName = `btn ${isDarkMode ? "btn-outline-light" : "btn-outline-secondary"} fw-bold flex-sm-fill`
   const summaryItemClassName = `d-flex flex-column flex-sm-row justify-content-sm-between gap-1 gap-sm-3 py-2 border-bottom ${isDarkMode ? "border-secondary" : ""}`
 
-  // Cálculo local do preço estimado para exibição no resumo antes do back responder
+  // Cálculo local do preço estimado para exibição no resumo antes do back responder.
+  // CORREÇÃO: usa a MESMA fórmula do microsserviço gestao_pedidos
+  // (precoBase 10 + peso * 5) * multiplicador, para que a prévia bata com o
+  // preço real retornado pelo back. Antes usava (18 + peso * 4.5 * mult), o que
+  // dava um valor diferente do cobrado de fato.
   const pesoNumerico = Number(pedido.peso)
   const precoEstimado =
     pesoNumerico > 0
-      ? 18 + pesoNumerico * 4.5 * (multiplicadoresEntrega[pedido.tipoEntrega] || 1)
+      ? (10 + pesoNumerico * 5) * (multiplicadoresEntrega[pedido.tipoEntrega] || 1)
       : 0
 
   const subtitleStyle = {

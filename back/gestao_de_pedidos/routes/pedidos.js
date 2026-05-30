@@ -29,12 +29,16 @@ const calcularPreco = (peso, tipo) => {
   // Taxa adicional por kg
   const taxaPorKg = 5.00;
 
-  // Multiplicador por tipo de entrega:
-  // expressa = 2x mais caro, padrão = preço normal, econômica = metade do preço
+  // Multiplicador por tipo de entrega.
+  // CORREÇÃO: o front (PedidoPage) oferece os tipos "padrao", "expressa" e
+  // "prioritaria". Antes o back só conhecia "padrao", "expressa" e "economica",
+  // então um pedido "prioritaria" caía no fallback e era cobrado como padrão.
+  // Agora as chaves batem com o front e os multiplicadores seguem os mesmos
+  // níveis usados na prévia do front (1.0 / 1.35 / 1.65).
   const taxaTipo = {
-    expressa: 2.0,
-    padrao: 1.0,
-    economica: 0.5,
+    padrao: 1.0,      // entrega normal — preço base
+    expressa: 1.35,   // mais rápida — 35% mais cara
+    prioritaria: 1.65, // máxima prioridade — 65% mais cara
   };
 
   // Se o tipo não existir, usa 1.0 como padrão (sem multiplicador)
@@ -49,11 +53,12 @@ const calcularPreco = (peso, tipo) => {
 // CÁLCULO DE TEMPO ESTIMADO
 // ─────────────────────────────────────────
 const calcularTempo = (tipo) => {
-  // Tempo estimado em minutos por tipo de entrega
+  // Tempo estimado em minutos por tipo de entrega.
+  // CORREÇÃO: chaves alinhadas aos tipos do front (padrao/expressa/prioritaria).
   const tempoPorTipo = {
-    expressa: 15,   // drone prioritário, entrega rápida
-    padrao: 45,     // entrega normal
-    economica: 90,  // entrega agendada, menor prioridade
+    padrao: 45,       // entrega normal
+    expressa: 30,     // drone mais rápido
+    prioritaria: 20,  // drone prioritário, entrega mais rápida
   };
 
   // Se o tipo não existir, usa 45 minutos como padrão
