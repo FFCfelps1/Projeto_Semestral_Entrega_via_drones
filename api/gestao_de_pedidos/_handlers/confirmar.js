@@ -6,7 +6,7 @@ const {
   sendJson,
   responderErro,
   handleError,
-} = require("../../_utils");
+} = require("../_utils");
 
 // POST /api/gestao_de_pedidos/pedidos/:id/confirmar
 module.exports = async function handler(req, res) {

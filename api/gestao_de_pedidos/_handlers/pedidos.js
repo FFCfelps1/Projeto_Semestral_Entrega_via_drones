@@ -9,7 +9,7 @@ const {
   sendJson,
   readRequestBody,
   handleError,
-} = require("./_utils");
+} = require("../_utils");
 
 // POST /api/gestao_de_pedidos/pedidos  → cria um pedido
 async function criarPedido(req, res) {

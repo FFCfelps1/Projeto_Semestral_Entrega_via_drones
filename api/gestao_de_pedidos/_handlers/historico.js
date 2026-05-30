@@ -3,7 +3,7 @@ const {
   sendJson,
   responderErro,
   handleError,
-} = require("../../_utils");
+} = require("../_utils");
 
 // GET /api/gestao_de_pedidos/pedidos/:id/historico
 module.exports = async function handler(req, res) {
