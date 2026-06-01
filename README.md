@@ -409,34 +409,107 @@ Se quiser sobrescrever manualmente no frontend:
 ## 📁 Estrutura do Projeto
 
 ```
-src/
-├── contexts/
-│   └── ThemeContext.jsx          # Context para gerenciar tema claro/escuro
-├── components/
-│   ├── common/
-│   │   ├── Button.jsx            # Botão reutilizável com variantes
-│   │   ├── Container.jsx         # Wrapper com classe container Bootstrap
-│   │   ├── Section.jsx           # Seção com styles personalizados
-│   │   └── Icon.jsx              # Ícone FontAwesome wrapper
-│   ├── header/
-│   │   ├── Header.jsx            # Navbar com toggle tema e menu mobile
-│   │   ├── NavLinks.jsx          # Links de navegação
-│   │   └── Header.css
-│   ├── sections/
-│   │   ├── Hero.jsx              # Banner principal
-│   │   ├── HowItWorks.jsx        # Seção "Como funciona"
-│   │   ├── HowItWorksCard.jsx    # Card individual
-│   │   ├── Benefits.jsx          # Seção de benefícios
-│   │   ├── BenefitItem.jsx       # Item de benefício
-│   │   ├── CTA.jsx               # Call to Action
-│   │   └── sections.css
-│   └── footer/
-│       ├── Footer.jsx            # Rodapé com links
-│       └── Footer.css
-├── App.jsx                        # Componente raiz
-├── App.css                        # Estilos globais
-├── main.jsx                       # Entry point
-└── assets/                        # Imagens e recursos estáticos
+PROJETO_SEMESTRAL_ENTREGA_VIA_DRONES/
+│
+├── api/                                         # APIs Serverless
+│   │
+│   ├── cadastro_usuario/
+│   │   ├── _handlers/
+│   │   │   ├── cadastro.js
+│   │   │   ├── health.js
+│   │   │   ├── login.js
+│   │   │   ├── me.js
+│   │   │   └── senha.js
+│   │   ├── _utils.js
+│   │   └── [[...path]].js
+│   │
+│   ├── contato_email/
+│   │   ├── _handlers/
+│   │   │   ├── contato.js
+│   │   │   ├── enviar.js
+│   │   │   └── health.js
+│   │   └── [[...path]].js
+│   │
+│   ├── entrega_via_drone/
+│   │   ├── _handlers/
+│   │   │   ├── health.js
+│   │   │   └── rota.js
+│   │   └── [[...path]].js
+│   │
+│   └── gestao_de_pedidos/
+│       ├── _handlers/
+│       │   ├── confirmar.js
+│       │   ├── health.js
+│       │   ├── historico.js
+│       │   ├── pedido.js
+│       │   ├── pedidos.js
+│       │   └── receber.js
+│       ├── _utils.js
+│       └── [[...path]].js
+│
+├── back/                                        # Microsserviços e Backend
+│   │
+│   ├── banco/
+│   │   └── script.sql                           # Script de criação e configuração do banco de dados
+│   │
+│   ├── barramento_eventos/
+│   │   └── server.js                            # Serviço de barramento de eventos
+│   │
+│   ├── cadastro_usuario/
+│   │   └── server.js                            # Microsserviço de cadastro de usuários
+│   │
+│   ├── contato_email/
+│   │   └── server.js                            # Microsserviço de envio de e-mails
+│   │
+│   ├── entrega_via_drone/
+│   │   └── server.js                            # Microsserviço responsável pelas entregas via drone
+│   │
+│   └── gestao_de_pedidos/
+│       ├── middleware/
+│       │   └── validarPedido.js                 # Middleware para validação de pedidos
+│       ├── routes/
+│       │   └── pedidos.js                       # Rotas relacionadas aos pedidos
+│       ├── readme.md
+│       ├── server.js                            # Microsserviço de gestão de pedidos
+│       └── text.txt
+│
+└── front/                                       # Aplicação React
+    │
+    ├── public/
+    │
+    └── src/
+        │
+        ├── assets/                              # Imagens e recursos estáticos
+        │
+        ├── App.jsx                              # Componente raiz da aplicação
+        ├── main.jsx                             # Ponto de entrada da aplicação
+        │
+        ├── AccountPage.jsx                      # Página de gerenciamento da conta do usuário
+        ├── Advantages.jsx                       # Seção de vantagens do serviço
+        ├── CallToAction.jsx                     # Seção de chamada para ação (CTA)
+        ├── CardPedido.jsx                       # Card individual de exibição de pedido
+        ├── Cartao.jsx                           # Componente de cartão reutilizável
+        ├── DroneTrackingSection.jsx             # Seção de rastreamento da entrega
+        ├── Feedback.jsx                         # Depoimentos e feedback dos clientes
+        ├── Footer.jsx                           # Rodapé da aplicação
+        ├── FormularioPedido.jsx                 # Formulário para solicitação de entrega
+        ├── Hero.jsx                             # Banner principal da página inicial
+        ├── HistoricoPedido.jsx                  # Histórico de pedidos do usuário
+        ├── ListaPedidos.jsx                     # Listagem de pedidos cadastrados
+        ├── LoginPage.jsx                        # Página de autenticação
+        ├── Pedido.jsx                           # Componente principal de pedido
+        ├── PedidoPage.jsx                       # Página de detalhes do pedido
+        ├── PerguntasFrequentes.jsx              # FAQ - Perguntas frequentes
+        ├── PlanoCard.jsx                        # Card de exibição de planos
+        ├── PrecosPage.jsx                       # Página de preços e planos
+        ├── ResumoPedido.jsx                     # Resumo do pedido antes da confirmação
+        ├── StatusPedido.jsx                     # Exibição do status da entrega
+        ├── SuportePage.jsx                      # Página de suporte ao cliente
+        ├── TopBar.jsx                           # Barra superior de navegação
+        ├── TopicoAjuda.jsx                      # Item individual da central de ajuda
+        │
+        ├── pedidosEntregaService.js             # Serviço de integração com a API
+        └── usePedidos.js                        # Hook customizado para gerenciamento de pedidos
 ```
 
 ## 🎨 Componentes Principais
