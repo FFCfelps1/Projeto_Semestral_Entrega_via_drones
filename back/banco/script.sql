@@ -46,3 +46,21 @@ CREATE TABLE IF NOT EXISTS pedidos (
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
         ON DELETE SET NULL
 );
+
+-- ─────────────────────────────────────────────────────────────
+-- Tabela do microsserviço de notificações
+-- Registra notificações globais geradas a partir de eventos do barramento.
+-- ─────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS notificacoes (
+    id INT NOT NULL AUTO_INCREMENT,
+    titulo VARCHAR(120) NOT NULL,
+    mensagem VARCHAR(500) NOT NULL,
+    pedido_id CHAR(36) NULL,
+    evento_tipo VARCHAR(80) NOT NULL,
+    lida BOOLEAN NOT NULL DEFAULT false,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    lida_em TIMESTAMP NULL,
+    PRIMARY KEY (id),
+    INDEX idx_notificacoes_lida_criado (lida, criado_em),
+    INDEX idx_notificacoes_pedido (pedido_id)
+);

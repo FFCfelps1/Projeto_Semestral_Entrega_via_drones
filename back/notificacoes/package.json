@@ -1,0 +1,21 @@
+{
+  "name": "notificacoes",
+  "version": "1.0.0",
+  "description": "Microsservico de notificacoes da SkySwift",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.16.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
