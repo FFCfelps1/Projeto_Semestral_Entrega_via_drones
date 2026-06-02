@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Pedido from "./Pedido.jsx"
 import Cartao from "./Cartao.jsx"
 import TopBar from "./TopBar.jsx"
@@ -12,6 +12,8 @@ import PedidoPage from "./PedidoPage.jsx"
 import SuportePage from "./SuportePage.jsx"
 import LoginPage from "./LoginPage.jsx"
 import AccountPage from "./AccountPage.jsx"
+import NotificacoesPage from "./NotificacoesPage.jsx"
+import { contarNotificacoesNaoLidas } from "./notificacoesService.js"
 import axios from "axios"
 
 const MAP_SERVICE_URL =
@@ -31,6 +33,7 @@ const AUTH_SERVICE_URL =
 // mais necessário ler/repassar essa constante por aqui.
 
 const AUTH_STORAGE_KEY = "skyswift-auth"
+const NOTIFICATIONS_POLLING_MS = 10000
 
 const App = () => {
   const [rota, setRota] = useState(null)
@@ -263,6 +266,26 @@ const App = () => {
     }
   }
 
+  const [notificacoesNaoLidas, setNotificacoesNaoLidas] = useState(0)
+
+  const atualizarContagemNotificacoes = useCallback(async () => {
+    try {
+      const response = await contarNotificacoesNaoLidas()
+      setNotificacoesNaoLidas(Number(response?.total) || 0)
+    } catch (error) {
+      console.error("Erro ao atualizar contagem de notificacoes:", error)
+    }
+  }, [])
+
+  useEffect(() => {
+    atualizarContagemNotificacoes()
+    const intervalId = window.setInterval(atualizarContagemNotificacoes, NOTIFICATIONS_POLLING_MS)
+
+    return () => {
+      window.clearInterval(intervalId)
+    }
+  }, [atualizarContagemNotificacoes])
+
   // Estado global simples de tema para toda a aplicacao (claro/escuro).
   const [themeMode, setThemeMode] = useState(() => {
     if (typeof window === "undefined") return "light"
@@ -296,11 +319,13 @@ const App = () => {
   const isSuportePage = window.location.pathname === "/suporte"
   const isLoginPage = window.location.pathname === "/login"
   const isContaPage = window.location.pathname === "/conta"
+  const isNotificacoesPage = window.location.pathname === "/notificacoes"
   const topBarProps = {
     themeMode,
     onToggleTheme: handleToggleTheme,
     usuario: validandoSessao ? null : authSession?.usuario,
     onLogout: handleLogout,
+    notificacoesNaoLidas,
   }
 
   if (isTrackingPage) {
@@ -350,6 +375,21 @@ const App = () => {
         <TopBar {...topBarProps} />
         <main>
           <SuportePage themeMode={themeMode} onContatar={handleContatarVendas} />
+        </main>
+        <Footer themeMode={themeMode} />
+      </div>
+    )
+  }
+
+  if (isNotificacoesPage) {
+    return (
+      <div style={appShellStyle}>
+        <TopBar {...topBarProps} />
+        <main>
+          <NotificacoesPage
+            themeMode={themeMode}
+            onAtualizarContagem={atualizarContagemNotificacoes}
+          />
         </main>
         <Footer themeMode={themeMode} />
       </div>

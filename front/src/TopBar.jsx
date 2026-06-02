@@ -1,12 +1,15 @@
-const TopBar = ({ themeMode = "light", onToggleTheme, usuario, onLogout }) => {
+const TopBar = ({ themeMode = "light", onToggleTheme, usuario, onLogout, notificacoesNaoLidas = 0 }) => {
   const isDarkMode = themeMode === "dark";
   const isSubPage = typeof window !== "undefined" && window.location.pathname !== "/";
   const isPrecosPage = typeof window !== "undefined" && window.location.pathname === "/precos";
   const isPedidoPage = typeof window !== "undefined" && window.location.pathname === "/pedido";
   const isLoginPage = typeof window !== "undefined" && window.location.pathname === "/login";
   const isContaPage = typeof window !== "undefined" && window.location.pathname === "/conta";
+  const isNotificacoesPage = typeof window !== "undefined" && window.location.pathname === "/notificacoes";
   const isHomePage = !isSubPage;
   const homeHref = isSubPage ? "/" : "#home";
+  const totalNotificacoes = Number(notificacoesNaoLidas) || 0;
+  const badgeNotificacoes = totalNotificacoes > 99 ? "99+" : String(totalNotificacoes);
 
   // O icone e o texto representam o modo atualmente ativo na interface.
   const themeIconClass = isDarkMode ? "fa-moon" : "fa-sun";
@@ -65,6 +68,30 @@ const TopBar = ({ themeMode = "light", onToggleTheme, usuario, onLogout }) => {
               <a className={`nav-link ${isPrecosPage ? "active" : ""}`} aria-current={isPrecosPage ? "page" : undefined} href="/precos">
                 <i className="fa fa-tag me-1"></i>
                 Preços
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                className={`nav-link position-relative d-inline-flex align-items-center ${isNotificacoesPage ? "active" : ""}`}
+                aria-current={isNotificacoesPage ? "page" : undefined}
+                aria-label={
+                  totalNotificacoes > 0
+                    ? `${totalNotificacoes} notificacoes nao lidas`
+                    : "Notificacoes"
+                }
+                href="/notificacoes"
+              >
+                <i className="fa-solid fa-bell me-1" aria-hidden="true"></i>
+                Notificações
+                {totalNotificacoes > 0 && (
+                  <span
+                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                    style={{ minWidth: "1.25rem", fontSize: "0.65rem" }}
+                  >
+                    {badgeNotificacoes}
+                    <span className="visually-hidden">notificacoes nao lidas</span>
+                  </span>
+                )}
               </a>
             </li>
             {usuario ? (
