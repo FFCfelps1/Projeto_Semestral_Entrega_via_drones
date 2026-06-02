@@ -242,6 +242,22 @@ padrao. Para sobrescrever:
 VITE_NOTIFICACOES_SERVICE_URL=http://localhost:3006
 ```
 
+**Funcionamento das notificacoes:** a primeira versao e global, sem filtro por usuario.
+Quando `gestao_de_pedidos` cria um pedido, ele publica `PEDIDO_CRIADO` no barramento no
+formato `{ tipo, dados, origem }`. O microsservico `notificacoes`, quando inscrito no
+barramento, recebe esse evento em `POST /eventos/receber` e grava uma notificacao persistente
+na tabela `notificacoes`.
+
+**Persistencia:** as notificacoes nao ficam em memoria. Elas sao salvas no MySQL com titulo,
+mensagem, `pedido_id`, tipo de evento, estado de leitura (`lida`) e timestamps. O campo
+`pedido_id` e apenas uma referencia textual ao pedido, sem chave estrangeira, para funcionar
+tambem com o micro local de pedidos que ainda usa armazenamento em memoria.
+
+**Cuidados para teste local:** inicie primeiro o barramento, depois `notificacoes` e
+`gestao_de_pedidos`. Se o barramento ou o micro de notificacoes estiverem fora do ar no momento
+da criacao do pedido, o pedido ainda sera criado, mas a notificacao nao sera gerada. O sino do
+frontend atualiza por polling a cada 10 segundos.
+
 ### Endpoints principais
 
 - `GET http://localhost:3001/health`
