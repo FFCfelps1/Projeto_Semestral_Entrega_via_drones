@@ -68,7 +68,7 @@ http://localhost:5173
 
 O projeto utiliza uma arquitetura de microsservicos Node.js no diretorio `back`, conectados por um barramento de eventos:
 
-1. `back/barramento_eventos` (porta `3001`): barramento central de eventos para comunicacao entre servicos.
+1. `back/barramento_eventos` (porta `3001`): barramento central de eventos para comunicacao entre servicos. Não é um serviço a mais, mas sim um componente da infraestrutura do software.
 2. `back/entrega_via_drone` (porta `3002`): calcula rota para rastreamento.
 3. `back/contato_email` (porta `3003`): oferece duas formas de contato:
   - abrir cliente de e-mail com `mailto`;
