@@ -62,6 +62,7 @@ http://localhost:5173
 - `/precos` — Planos de preço (Pessoal, Empresarial, Corporativo) e FAQ
 - `/rastreamento` — Rastreamento de entrega por drone com mapa interativo
 - `/suporte` — Central de ajuda com busca e tópicos expansíveis
+- `/notificacoes` — Central de notificacoes recebidas pelo usuario, com leitura individual ou em lote
 
 ## Backend: Microsservicos
 
@@ -74,6 +75,7 @@ O projeto utiliza uma arquitetura de microsservicos Node.js no diretorio `back`,
   - enviar mensagem direto no site (backend envia para `entrega.drones@gmail.com`).
 4. `back/cadastro_usuario` (porta `3004`): autentica usuarios, cria cadastro, gerencia perfil e emite token JWT.
 5. `back/gestao_de_pedidos` (porta `3005`): gerencia o ciclo de vida dos pedidos de entrega via drone — criacao, confirmacao, listagem, atualizacao de status, cancelamento e historico. Calcula preco e tempo estimados e emite eventos no barramento.
+6. `back/notificacoes` (porta `3006`): consome eventos do barramento e registra notificacoes globais exibidas no frontend.
 
 ### Barramento de Eventos (porta 3001)
 
@@ -89,6 +91,7 @@ O barramento de eventos e o componente central da arquitetura de microsservicos.
 - `ContatoSolicitado` — publicado pelo servico de email quando um link mailto e gerado
 - `EmailEnviado` — publicado pelo servico de email quando uma mensagem e enviada
 - `PEDIDO_CRIADO`, `PEDIDO_CONFIRMADO`, `PEDIDO_ATUALIZADO`, `PEDIDO_CANCELADO` — publicados pelo servico de pedidos a cada mudanca no ciclo de vida do pedido
+- `PEDIDO_CRIADO` tambem e consumido pelo servico de notificacoes para criar a mensagem "Pedido criado" exibida no sino e na pagina `/notificacoes`
 
 **Ordem de inicializacao:** O barramento deve ser iniciado ANTES dos demais servicos.
 
@@ -201,6 +204,44 @@ e `prioritaria` (x1,65 / 20 min). O preco segue a formula `(10 + peso * 5) * mul
 `entregue` (transicao so avanca; `cancelado` pode ser aplicado de qualquer estado, exceto
 quando o pedido ja esta `em_rota` ou `entregue`).
 
+### Como iniciar o microsservico de notificacoes (3006)
+
+Este microsservico persiste notificacoes globais no MySQL (banco `skyswift`). Garanta que a
+tabela `notificacoes` existe rodando o script:
+
+```sql
+source back/banco/script.sql;
+```
+
+Configure `back/notificacoes/.env` a partir de `back/notificacoes/.env.example`:
+
+```env
+PORT=3006
+SERVICE_URL=http://localhost:3006
+BARRAMENTO_URL=http://localhost:3001
+
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=sua_senha_mysql
+DB_NAME=skyswift
+DB_PORT=3306
+```
+
+Inicie o microsservico em um terminal separado:
+
+```bash
+cd back/notificacoes
+npm install
+npm run dev
+```
+
+No frontend local, a TopBar e a pagina `/notificacoes` usam `http://localhost:3006` por
+padrao. Para sobrescrever:
+
+```env
+VITE_NOTIFICACOES_SERVICE_URL=http://localhost:3006
+```
+
 ### Endpoints principais
 
 - `GET http://localhost:3001/health`
@@ -231,6 +272,12 @@ quando o pedido ja esta `em_rota` ou `entregue`).
 - `DELETE http://localhost:3005/pedidos/:id` — cancela um pedido
 - `GET http://localhost:3005/pedidos/:id/historico` — historico de status do pedido
 - `POST http://localhost:3005/eventos/receber` — recebe eventos do barramento
+- `GET http://localhost:3006/health`
+- `GET http://localhost:3006/notificacoes` — lista notificacoes da mais recente para a mais antiga
+- `GET http://localhost:3006/notificacoes/nao-lidas/contagem` — retorna total de notificacoes nao lidas
+- `PATCH http://localhost:3006/notificacoes/:id/ler` — marca uma notificacao como lida
+- `PATCH http://localhost:3006/notificacoes/ler-todas` — marca todas as notificacoes como lidas
+- `POST http://localhost:3006/eventos/receber` — recebe eventos do barramento
 
 ### Resposta do endpoint de contato por `mailto`
 
@@ -324,7 +371,7 @@ resumo exibe preco/tempo retornados pelo back e a lista permite ver historico e 
 Este repositorio esta preparado para deploy unico na Vercel com:
 
 - frontend React em `front`;
-- funcoes serverless em `api/entrega_via_drone`, `api/contato_email`, `api/cadastro_usuario` e `api/gestao_de_pedidos`.
+- funcoes serverless em `api/entrega_via_drone`, `api/contato_email`, `api/cadastro_usuario`, `api/gestao_de_pedidos` e `api/notificacoes`.
 
 ### Endpoints em producao
 
@@ -348,6 +395,12 @@ Este repositorio esta preparado para deploy unico na Vercel com:
 - `PATCH /api/gestao_de_pedidos/pedidos/:id`
 - `DELETE /api/gestao_de_pedidos/pedidos/:id`
 - `GET /api/gestao_de_pedidos/pedidos/:id/historico`
+- `GET /api/notificacoes/health`
+- `GET /api/notificacoes/notificacoes`
+- `GET /api/notificacoes/notificacoes/nao-lidas/contagem`
+- `PATCH /api/notificacoes/notificacoes/:id/ler`
+- `PATCH /api/notificacoes/notificacoes/ler-todas`
+- `POST /api/notificacoes/eventos/receber`
 
 ### Variaveis de ambiente na Vercel
 
@@ -375,6 +428,9 @@ O microsservico de pedidos (`api/gestao_de_pedidos`) usa as **mesmas** variaveis
 (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT`) — nao exige variaveis extras,
 mas a tabela `pedidos` precisa existir no banco (criada por `back/banco/script.sql`).
 
+O microsservico de notificacoes (`api/notificacoes`) tambem usa as **mesmas** variaveis de
+banco. A tabela `notificacoes` precisa existir no banco (criada por `back/banco/script.sql`).
+
 Opcional para integracao com barramento externo:
 
 - `BARRAMENTO_URL`
@@ -387,6 +443,7 @@ No ambiente de desenvolvimento local, o frontend continua usando:
 - `http://localhost:3003` para contato.
 - `http://localhost:3004` para autenticacao.
 - `http://localhost:3005` para pedidos.
+- `http://localhost:3006` para notificacoes.
 
 Em producao, o frontend usa automaticamente as rotas serverless em `/api/...`.
 
@@ -396,6 +453,7 @@ Se quiser sobrescrever manualmente no frontend:
 - `VITE_EMAIL_SERVICE_URL`
 - `VITE_AUTH_SERVICE_URL`
 - `VITE_PEDIDOS_ENTREGA_SERVICE_URL`
+- `VITE_NOTIFICACOES_SERVICE_URL`
 
 ## 📜 Scripts Disponíveis
 
@@ -436,15 +494,18 @@ PROJETO_SEMESTRAL_ENTREGA_VIA_DRONES/
 │   │   │   └── rota.js
 │   │   └── [[...path]].js
 │   │
-│   └── gestao_de_pedidos/
-│       ├── _handlers/
-│       │   ├── confirmar.js
-│       │   ├── health.js
-│       │   ├── historico.js
-│       │   ├── pedido.js
-│       │   ├── pedidos.js
-│       │   └── receber.js
-│       ├── _utils.js
+│   ├── gestao_de_pedidos/
+│   │   ├── _handlers/
+│   │   │   ├── confirmar.js
+│   │   │   ├── health.js
+│   │   │   ├── historico.js
+│   │   │   ├── pedido.js
+│   │   │   ├── pedidos.js
+│   │   │   └── receber.js
+│   │   ├── _utils.js
+│   │   └── [[...path]].js
+│   │
+│   └── notificacoes/
 │       └── [[...path]].js
 │
 ├── back/                                        # Microsserviços e Backend
@@ -464,14 +525,17 @@ PROJETO_SEMESTRAL_ENTREGA_VIA_DRONES/
 │   ├── entrega_via_drone/
 │   │   └── server.js                            # Microsserviço responsável pelas entregas via drone
 │   │
-│   └── gestao_de_pedidos/
-│       ├── middleware/
-│       │   └── validarPedido.js                 # Middleware para validação de pedidos
-│       ├── routes/
-│       │   └── pedidos.js                       # Rotas relacionadas aos pedidos
-│       ├── readme.md
-│       ├── server.js                            # Microsserviço de gestão de pedidos
-│       └── text.txt
+│   ├── gestao_de_pedidos/
+│   │   ├── middleware/
+│   │   │   └── validarPedido.js                 # Middleware para validação de pedidos
+│   │   ├── routes/
+│   │   │   └── pedidos.js                       # Rotas relacionadas aos pedidos
+│   │   ├── readme.md
+│   │   ├── server.js                            # Microsserviço de gestão de pedidos
+│   │   └── text.txt
+│   │
+│   └── notificacoes/
+│       └── server.js                            # Microsserviço de notificações
 │
 └── front/                                       # Aplicação React
     │
@@ -497,6 +561,7 @@ PROJETO_SEMESTRAL_ENTREGA_VIA_DRONES/
         ├── HistoricoPedido.jsx                  # Histórico de pedidos do usuário
         ├── ListaPedidos.jsx                     # Listagem de pedidos cadastrados
         ├── LoginPage.jsx                        # Página de autenticação
+        ├── NotificacoesPage.jsx                 # Página de notificações recebidas
         ├── Pedido.jsx                           # Componente principal de pedido
         ├── PedidoPage.jsx                       # Página de detalhes do pedido
         ├── PerguntasFrequentes.jsx              # FAQ - Perguntas frequentes
@@ -508,6 +573,7 @@ PROJETO_SEMESTRAL_ENTREGA_VIA_DRONES/
         ├── TopBar.jsx                           # Barra superior de navegação
         ├── TopicoAjuda.jsx                      # Item individual da central de ajuda
         │
+        ├── notificacoesService.js               # Serviço de integração com notificações
         ├── pedidosEntregaService.js             # Serviço de integração com a API
         └── usePedidos.js                        # Hook customizado para gerenciamento de pedidos
 ```
@@ -706,4 +772,3 @@ Este projeto está sob a licença que consta no arquivo `LICENSE`.
 ### 👨‍🏫 Orientador
 
 - Professor Rodrigo Bossini Tavares Moreira
-
