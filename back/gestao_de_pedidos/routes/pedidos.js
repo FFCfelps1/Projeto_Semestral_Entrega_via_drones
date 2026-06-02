@@ -68,9 +68,13 @@ const calcularTempo = (tipo) => {
 // ─────────────────────────────────────────
 // FUNÇÃO UTILITÁRIA — BARRAMENTO
 // ─────────────────────────────────────────
-const emitirEvento = (tipo, payload) => {
+const emitirEvento = (tipo, dados) => {
   // Envia o evento para o barramento de forma assíncrona
-  axios.post(`${BARRAMENTO_URL}/eventos`, { tipo, payload })
+  axios.post(`${BARRAMENTO_URL}/eventos`, {
+    tipo,
+    dados,
+    origem: "gestao_de_pedidos",
+  })
     .then(() => {
       console.log(`✅ Evento emitido: ${tipo}`);
     })
@@ -332,16 +336,17 @@ router.get("/pedidos/:id/historico", (req, res) => {
 // RECEBER EVENTOS DO BARRAMENTO
 // ─────────────────────────────────────────
 router.post("/eventos/receber", (req, res) => {
-  // Desestrutura o tipo e payload do evento recebido
-  const { tipo, payload } = req.body;
+  // Desestrutura o tipo e os dados do evento recebido
+  const { tipo, dados, payload } = req.body;
+  const eventoDados = dados || payload || {};
 
   // Loga no terminal qual evento foi recebido
   console.log(`📨 Evento recebido: ${tipo}`);
 
   // Verifica se o evento é de rota calculada e se tem pedidoId
-  if (tipo === "RotaCalculada" && payload.pedidoId) {
+  if (tipo === "RotaCalculada" && eventoDados.pedidoId) {
     // Procura o pedido no array pelo pedidoId que veio no payload
-    const index = pedidos.findIndex((p) => p.id === payload.pedidoId);
+    const index = pedidos.findIndex((p) => p.id === eventoDados.pedidoId);
 
     // Se encontrou o pedido, atualiza o status para em_rota
     if (index !== -1) {
@@ -357,7 +362,7 @@ router.post("/eventos/receber", (req, res) => {
       };
 
       // Confirma no terminal que o pedido foi atualizado
-      console.log(`🚁 Pedido ${payload.pedidoId} atualizado para em_rota`);
+      console.log(`🚁 Pedido ${eventoDados.pedidoId} atualizado para em_rota`);
     }
   }
 

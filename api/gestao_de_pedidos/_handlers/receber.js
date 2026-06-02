@@ -16,11 +16,12 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { tipo, payload } = await readRequestBody(req);
+    const { tipo, dados, payload } = await readRequestBody(req);
+    const eventoDados = dados || payload || {};
     console.log(`Evento recebido: ${tipo}`);
 
-    if (tipo === "RotaCalculada" && payload && payload.pedidoId) {
-      const pedido = await buscarPedidoPorId(payload.pedidoId);
+    if (tipo === "RotaCalculada" && eventoDados.pedidoId) {
+      const pedido = await buscarPedidoPorId(eventoDados.pedidoId);
 
       if (pedido) {
         const novoHistorico = [
@@ -30,10 +31,10 @@ module.exports = async function handler(req, res) {
 
         await query(
           "UPDATE pedidos SET status = ?, status_historico = ? WHERE id = ?",
-          [STATUS.EM_ROTA, JSON.stringify(novoHistorico), payload.pedidoId],
+          [STATUS.EM_ROTA, JSON.stringify(novoHistorico), eventoDados.pedidoId],
         );
 
-        console.log(`Pedido ${payload.pedidoId} atualizado para em_rota`);
+        console.log(`Pedido ${eventoDados.pedidoId} atualizado para em_rota`);
       }
     }
 

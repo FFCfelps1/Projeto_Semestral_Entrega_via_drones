@@ -127,7 +127,7 @@ function calcularTempo(tipo) {
 }
 
 // Emite evento no barramento (best-effort; não derruba a requisição).
-async function emitirEvento(tipo, payload) {
+async function emitirEvento(tipo, dados) {
   const barramentoUrl = process.env.BARRAMENTO_URL;
   if (!barramentoUrl) return;
 
@@ -135,7 +135,7 @@ async function emitirEvento(tipo, payload) {
     await fetch(`${barramentoUrl}/eventos`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ tipo, payload, origem: "gestao_de_pedidos" }),
+      body: JSON.stringify({ tipo, dados, origem: "gestao_de_pedidos" }),
     });
   } catch (error) {
     console.warn(`Erro ao emitir evento ${tipo}:`, error.message);
