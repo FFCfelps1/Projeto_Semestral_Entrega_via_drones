@@ -63,10 +63,10 @@ const NotificacoesPage = ({ themeMode = "light", onAtualizarContagem }) => {
       })
       await onAtualizarContagem?.()
     } catch (error) {
-      console.error("Erro ao marcar notificacao como lida:", error)
+      console.error("Erro ao marcar notificação como lida:", error)
       setStatus({
         tipo: "erro",
-        texto: "Nao foi possivel marcar a notificacao como lida.",
+        texto: "Nao foi possivel marcar a notificação como lida.",
       })
     } finally {
       setProcessandoId(null)
@@ -86,11 +86,11 @@ const NotificacoesPage = ({ themeMode = "light", onAtualizarContagem }) => {
       )
       setStatus({
         tipo: "sucesso",
-        texto: "Todas as notificacoes foram marcadas como lidas.",
+        texto: "Todas as notificações foram marcadas como lidas.",
       })
       await onAtualizarContagem?.()
     } catch (error) {
-      console.error("Erro ao marcar todas as notificacoes como lidas:", error)
+      console.error("Erro ao marcar todas as notificações como lidas:", error)
       setStatus({
         tipo: "erro",
         texto: "Nao foi possivel marcar todas como lidas.",
@@ -125,7 +125,7 @@ const NotificacoesPage = ({ themeMode = "light", onAtualizarContagem }) => {
             <span className="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-2 mb-3">
               Central de notificacoes
             </span>
-            <h1 className="fw-bold mb-2">Notificacoes</h1>
+            <h1 className="fw-bold mb-2">Notificações</h1>
             <p className={`mb-0 ${mutedClassName}`}>
               Acompanhe os eventos recentes gerados pelos pedidos da SkySwift.
             </p>
