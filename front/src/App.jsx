@@ -458,44 +458,33 @@ const App = () => {
         funcao1={() => { window.location.href = "/login" }}
         funcao2={() => { window.location.href = "/rastreamento" }}
       />
-      <div className={`container border mt-4 ${themeMode === "dark" ? "border-secondary" : ""}`}>
+      <div className="container mt-4">
       <div className="row g-4">
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
-          cabecalho="1. Pedido">
+          cabecalho="1. Preço">
           <Pedido 
-            data="Escolha itens"
-            icone="shopping-cart"
-            titulo="Pedido"
-            descricao="Escolha seus itens através do aplicativo SkySwift e defina seu ponto de entrega com precisão GPS."/>
-            <a href="/pedido" className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</a>
+            data="Planos"
+            icone="tag"
+            titulo="Preço"
+            descricao="Compare planos, estimativas e opções de entrega para escolher a solução ideal antes de solicitar seu drone."/>
+            <a href="/precos" className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</a>
             </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
-          cabecalho="2. Voo">
+          cabecalho="2. Pedidos">
           <Pedido 
-            data="Em trânsito"
-            icone="plane"
-            titulo="Voo"
-            descricao="Nossos drones autônomos calculam a rota mais rápida e segura para o seu destino, contornando o tráfego terrestre."/>
-            <button className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</button>
+            data="Escolha itens"
+            icone="shopping-cart"
+            titulo="Pedidos"
+            descricao="Escolha seus itens através do aplicativo SkySwift e defina seu ponto de entrega com precisão GPS."/>
+            <a href="/pedido" className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</a>
           </Cartao>
         </div>
         <div className="col-sm-12 col-md-6 col-xl-3">
           <Cartao
-          cabecalho="3. Entrega">
-          <Pedido
-            data="Pouso em breve"
-            icone="map-marker"
-            titulo="Entrega"
-            descricao="Um pouso preciso garante que seu pacote chegue com segurança na sua porta ou quintal."/>
-            <button className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</button>
-          </Cartao>
-        </div>
-        <div className="col-sm-12 col-md-6 col-xl-3">
-          <Cartao
-          cabecalho="4. Rastreamento">
+          cabecalho="3. Rastreamento">
           <Pedido
             data="Tempo real"
             icone="location-arrow"
@@ -503,6 +492,17 @@ const App = () => {
             descricao="Monitore sua entrega em tempo real com coordenadas GPS ao vivo e hora estimada de chegada."/>
             {/* CTA da home para abrir a pagina dedicada de rastreamento */}
             <a href="/rastreamento" className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</a>
+          </Cartao>
+        </div>
+        <div className="col-sm-12 col-md-6 col-xl-3">
+          <Cartao
+          cabecalho="4. Notificações">
+          <Pedido
+            data="Atualizações"
+            icone="bell"
+            titulo="Notificações"
+            descricao="Acompanhe avisos importantes sobre seus pedidos, confirmações e atualizações de status em um só lugar."/>
+            <a href="/notificacoes" className="btn btn-primary btn-sm w-100 mt-auto">Clique para ver mais</a>
           </Cartao>
         </div>
       </div>
