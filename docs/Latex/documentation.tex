@@ -1,0 +1,281 @@
+% Integrantes:
+% - Arthur Gama Ruiz (RA: 23.01445-8)
+% - Enzo Oliveira D’Onofrio (RA: 23.01561-6)
+% - Felipe Fazio da Costa (RA: 23.00055-4)
+% - João Vitor Morimoto Sesma (RA: 23.01516-0)
+% - Leonardo Souza Olivieri (RA: 23.01512-8)
+% - Pedro Wilian Palumbo Bevilacqua (RA: 23.01307-9)
+%
+% Data: 04/06/2026
+% Matérias: 
+% - ECM516_Arquitetura_de_Computadores
+% - ECM252_Linguagens_de_Programação_2
+
+\documentclass[12pt,a4paper]{article}
+
+% --- Pacotes Básicos ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{indentfirst}
+\usepackage{titlesec}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{caption}
+
+% --- Configurações de Margens (ABNT) ---
+\geometry{
+    top=3cm,
+    left=3cm,
+    right=2cm,
+    bottom=2cm
+}
+
+% --- Configurações de Espaçamento e Fonte ---
+\onehalfspacing 
+\setlength{\parindent}{1.25cm} 
+
+% --- Estilo de Código ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+% --- Definição da Linguagem JavaScript ---
+\lstdefinelanguage{JavaScript}{
+  morekeywords={async, await, break, case, catch, class, const, continue, debugger, default, delete, do, else, enum, export, extends, false, finally, for, function, if, import, in, instanceof, let, new, null, return, super, switch, this, throw, true, try, typeof, var, void, while, with, yield},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]"
+}
+
+% --- TikZ Libraries ---
+\usetikzlibrary{shapes,arrows,positioning,calc}
+
+% --- Início do Documento ---
+\begin{document}
+
+% --- CAPA ---
+\begin{titlepage}
+    \begin{center}
+        {\large \textbf{CEUN-IMT - INSTITUTO MAUÁ DE TECNOLOGIA}} \\
+        \vspace{0.5cm}
+        {\large CURSO DE ENGENHARIA DE COMPUTAÇÃO} \\
+        \vspace{0.5cm}
+        {\large ECM516 - ARQUITETURA DE COMPUTADORES} \\
+        {\large ECM252 - LINGUAGENS DE PROGRAMAÇÃO 2} \\
+        \vfill
+        {\Large \textbf{SkySwift: Desenvolvimento de uma Infraestrutura de Entrega Autônoma via Drones baseada em Microsserviços}} \\
+        \vfill
+        {\large Arthur Gama Ruiz - 23.01445-8} \\
+        {\large Enzo Oliveira D’Onofrio - 23.01561-6} \\
+        {\large Felipe Fazio da Costa - 23.00055-4} \\
+        {\large João Vitor Morimoto Sesma - 23.01516-0} \\
+        {\large Leonardo Souza Olivieri - 23.01512-8} \\
+        {\large Pedro Wilian Palumbo Bevilacqua - 23.01307-9} \\
+        \vfill
+        {\large SÃO CAETANO DO SUL} \\
+        {\large 2026}
+    \end{center}
+\end{titlepage}
+
+% --- FOLHA DE ROSTO ---
+\newpage
+\begin{center}
+    {\large \textbf{Arthur Gama Ruiz, Enzo Oliveira D’Onofrio, Felipe Fazio da Costa, \\ João Vitor Morimoto Sesma, Leonardo Souza Olivieri, Pedro Bevilacqua}} \\
+    \vfill
+    {\Large \textbf{SkySwift: Desenvolvimento de uma Infraestrutura de Entrega Autônoma via Drones baseada em Microsserviços}} \\
+    \vfill
+    \hspace{.45\textwidth}
+    \begin{minipage}{.5\textwidth}
+        Relatório técnico apresentado como requisito parcial para aprovação nas disciplinas de Arquitetura de Computadores (ECM516) e Linguagens de Programação 2 (ECM252) no CEUN-IMT - Instituto Mauá de Tecnologia.
+    \end{minipage}
+    \vfill
+    {\large SÃO CAETANO DO SUL} \\
+    {\large 2026}
+\end{center}
+
+% --- RESUMO ---
+\newpage
+\begin{center}
+    {\large \textbf{RESUMO}}
+\end{center}
+\vspace{1cm}
+Este trabalho apresenta o projeto SkySwift, uma solução integrada para logística autônoma utilizando drones. A arquitetura proposta rompe com o modelo monolítico tradicional, adotando um ecossistema de microsserviços desacoplados que se comunicam através de um barramento de eventos centralizado. A implementação técnica abrange desde o backend em Node.js com persistência poliglota (MySQL e SQLite), até uma interface de usuário rica desenvolvida em React.js. O foco principal reside na confiabilidade da entrega de mensagens, segurança através de criptografia assimétrica e JWT, e precisão geográfica via algoritmos de roteirização. Os resultados demonstram um sistema resiliente, capaz de processar pedidos, calcular rotas e notificar usuários de forma assíncrona e escalável.
+
+\textbf{Palavras-chave:} Microsserviços, Barramento de Eventos, Node.js, React, Logística de Drones.
+
+% --- LISTAS ---
+\newpage
+\tableofcontents
+\newpage
+\listoffigures
+
+% --- INTRODUÇÃO ---
+\newpage
+\section{INTRODUÇÃO}
+O mercado de entregas \textit{last-mile} enfrenta desafios crescentes relacionados à infraestrutura urbana. A proposta do SkySwift é automatizar esse processo utilizando drones, integrando tecnologias de ponta em desenvolvimento de software e arquitetura de sistemas distribuídos. Este relatório detalha a engenharia por trás da plataforma, focando na separação de responsabilidades e na robustez da comunicação entre os módulos.
+
+\section{ARQUITETURA DE MICROSSERVIÇOS}
+
+\subsection{Filosofia de Design}
+Diferente de uma aplicação monolítica, onde uma falha em um módulo pode comprometer todo o sistema, o SkySwift utiliza o isolamento de processos. Cada serviço possui seu próprio contexto, dependências e, em alguns casos, banco de dados.
+
+\subsection{Barramento de Eventos (Event Bus)}
+O coração da arquitetura é o \textbf{Barramento de Eventos}. Ele atua como um mediador (\textit{Middleware}) seguindo o padrão \textit{Observer}.
+
+\textbf{Funcionamento:}
+1. Um serviço de origem realiza um \textit{POST} para o barramento enviando um objeto JSON que contém o \texttt{tipo} do evento e os \texttt{dados}.
+2. O barramento registra o evento em um histórico.
+3. O barramento percorre uma lista interna de serviços "inscritos" e repassa o evento para cada um deles via HTTP.
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[node distance=2cm, auto]
+        \tikzstyle{svc} = [rectangle, draw, fill=orange!20, text width=5em, text centered, rounded corners, minimum height=2em]
+        \tikzstyle{bus} = [rectangle, draw, fill=blue!30, text width=8em, text centered, rounded corners, minimum height=4em]
+        
+        \node [svc] (source) {Serviço Origem};
+        \node [bus, right=2cm of source] (bus) {BARRAMENTO\\(Hub Central)};
+        \node [svc, right=2cm of bus, yshift=1.5cm] (sub1) {Inscrito A};
+        \node [svc, right=2cm of bus, yshift=0cm] (sub2) {Inscrito B};
+        \node [svc, right=2cm of bus, yshift=-1.5cm] (sub3) {Inscrito C};
+
+        \draw [->, thick] (source) -- node[above, font=\tiny]{Publica Evento} (bus);
+        \draw [->, thick] (bus) -- (sub1);
+        \draw [->, thick] (bus) -- (sub2);
+        \draw [->, thick] (bus) -- (sub3);
+    \end{tikzpicture}
+    \caption{Fluxo de Distribuição de Eventos (Pub/Sub)}
+\end{figure}
+
+\newpage
+\section{DETALHAMENTO TÉCNICO E CÓDIGO}
+
+\subsection{Barramento de Eventos (Hub Central)}
+O Barramento de Eventos é o sistema nervoso central do ecossistema. Ele gerencia a inscrição de microsserviços e a distribuição de mensagens seguindo o modelo \textit{Publish/Subscribe}. Nesta arquitetura, o serviço emissor (Publisher) não precisa conhecer o endereço ou a existência dos receptores (Subscribers), o que reduz a complexidade de conexão de $O(n^2)$ para $O(n)$.
+
+A implementação do broadcast no arquivo \texttt{server.js} do barramento é crítica para a consistência eventual do sistema. Abaixo, o trecho que garante a entrega para todos os serviços ativos:
+
+\begin{lstlisting}[language=JavaScript, caption=Implementação de Distribuição de Eventos]
+async function distribuirEvento(evento) {
+  const resultados = [];
+  for (const servico of inscricoes) {
+    if (servico.nome === evento.origem) continue; // Evita loop infinito
+
+    try {
+      await axios.post(`${servico.url}/eventos/receber`, evento, {
+        timeout: 5000,
+      });
+      resultados.push({ servico: servico.nome, status: 'entregue' });
+    } catch (erro) {
+      resultados.push({ servico: servico.nome, status: 'falha' });
+    }
+  }
+  return resultados;
+}
+\end{lstlisting}
+
+\subsection{Cálculo de Rota e Rastreamento}
+O microsserviço \texttt{entrega\_via\_drone} implementa uma estratégia de \textit{fallback} geográfica. Ele tenta consumir o provedor OSRM (\textit{Open Source Routing Machine}), mas possui uma inteligência local baseada na Fórmula de Haversine. Esta abordagem garante que, mesmo sem conectividade com a malha rodoviária externa, o drone consiga estimar o tempo de voo em linha reta.
+
+\begin{equation}
+d = 2R \cdot \operatorname{atan2}\left(\sqrt{a}, \sqrt{1-a}\right)
+\end{equation}
+Onde $a = \sin^2(\Delta\phi/2) + \cos \phi_1 \cdot \cos \phi_2 \cdot \sin^2(\Delta\lambda/2)$.
+
+\begin{lstlisting}[language=JavaScript, caption=Implementação da Fórmula de Haversine]
+function haversineDistanceMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371000; // Raio da Terra em metros
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+\end{lstlisting}
+
+\subsection{Frontend React e Orquestração de Estado}
+A interface foi desenvolvida utilizando \textbf{React 19} com \textbf{Vite}. O grande diferencial técnico reside no roteamento customizado baseado em estado, que evita o uso de bibliotecas externas pesadas e garante transições rápidas entre o painel de pedidos e o mapa de rastreamento.
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[node distance=1.5cm, auto]
+        \node [rectangle, draw, fill=blue!10] (state) {Estado Global (Auth/Tema)};
+        \node [rectangle, draw, below left=of state] (page1) {Página Pedidos};
+        \node [rectangle, draw, below=of state] (page2) {Rastreamento};
+        \node [rectangle, draw, below right=of state] (page3) {Perfil};
+        \draw [->, thick] (state) -- (page1);
+        \draw [->, thick] (state) -- (page2);
+        \draw [->, thick] (state) -- (page3);
+    \end{tikzpicture}
+    \caption{Fluxo de Estado e Propagação de Dados no Frontend}
+\end{figure}
+
+\subsection{Segurança e Integração Reativa}
+O serviço de usuários protege os dados sensíveis utilizando \texttt{bcrypt}. A autenticação gera um \textit{JSON Web Token} (JWT) que permite o processamento distribuído (Arquitetura de Computadores), onde cada microsserviço pode validar a identidade do usuário sem sobrecarregar o banco de dados central, utilizando apenas a chave pública de assinatura.
+
+Serviços periféricos como \texttt{notificacoes} e \texttt{contato\_email} funcionam como consumidores reativos puros. Eles processam eventos do tipo \texttt{PEDIDO\_CRIADO} para disparar e-mails via SMTP e alertas em tempo real.
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[node distance=2.5cm, auto]
+        \node [circle, draw, fill=yellow!20] (event) {Evento};
+        \node [rectangle, draw, right=of event, fill=green!10] (logic) {Processamento};
+        \node [rectangle, draw, right=of logic, fill=orange!10] (action) {Ação (SMTP/Push)};
+        \draw [->, thick] (event) -- (logic);
+        \draw [->, thick] (logic) -- (action);
+    \end{tikzpicture}
+    \caption{Cadeia de Reação Reativa de Serviços Periféricos}
+\end{figure}
+
+\section{INFRAESTRUTURA DE DADOS}
+O sistema utiliza um esquema relacional para garantir a integridade referencial. Abaixo, o diagrama simplificado das tabelas principais:
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[node distance=3cm, every node/.style={rectangle, draw, fill=gray!10, text width=8em, align=left}]
+        \node (user) {\textbf{USUARIOS}\\ id (PK)\\ nome\\ email\\ senha (hash)};
+        \node (order) [right=of user] {\textbf{PEDIDOS}\\ id (PK)\\ user\_id (FK)\\ status\\ destino\_lat\\ destino\_lng};
+        \node (notify) [below=1.5cm of order] {\textbf{NOTIFICACOES}\\ id (PK)\\ pedido\_id (FK)\\ mensagem\\ lida (bool)};
+
+        \draw [->, thick] (user) -- (order);
+        \draw [->, thick] (order) -- (notify);
+    \end{tikzpicture}
+    \caption{Modelo de Dados Relacional}
+\end{figure}
+
+\section{CONCLUSÃO}
+O SkySwift demonstrou ser uma plataforma robusta para a gestão de entregas autônomas. A escolha pela arquitetura de microsserviços via barramento de eventos provou-se eficaz para o desacoplamento, permitindo que novos serviços (como um gateway de pagamento) sejam adicionados sem alterar o código existente. O projeto atende integralmente aos requisitos de ECM516 e ECM252, consolidando conhecimentos de sistemas distribuídos, segurança e desenvolvimento frontend moderno no CEUN-IMT.
+
+\end{document}

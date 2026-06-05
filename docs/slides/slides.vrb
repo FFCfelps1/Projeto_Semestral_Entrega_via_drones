@@ -1,0 +1,23 @@
+\frametitle{04 | Backend: Segurança e JWT}
+\begin{columns}[T]
+    \column{0.5\textwidth}
+      \begin{itemize}
+        \item \textbf{Identity Provider:} JWT assinado digitalmente.
+        \item \textbf{Privacy:} Hashing \texttt{bcrypt} (10 rounds).
+        \item \textbf{Arquitetura:} Stateless (não salva sessão no servidor).
+      \end{itemize}
+    \column{0.5\textwidth}
+      \begin{lstlisting}
+// Validação de Token (Middleware)
+function autenticar(req, res, next) {
+  const token = req.headers['authorization'];
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+      \end{lstlisting}
+  \end{columns}

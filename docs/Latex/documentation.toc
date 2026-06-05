@@ -1,0 +1,12 @@
+\babel@toc {portuguese}{}\relax 
+\contentsline {section}{\numberline {1}INTRODUÇÃO}{5}{section.1}%
+\contentsline {section}{\numberline {2}ARQUITETURA DE MICROSSERVIÇOS}{5}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Filosofia de Design}{5}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Barramento de Eventos (Event Bus)}{5}{subsection.2.2}%
+\contentsline {section}{\numberline {3}DETALHAMENTO TÉCNICO E CÓDIGO}{6}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Barramento de Eventos (Hub Central)}{6}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Cálculo de Rota e Rastreamento}{6}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Frontend React e Orquestração de Estado}{7}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Segurança e Integração Reativa}{7}{subsection.3.4}%
+\contentsline {section}{\numberline {4}INFRAESTRUTURA DE DADOS}{8}{section.4}%
+\contentsline {section}{\numberline {5}CONCLUSÃO}{8}{section.5}%
