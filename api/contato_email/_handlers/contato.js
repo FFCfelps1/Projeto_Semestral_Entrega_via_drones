@@ -50,6 +50,7 @@ async function publishEvent(tipo, dados) {
         dados,
         origem: "contato_email",
       }),
+      signal: AbortSignal.timeout(5000)
     });
   } catch (error) {
     console.error("Falha ao publicar evento:", error.message);

@@ -3,17 +3,13 @@
   "installCommand": "npm install && npm install --prefix front",
   "buildCommand": "npm run build",
   "outputDirectory": "front/dist",
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+  "rewrites": [
+    { "source": "/api/barramento_eventos/:path*", "destination": "/api/barramento_eventos/handler.js" },
+    { "source": "/api/cadastro_usuario/:path*", "destination": "/api/cadastro_usuario/handler.js" },
+    { "source": "/api/contato_email/:path*", "destination": "/api/contato_email/handler.js" },
+    { "source": "/api/entrega_via_drone/:path*", "destination": "/api/entrega_via_drone/handler.js" },
+    { "source": "/api/gestao_de_pedidos/:path*", "destination": "/api/gestao_de_pedidos/handler.js" },
+    { "source": "/api/notificacoes/:path*", "destination": "/api/notificacoes/handler.js" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

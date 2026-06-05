@@ -1,34 +1,3 @@
-const mysql = require("mysql2/promise");
-
-let pool;
-
-function getPool() {
-  if (!pool) {
-    pool = mysql.createPool({
-      host: process.env.DB_HOST || process.env.HOST,
-      user: process.env.DB_USER || process.env.USER,
-      password: process.env.DB_PASSWORD || process.env.PASSWORD,
-      database: process.env.DB_NAME || process.env.DATABASE,
-      port: Number(process.env.DB_PORT || 3306),
-      waitForConnections: true,
-      connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10),
-    });
-  }
-
-  return pool;
-}
-
-async function query(sql, params = []) {
-  const [rows] = await getPool().query(sql, params);
-  return rows;
-}
-
-function sendJson(res, statusCode, payload) {
-  res.statusCode = statusCode;
-  res.setHeader("content-type", "application/json; charset=utf-8");
-  res.end(JSON.stringify(payload));
-}
-
 function readRequestBody(req) {
   if (req.body !== undefined) {
     if (typeof req.body === "string") {
@@ -98,7 +67,7 @@ async function criarNotificacaoPedidoCriado(dados) {
   return formatarNotificacao(rows[0]);
 }
 
-module.exports = async function handler(req, res) {
+module.exports = async function handler(req, res) { if (req.method === 'OPTIONS') { res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS'); res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); res.statusCode = 204; return res.end(); } 
   req.query = req.query || {};
   const segs = getSegments(req);
 
@@ -164,3 +133,9 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 500, { erro: "Erro no microsservico de notificacoes." });
   }
 };
+
+
+
+
+
+

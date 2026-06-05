@@ -1,12 +1,11 @@
-// Dispatcher único do microsserviço contato_email.
-// Consolida email/contato, email/enviar e health numa só função serverless,
-// para ficar abaixo do limite de 12 funções do plano Hobby da Vercel.
+// Dispatcher único do microsserviço entrega_via_drone.
+// Consolida rota e health numa só função serverless, para ficar abaixo do
+// limite de 12 funções do plano Hobby da Vercel.
 // As rotas expostas ao front continuam EXATAMENTE as mesmas.
-const contato = require("./_handlers/contato");
-const enviar = require("./_handlers/enviar");
+const rota = require("./_handlers/rota");
 const health = require("./_handlers/health");
 
-const BASE = "/api/contato_email";
+const BASE = "/api/entrega_via_drone";
 
 function sendJson(res, statusCode, payload) {
   res.statusCode = statusCode;
@@ -23,13 +22,13 @@ function getSegments(req) {
   return rest.split("/").filter(Boolean);
 }
 
-module.exports = async function handler(req, res) {
+module.exports = async function handler(req, res) { if (req.method === 'OPTIONS') { res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS'); res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); res.statusCode = 204; return res.end(); } 
   req.query = req.query || {};
   const path = getSegments(req).join("/");
 
-  if (path === "email/contato") return contato(req, res);
-  if (path === "email/enviar") return enviar(req, res);
+  if (path === "rota") return rota(req, res);
   if (path === "health" || path === "") return health(req, res);
 
   return sendJson(res, 404, { success: false, error: "Rota nao encontrada" });
 };
+

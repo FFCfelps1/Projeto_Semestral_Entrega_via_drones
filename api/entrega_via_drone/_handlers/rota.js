@@ -56,6 +56,7 @@ async function publishEvent(tipo, dados) {
         dados,
         origem: "entrega_via_drone",
       }),
+      signal: AbortSignal.timeout(5000)
     });
   } catch (error) {
     console.error("Falha ao publicar evento:", error.message);
