@@ -1,3 +1,4 @@
+// Imports 
 import { useState } from "react";
 import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet";
 import L from "leaflet";
@@ -5,36 +6,39 @@ import axios from "axios";
 
 import "leaflet/dist/leaflet.css";
 
-//configuração dos ícones do Leaflet
+// configuração dos ícones do Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  // ícone com alta resolução
+  iconRetinaUrl:  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  // ícone padrão
+  iconUrl:        'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  // sombra do ícone
+  shadowUrl:      'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
 const ORIGEM_FIXA = [-23.5505, -46.6333]; // SkySwift (marco zero de sp)
 const NOME_ORIGEM = "Centro Logístico SkySwift, Bloco B";
 
 const DroneTrackingSection = ({ themeMode, mapServiceUrl }) => {
-  const mapBaseUrl = mapServiceUrl || "http://localhost:3002";
-  const rotaEndpoint = `${mapBaseUrl}/rota`;
-  const [enderecoDestino, setEnderecoDestino] = useState("");   //endereço do estino
-  const [destino, setDestino] = useState(null);                 //coodenadas do destino (lat, long)
-  const [rotaPontos, setRotaPontos] = useState([]);             //pontos utilizados para traçar rota
-  const [loading, setLoading] = useState(false);                //status do botão 
+  const mapBaseUrl = mapServiceUrl || "http://localhost:3002";  // URL base para a API de roteamento
+  const rotaEndpoint = `${mapBaseUrl}/rota`;                    // endpoint para calcular rota
+  const [enderecoDestino, setEnderecoDestino] = useState("");   // endereço do destino
+  const [destino, setDestino] = useState(null);                 // coodenadas do destino (lat, long)
+  const [rotaPontos, setRotaPontos] = useState([]);             // pontos utilizados para traçar rota
+  const [loading, setLoading] = useState(false);                // status do botão 
 
   const buscarRota = async () => {
-    if (!enderecoDestino.trim()) {      //trim: retira espaços extras da string
-      alert("Por favor, digite o endereço de destino."); //se o endereço não for digitado, gera um alerta
+    if (!enderecoDestino.trim()) {      // trim: retira espaços extras da string
+      alert("Por favor, digite o endereço de destino."); // se o endereço não for digitado, gera um alerta
       return;
     }
 
-    setLoading(true);                   //altera status do botão
-    setRotaPontos([]);
+    setLoading(true);                  // altera status do botão para "calculando rota"
+    setRotaPontos([]);                 // limpa rota anterior do mapa
 
     try {
-      //Geocoding - Converte endereço em coordenadas
+      // Geocoding - Converte endereço em coordenadas (lat, lon) com Nominatim com dados do OpenStreetMap
       const geoResponse = await axios.get(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(enderecoDestino)}&limit=1`
       );
@@ -46,33 +50,34 @@ const DroneTrackingSection = ({ themeMode, mapServiceUrl }) => {
         return;
       }
 
-      const { lat, lon } = geoResponse.data[0];
-      const destinoCoord = [parseFloat(lat), parseFloat(lon)];      //coordenadas do destino
+      const { lat, lon } = geoResponse.data[0];                     // extrai lat e lon da resposta do geocoding
+      const destinoCoord = [parseFloat(lat), parseFloat(lon)];      // coordenadas do destino
 
-      setDestino(destinoCoord);
-
-      //busca a rota na API
+      setDestino(destinoCoord); // atualiza estado do destino para exibir no mapa      
+      
+      /* BUSCA ROTA NA API DE ROTEAMENTO */
       console.log("Enviando requisição para:", rotaEndpoint, {
-        origemLat: ORIGEM_FIXA[0],
-        origemLng: ORIGEM_FIXA[1],
-        destinoLat: destinoCoord[0],
-        destinoLng: destinoCoord[1],
+        origemLat: ORIGEM_FIXA[0],    // latitude da origem fixa
+        origemLng: ORIGEM_FIXA[1],    // longitude da origem fixa
+        destinoLat: destinoCoord[0],  // latitude do destino
+        destinoLng: destinoCoord[1],  // longitude do destino
       });
 
       const rotaResponse = await axios.get(rotaEndpoint, {
         params: {
-          origemLat: ORIGEM_FIXA[0],
-          origemLng: ORIGEM_FIXA[1],
-          destinoLat: destinoCoord[0],
-          destinoLng: destinoCoord[1],
+          origemLat: ORIGEM_FIXA[0],    // latitude da origem fixa
+          origemLng: ORIGEM_FIXA[1],    // longitude da origem fixa
+          destinoLat: destinoCoord[0],  // latitude do destino
+          destinoLng: destinoCoord[1],  // longitude do destino
         },
         timeout: 60000, // aumentado para 60 segundos
       });
 
-      console.log("Resposta da rota:", rotaResponse.data);
+      console.log("Resposta da rota:", rotaResponse.data);  // log completo da resposta da API de roteamento
 
-      //lista de pontos 
+      // lista de pontos 
       let pontos = [];
+      // verifica se a resposta tem o formato esperado (rota dentro de um objeto ou diretamente como array)
       if (rotaResponse.data?.rota && Array.isArray(rotaResponse.data.rota)) {
         pontos = rotaResponse.data.rota;
       } else if (Array.isArray(rotaResponse.data)) {
@@ -80,15 +85,16 @@ const DroneTrackingSection = ({ themeMode, mapServiceUrl }) => {
       }
       console.log("Pontos processados:", pontos.length);
       
-      //tratamento de erro caso a API retorne poucos pontos 
-      if (pontos.length < 2) {        //desenhar linha reta
+      // tratamento de erro caso a API retorne poucos pontos 
+      if (pontos.length < 2) {        // desenhar linha reta 
         console.warn("Poucos pontos retornados, usando linha reta");
-        pontos = [ORIGEM_FIXA, destinoCoord];
+        pontos = [ORIGEM_FIXA, destinoCoord]; // rota direta entre origem e destino
       }
 
-      setRotaPontos(pontos);          //altera pontos da rota
+      setRotaPontos(pontos);          // altera pontos da rota
 
-    } catch (erro) {
+
+    } catch (erro) { // tratamento de erros mais detalhado para diferentes cenários
       console.error("Erro ao calcular rota:");
       console.error("Message:", erro.message);
       console.error("Status:", erro.response?.status);
@@ -98,6 +104,7 @@ const DroneTrackingSection = ({ themeMode, mapServiceUrl }) => {
       
       let mensagemErro = "Não foi possível calcular a rota.";
       
+      // tratamento específico para diferentes tipos de erros
       if (erro.message.includes('timeout')) {
         mensagemErro = "A API de roteamento está lenta. Por favor, aguarde alguns segundos e tente novamente...";
       } else if (erro.response?.status === 0 || erro.message === 'Network Error') {
@@ -113,6 +120,7 @@ const DroneTrackingSection = ({ themeMode, mapServiceUrl }) => {
     }
   };
 
+  // renderização do componente
   return (
     <div className="container mt-4" data-bs-theme={themeMode}>
       <h2 className={`mb-4 ${themeMode === "dark" ? "text-light" : "text-dark"}`}>

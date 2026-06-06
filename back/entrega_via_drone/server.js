@@ -1,18 +1,18 @@
 // Importações
-const express = require('express');
-const axios = require('axios');
-const cors = require('cors');
+const express = require('express'); // Criar o servidor
+const axios = require('axios');     // Fazer requisições HTTP para serviços externos e para o barramento
+const cors = require('cors');       // Permitir que o frontend acesse esse backend
 
 // Criação do servidor do primeiro microsserviço
-const app = express();
-app.use(cors());
-app.use(express.json());
+const app = express();    // servidor Express
+app.use(cors());          // libera chamadas vindas do front
+app.use(express.json());  // permite receber JSON no corpo das requisições
 
-const ROUTING_TIMEOUT_MS = 5000;
-const BARRAMENTO_URL = 'http://localhost:3001';
-const ROUTING_PROVIDERS = [
+const ROUTING_TIMEOUT_MS = 5000;                      // tempo limite para requisições de roteamento (5 segundos)
+const BARRAMENTO_URL = 'http://localhost:3001';       // URL do barramento de eventos para publicação e inscrição
+const ROUTING_PROVIDERS = [                           // OSRM -> calcular rotas rodoviarias
   "https://router.project-osrm.org/route/v1/driving",
-  "http://router.project-osrm.org/route/v1/driving",
+  "http://router.project-osrm.org/route/v1/driving",  
 ];
 
 //transforma para radianos
@@ -20,6 +20,7 @@ function toRad(degrees) {
   return (degrees * Math.PI) / 180;
 }
 
+// Calcula a distância entre dois pontos usando a fórmula de Haversine
 function haversineDistanceMeters(lat1, lon1, lat2, lon2) {
   const earthRadius = 6371000;
   const dLat = toRad(lat2 - lat1);
@@ -31,9 +32,10 @@ function haversineDistanceMeters(lat1, lon1, lat2, lon2) {
   return earthRadius * c;
 }
 
+// Cria uma rota alternativa caso o OSRM não responda
 function buildFallbackRoute(origemLat, origemLng, destinoLat, destinoLng) {
   const distancia = haversineDistanceMeters(origemLat, origemLng, destinoLat, destinoLng);
-  const velocidadeMediaDroneMps = 12;
+  const velocidadeMediaDroneMps = 12; // ESTIMATIVA da velocidade média em m/s (43 km/h)
   const duracao = distancia / velocidadeMediaDroneMps;
 
   return {
@@ -51,7 +53,7 @@ function buildFallbackRoute(origemLat, origemLng, destinoLat, destinoLng) {
 }
 
 // Publica um evento no barramento de eventos
-async function publicarEvento(tipo, dados) {
+async function publicarEvento(tipo, dados) {  // Nome do evento e Informações do evento
   try {
     await axios.post(`${BARRAMENTO_URL}/eventos`, {
       tipo,
@@ -76,15 +78,17 @@ app.post('/eventos/receber', (req, res) => {
   res.json({ success: true, message: 'Evento recebido' });
 });
 
-// Endpoint de health check
+// Endpoint de health check -> verificar se o backend está rodando
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Backend rodando' });
 });
 
 // Cria um endpoint para calcular rota
 app.get('/rota', async (req, res) => {
+  // recebe os dados pela URL
   const { origemLat, origemLng, destinoLat, destinoLng } = req.query;
 
+  // Log da requisição recebida
   console.log(`[${new Date().toISOString()}] Nova requisição de rota:`, {
     origemLat,
     origemLng,
@@ -92,17 +96,19 @@ app.get('/rota', async (req, res) => {
     destinoLng,
   });
 
-  // Validação dos parâmetros
+  // Validação dos parâmetros - verifica se estão presentes
   if (!origemLat || !origemLng || !destinoLat || !destinoLng) {
     console.error("Parâmetros ausentes na requisição");
     return res.status(400).json({ erro: 'Coordenadas ausentes' });
   }
 
-  const origemLatNum = Number(origemLat);
-  const origemLngNum = Number(origemLng);
+  // Validação dos parâmetros - verifica se são números válidos
+  const origemLatNum  = Number(origemLat);
+  const origemLngNum  = Number(origemLng);
   const destinoLatNum = Number(destinoLat);
   const destinoLngNum = Number(destinoLng);
 
+  // Evita que o backend tente calcular rota com valores inválidos
   if (
     !Number.isFinite(origemLatNum) ||
     !Number.isFinite(origemLngNum) ||
@@ -113,6 +119,7 @@ app.get('/rota', async (req, res) => {
   }
 
   try {
+    // Tenta calcular a rota usando provedores de roteamento OSRM
     for (const providerBase of ROUTING_PROVIDERS) {
       const url = `${providerBase}/${origemLngNum},${origemLatNum};${destinoLngNum},${destinoLatNum}?overview=full&geometries=geojson`;
 
@@ -122,9 +129,9 @@ app.get('/rota', async (req, res) => {
         const response = await axios.get(url, { timeout: ROUTING_TIMEOUT_MS });
 
         if (response.data && response.data.routes && response.data.routes[0]) {
-          const rota = response.data.routes[0].geometry.coordinates.map((coord) => [coord[1], coord[0]]);
-          const distancia = response.data.routes[0].distance;
-          const duracao = response.data.routes[0].duration;
+          const rota = response.data.routes[0].geometry.coordinates.map((coord) => [coord[1], coord[0]]); // Inverte para [lat, lng] para o front
+          const distancia = response.data.routes[0].distance; // distância em metros
+          const duracao = response.data.routes[0].duration;   // duração em segundos
 
           console.log(`Rota calculada com sucesso. Pontos: ${rota.length}, Distância: ${distancia}m, Duração: ${duracao}s`);
 
@@ -154,6 +161,7 @@ app.get('/rota', async (req, res) => {
       }
     }
 
+    // Se todos os provedores falharem, retorna uma rota aproximada (linha reta) e publica evento de fallback
     console.warn('Todos os provedores falharam. Retornando rota aproximada.');
     const rotaFallback = buildFallbackRoute(origemLatNum, origemLngNum, destinoLatNum, destinoLngNum);
 
@@ -181,7 +189,7 @@ app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Map service rodando na porta ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
 
-  // Auto-inscricao no barramento de eventos
+  // Auto-inscricao no barramento de eventos -> registra esse microsserviço para receber eventos do barramento
   try {
     await axios.post(`${BARRAMENTO_URL}/inscricao`, {
       nome: 'entrega_via_drone',
