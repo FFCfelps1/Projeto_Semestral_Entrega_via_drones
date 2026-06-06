@@ -74,11 +74,12 @@ async function publicarEvento(tipo, dados) {
     }
 }
 
+//cria uma sessão autenticada para um usuário utilizando um JWT (JSON Web Token)
 function criarSessao(usuario) {
     const token = jwt.sign(
         { id: usuario.id, email: usuario.email },
         JWT_SECRET,
-        { expiresIn: '2h' }
+        { expiresIn: '2h' }                     //expira em duas horas
     )
 
     return {
@@ -88,24 +89,28 @@ function criarSessao(usuario) {
     }
 }
 
+//padroniza o email (sem espaços em branco a mais e tudo minúsculo)
 function normalizarEmail(email) {
     return String(email || '').trim().toLowerCase()
 }
 
+//verifica se a string possui um formato de email válido usando uma expressão regular
 function emailValido(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
+// verifica se o usuário enviou um token válido antes de permitir o acesso a uma rota protegida.
 function autenticarToken(req, res, next) {
-    const authHeader = req.headers.authorization || ''
-    const [tipo, token] = authHeader.split(' ')
+    const authHeader = req.headers.authorization || ''          //obtém cabeçalho authorization
+    const [tipo, token] = authHeader.split(' ')                 //separa pelo espaço tipo e token 
 
+    //verifica se o token foi enviado 
     if (tipo !== 'Bearer' || !token) {
         return res.status(401).json({ error: 'Token de autenticacao nao informado.' })
     }
 
     try {
-        req.auth = jwt.verify(token, JWT_SECRET)
+        req.auth = jwt.verify(token, JWT_SECRET)            //valida o JWT e armazena os dados do usuário
         next()
     } catch (error) {
         return res.status(401).json({ error: 'Token de autenticacao invalido ou expirado.' })
@@ -113,15 +118,17 @@ function autenticarToken(req, res, next) {
 }
 
 // ******* definindo endpoints *******
+//verifica se o banco e a API estão funcionando 
 app.get('/health', async (req, res) => {
     try {
-        const banco = await obterConexao()
+        const banco = await obterConexao()      //conexão com o banco
 
+        //verifica se existe a conexão 
         if (!banco) {
             throw new Error('Banco de dados indisponivel.')
         }
 
-        await banco.query('SELECT 1')
+        await banco.query('SELECT 1')       //testa o banco
 
         res.json({
             status: 'ok',
@@ -146,6 +153,7 @@ app.use(async (req, res, next) => {
     next()
 })
 
+//busca por usuário
 app.get('/auth/me', autenticarToken, async (req, res) => {
     try {
         const [usuarios] = await conexao.query(
@@ -164,6 +172,7 @@ app.get('/auth/me', autenticarToken, async (req, res) => {
     }
 })
 
+// endpoint para atualizar nome ou email
 app.patch('/auth/me', autenticarToken, async (req, res) => {
     try {
         const nome = req.body.nome !== undefined ? String(req.body.nome).trim() : undefined
@@ -224,6 +233,7 @@ app.patch('/auth/me', autenticarToken, async (req, res) => {
     }
 })
 
+// endpoint para atualizar senha 
 app.patch('/auth/me/senha', autenticarToken, async (req, res) => {
     try {
         const { senhaAtual, novaSenha } = req.body
@@ -267,6 +277,7 @@ app.patch('/auth/me/senha', autenticarToken, async (req, res) => {
     }
 })
 
+// remover um usuário
 app.delete('/auth/me', autenticarToken, async (req, res) => {
     try {
         const [resultado] = await conexao.query('DELETE FROM usuarios WHERE id = ?', [req.auth.id])
@@ -284,20 +295,24 @@ app.delete('/auth/me', autenticarToken, async (req, res) => {
     }
 })
 
+// cadastrar usuário (INSERT)
 app.post('/auth/cadastro', async (req, res) => {
     try {
         const { senha } = req.body
-        const nome = String(req.body.nome || '').trim()
-        const email = normalizarEmail(req.body.email)
+        const nome = String(req.body.nome || '').trim()         //padroniza o nome
+        const email = normalizarEmail(req.body.email)           //normaliza email da requisição
 
+        //verifica se os campos não estão vazios
         if (!nome || !email || !senha) {
             return res.status(400).json({ error: 'Nome, email e senha sao obrigatorios.' })
         }
 
+        //verifica se o email é válido
         if (!emailValido(email)) {
             return res.status(400).json({ error: 'Informe um email valido.' })
         }
 
+        //verifica se a senha possui a quantidade mínima de caracteres 
         if (senha.length < 6) {
             return res.status(400).json({ error: 'A senha deve ter pelo menos 6 caracteres.' })
         }
@@ -307,10 +322,12 @@ app.post('/auth/cadastro', async (req, res) => {
             [email]
         )
 
+        //se a lista usuariosExistentes tem tamanho maior que zero, há ao menos um email cadastrado
         if (usuariosExistentes.length > 0) {
             return res.status(409).json({ error: 'Este email ja esta cadastrado.' })
         }
 
+        //criptografia da senha utilizando o algoritmo hash Bcrypt
         const senhaHash = await bcrypt.hash(senha, 10)
         const [resultado] = await conexao.query(
             'INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)',
@@ -332,24 +349,29 @@ app.post('/auth/cadastro', async (req, res) => {
     }
 })
 
+// login 
 app.post('/auth/login', async (req, res) => {
     try {
         const { senha } = req.body
-        const email = normalizarEmail(req.body.email)
+        const email = normalizarEmail(req.body.email)               //email normalizado
 
+        //verifica se os campos de senha e email estão preenchidos 
         if (!email || !senha) {
             return res.status(400).json({ error: 'Email e senha sao obrigatorios.' })
         }
 
+        //verifica se o email é válido 
         if (!emailValido(email)) {
             return res.status(400).json({ error: 'Informe um email valido.' })
         }
+
 
         const [usuarios] = await conexao.query(
             'SELECT id, nome, email, senha FROM usuarios WHERE email = ? LIMIT 1',
             [email]
         )
 
+        //verifica se a query acima foi executada
         if (usuarios.length === 0) {
             return res.status(401).json({ error: 'Email ou senha invalidos.' })
         }
@@ -357,12 +379,14 @@ app.post('/auth/login', async (req, res) => {
         const usuarioEncontrado = usuarios[0]
         const senhaJaCriptografada = usuarioEncontrado.senha.startsWith('$2')
         const senhaValida = senhaJaCriptografada
-            ? await bcrypt.compare(senha, usuarioEncontrado.senha)
+            ? await bcrypt.compare(senha, usuarioEncontrado.senha)          //verifica se a senha do corpo da requisição corresponde ao hash armazenado no banco de dados
             : senha === usuarioEncontrado.senha
 
+        //se as senhas acima forem diferentes, retorena inválido 
         if (!senhaValida) {
             return res.status(401).json({ error: 'Email ou senha invalidos.' })
         }
+
 
         if (!senhaJaCriptografada) {
             const senhaHash = await bcrypt.hash(senha, 10)
@@ -381,12 +405,11 @@ app.post('/auth/login', async (req, res) => {
         res.status(500).json({ error: 'Erro ao autenticar usuario.' })
     }
 })
+
 // ******* endpoint para receber eventos *******
 app.post('/eventos/receber', (req, res) => {
     const { tipo, dados, origem } = req.body;
     console.log(`Evento recebido: ${tipo} de ${origem}`, dados);
-    
-    // Aqui você pode reagir aos eventos de outros serviços
     
     res.json({ success: true, message: 'Evento recebido' });
 });
