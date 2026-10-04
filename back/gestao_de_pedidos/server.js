@@ -8,7 +8,11 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = Number(process.env.PORT || 3005);
-const runtime = createRuntime({ app, name: 'gestao_de_pedidos', port: PORT });
+const { pool } = require('./database');
+const runtime = createRuntime({ app, name: 'gestao_de_pedidos', port: PORT,
+  databaseReady: async () => { await pool.query('SELECT id FROM pedidos LIMIT 1'); },
+  closeDatabase: () => pool.end(),
+});
 
 // Importa as rotas do arquivo separado
 const pedidosRouter = require("./routes/pedidos");
