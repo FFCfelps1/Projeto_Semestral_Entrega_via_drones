@@ -12,7 +12,9 @@
     "k8s:status": "bash scripts/kubernetes/status.sh",
     "k8s:logs": "bash scripts/kubernetes/logs.sh",
     "k8s:test": "bash scripts/kubernetes/test.sh",
-    "k8s:down": "bash scripts/kubernetes/down.sh"
+    "k8s:down": "bash scripts/kubernetes/down.sh",
+    "test": "node --test tests/routes.cjs",
+    "test:vercel": "bash scripts/kubernetes/test-vercel.sh"
   },
   "dependencies": {
     "axios": "^1.16.0",
