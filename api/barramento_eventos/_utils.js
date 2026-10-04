@@ -57,7 +57,7 @@ async function query(sql, params = []) {
   if (!dbConnection) {
     const lowerSql = sql.toLowerCase();
 
-    if (lowerSql.includes("select * from inscricoes")) {
+    if (lowerSql.includes("from inscricoes")) {
       return [...mockInscricoes];
     }
 
@@ -84,7 +84,7 @@ async function query(sql, params = []) {
       // Vamos tentar um replace básico para SQLite se for o caso.
       let adjustedSql = sql;
       if (sql.toLowerCase().includes("on duplicate key update")) {
-        adjustedSql = sql.split("on duplicate key update")[0].replace(/insert into/i, "INSERT OR REPLACE INTO");
+        adjustedSql = sql.split(/on duplicate key update/i)[0].replace(/insert into/i, "INSERT OR REPLACE INTO");
       }
 
       dbConnection.db.all(adjustedSql, params, function(err, rows) {

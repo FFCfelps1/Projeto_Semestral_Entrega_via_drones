@@ -41,7 +41,7 @@ module.exports = async function handler(req, res) {
     );
 
     const confirmado = await buscarPedidoPorId(id);
-    emitirEvento("PEDIDO_CONFIRMADO", confirmado);
+    await emitirEvento("PEDIDO_CONFIRMADO", confirmado);
     return sendJson(res, 200, confirmado);
   } catch (error) {
     return handleError(res, error, "Erro ao confirmar pedido.");

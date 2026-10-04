@@ -1,5 +1,5 @@
 const ROUTING_TIMEOUT_MS = 5000;
-const ROUTING_PROVIDERS = [
+const ROUTING_PROVIDERS = process.env.ROUTING_PROVIDERS ? process.env.ROUTING_PROVIDERS.split(',') : [
   "https://router.project-osrm.org/route/v1/driving",
   "http://router.project-osrm.org/route/v1/driving",
 ];
@@ -74,7 +74,7 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 405, { success: false, error: "Metodo nao permitido" });
   }
 
-  const { origemLat, origemLng, destinoLat, destinoLng } = req.query || {};
+  const { origemLat, origemLng, destinoLat, destinoLng, pedidoId } = req.query || {};
 
   if (!origemLat || !origemLng || !destinoLat || !destinoLng) {
     return sendJson(res, 400, { erro: "Coordenadas ausentes" });
@@ -114,7 +114,8 @@ module.exports = async function handler(req, res) {
         const distancia = firstRoute.distance;
         const duracao = firstRoute.duration;
 
-        publishEvent("RotaCalculada", {
+        await publishEvent("RotaCalculada", {
+          ...(pedidoId ? { pedidoId } : {}),
           origemLat: origemLatNum,
           origemLng: origemLngNum,
           destinoLat: destinoLatNum,
@@ -144,8 +145,9 @@ module.exports = async function handler(req, res) {
 
   const rotaFallback = buildFallbackRoute(origemLatNum, origemLngNum, destinoLatNum, destinoLngNum);
 
-  publishEvent("RotaCalculada", {
-    origemLat: origemLatNum,
+  await publishEvent("RotaCalculada", {
+    ...(pedidoId ? { pedidoId } : {}),
+          origemLat: origemLatNum,
     origemLng: origemLngNum,
     destinoLat: destinoLatNum,
     destinoLng: destinoLngNum,

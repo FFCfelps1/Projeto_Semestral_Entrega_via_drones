@@ -68,7 +68,7 @@ module.exports = async function handler(req, res) {
 
   const link = buildMailtoLink(CONTACT_RECIPIENT, finalSubject, finalBody);
 
-  publishEvent("ContatoSolicitado", {
+  await publishEvent("ContatoSolicitado", {
     destinatario: CONTACT_RECIPIENT,
     assunto: finalSubject,
     metodo: "mailto",

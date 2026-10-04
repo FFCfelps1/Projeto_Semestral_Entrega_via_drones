@@ -64,7 +64,7 @@ function createMailer() {
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
 
-  if (!smtpUser || !smtpPass) {
+  if (process.env.SMTP_AUTH_REQUIRED !== 'false' && (!smtpUser || !smtpPass)) {
     return null;
   }
 
@@ -72,10 +72,9 @@ function createMailer() {
     host: smtpHost,
     port: smtpPort,
     secure: smtpSecure,
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
+    auth: process.env.SMTP_AUTH_REQUIRED === 'false' ? undefined : { user: smtpUser, pass: smtpPass },
+    connectionTimeout: 5000,
+    socketTimeout: 10000,
   });
 }
 
@@ -165,7 +164,7 @@ module.exports = async function handler(req, res) {
       text: corpoTexto,
     });
 
-    publishEvent("EmailEnviado", {
+    await publishEvent("EmailEnviado", {
       destinatario: CONTACT_RECIPIENT,
       remetente: email,
       nome,
