@@ -14,7 +14,7 @@ const runtime = createRuntime({ app, name: 'entrega_via_drone', port: PORT });  
 const ROUTING_TIMEOUT_MS = 5000;                      // tempo limite para requisições de roteamento (5 segundos)
 const BARRAMENTO_URL = process.env.BARRAMENTO_URL || 'http://localhost:3001';
 const SERVICE_URL = process.env.SERVICE_URL || `http://localhost:${Number(process.env.PORT || 3002)}`;       // URL do barramento de eventos para publicação e inscrição
-const ROUTING_PROVIDERS = [                           // OSRM -> calcular rotas rodoviarias
+const ROUTING_PROVIDERS = process.env.ROUTING_PROVIDERS ? process.env.ROUTING_PROVIDERS.split(',') : [                           // OSRM -> calcular rotas rodoviarias
   "https://router.project-osrm.org/route/v1/driving",
   "http://router.project-osrm.org/route/v1/driving",  
 ];
@@ -90,7 +90,7 @@ app.get('/health', (req, res) => {
 // Cria um endpoint para calcular rota
 app.get('/rota', async (req, res) => {
   // recebe os dados pela URL
-  const { origemLat, origemLng, destinoLat, destinoLng } = req.query;
+  const { origemLat, origemLng, destinoLat, destinoLng, pedidoId } = req.query;
 
   // Log da requisição recebida
   console.log(`[${new Date().toISOString()}] Nova requisição de rota:`, {
@@ -141,6 +141,7 @@ app.get('/rota', async (req, res) => {
 
           // Publica evento de rota calculada no barramento
           publicarEvento('RotaCalculada', {
+            ...(pedidoId ? { pedidoId } : {}),
             origemLat: origemLatNum,
             origemLng: origemLngNum,
             destinoLat: destinoLatNum,
@@ -171,7 +172,8 @@ app.get('/rota', async (req, res) => {
 
     // Publica evento mesmo com rota fallback
     publicarEvento('RotaCalculada', {
-      origemLat: origemLatNum,
+      ...(pedidoId ? { pedidoId } : {}),
+            origemLat: origemLatNum,
       origemLng: origemLngNum,
       destinoLat: destinoLatNum,
       destinoLng: destinoLngNum,

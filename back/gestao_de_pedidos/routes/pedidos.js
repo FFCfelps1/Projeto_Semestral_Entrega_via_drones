@@ -106,6 +106,15 @@ router.get('/pedidos/:id/historico', endpoint(async (req, res) => {
 router.post('/eventos/receber', endpoint(async (req, res) => {
   const { tipo } = req.body || {};
   if (!tipo) throw error(400, 'Evento invalido');
+  const dados = req.body.dados || req.body.payload || {};
+  if (tipo === 'RotaCalculada' && dados.pedidoId) {
+    try {
+      await mudar(dados.pedidoId, current =>
+        ['confirmado', 'em_processamento'].includes(current.status) ? { status: 'em_rota' } : null);
+    } catch (err) {
+      if (err.status !== 404) throw err;
+    }
+  }
   res.json({ recebido: true });
 }));
 module.exports = router;
