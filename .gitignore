@@ -147,3 +147,6 @@ vite.config.ts.timestamp-*
 .vite/
 .vercel
 .env*.local
+
+# Estado e credenciais do Kubernetes local
+.kubernetes-local/

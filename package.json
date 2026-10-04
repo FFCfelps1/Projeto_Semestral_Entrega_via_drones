@@ -4,7 +4,15 @@
     "dev": "npm run dev --prefix front",
     "build": "npm run build --prefix front",
     "preview": "npm run preview --prefix front",
-    "lint": "npm run lint --prefix front"
+    "lint": "npm run lint --prefix front",
+    "k8s:check": "bash scripts/kubernetes/check.sh",
+    "k8s:build": "bash scripts/kubernetes/build.sh",
+    "k8s:up": "bash scripts/kubernetes/up.sh",
+    "k8s:access": "bash scripts/kubernetes/access.sh",
+    "k8s:status": "bash scripts/kubernetes/status.sh",
+    "k8s:logs": "bash scripts/kubernetes/logs.sh",
+    "k8s:test": "bash scripts/kubernetes/test.sh",
+    "k8s:down": "bash scripts/kubernetes/down.sh"
   },
   "dependencies": {
     "axios": "^1.16.0",
