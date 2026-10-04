@@ -1,0 +1,488 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: barramento-eventos
+spec:
+  selector:
+    app: barramento-eventos
+  ports:
+    - name: http
+      port: 3001
+      targetPort: 3001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: barramento-eventos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: barramento-eventos
+  template:
+    metadata:
+      labels:
+        app: barramento-eventos
+    spec:
+      terminationGracePeriodSeconds: 15
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: barramento-eventos
+          image: docker.io/library/skyswift-barramento-eventos:local
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          ports:
+            - containerPort: 3001
+          envFrom:
+            - configMapRef:
+                name: skyswift-config
+          env:
+            - name: PORT
+              value: '3001'
+            - name: SERVICE_URL
+              value: http://barramento-eventos:3001
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          startupProbe:
+            httpGet: {path: /live, port: 3001}
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet: {path: /live, port: 3001}
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: {path: /ready, port: 3001}
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: entrega-via-drone
+spec:
+  selector:
+    app: entrega-via-drone
+  ports:
+    - name: http
+      port: 3002
+      targetPort: 3002
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: entrega-via-drone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: entrega-via-drone
+  template:
+    metadata:
+      labels:
+        app: entrega-via-drone
+    spec:
+      terminationGracePeriodSeconds: 15
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: entrega-via-drone
+          image: docker.io/library/skyswift-entrega-via-drone:local
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          ports:
+            - containerPort: 3002
+          envFrom:
+            - configMapRef:
+                name: skyswift-config
+          env:
+            - name: PORT
+              value: '3002'
+            - name: SERVICE_URL
+              value: http://entrega-via-drone:3002
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          startupProbe:
+            httpGet: {path: /live, port: 3002}
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet: {path: /live, port: 3002}
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: {path: /ready, port: 3002}
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: contato-email
+spec:
+  selector:
+    app: contato-email
+  ports:
+    - name: http
+      port: 3003
+      targetPort: 3003
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: contato-email
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: contato-email
+  template:
+    metadata:
+      labels:
+        app: contato-email
+    spec:
+      terminationGracePeriodSeconds: 15
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: contato-email
+          image: docker.io/library/skyswift-contato-email:local
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          ports:
+            - containerPort: 3003
+          envFrom:
+            - configMapRef:
+                name: skyswift-config
+          env:
+            - name: PORT
+              value: '3003'
+            - name: SERVICE_URL
+              value: http://contato-email:3003
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          startupProbe:
+            httpGet: {path: /live, port: 3003}
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet: {path: /live, port: 3003}
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: {path: /ready, port: 3003}
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cadastro-usuario
+spec:
+  selector:
+    app: cadastro-usuario
+  ports:
+    - name: http
+      port: 3004
+      targetPort: 3004
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cadastro-usuario
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cadastro-usuario
+  template:
+    metadata:
+      labels:
+        app: cadastro-usuario
+    spec:
+      terminationGracePeriodSeconds: 15
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: cadastro-usuario
+          image: docker.io/library/skyswift-cadastro-usuario:local
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          ports:
+            - containerPort: 3004
+          envFrom:
+            - configMapRef:
+                name: skyswift-config
+          env:
+            - name: PORT
+              value: '3004'
+            - name: SERVICE_URL
+              value: http://cadastro-usuario:3004
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: skyswift-secrets
+                  key: DB_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: skyswift-secrets
+                  key: JWT_SECRET
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          startupProbe:
+            httpGet: {path: /live, port: 3004}
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet: {path: /live, port: 3004}
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: {path: /ready, port: 3004}
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gestao-de-pedidos
+spec:
+  selector:
+    app: gestao-de-pedidos
+  ports:
+    - name: http
+      port: 3005
+      targetPort: 3005
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gestao-de-pedidos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gestao-de-pedidos
+  template:
+    metadata:
+      labels:
+        app: gestao-de-pedidos
+    spec:
+      terminationGracePeriodSeconds: 15
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: gestao-de-pedidos
+          image: docker.io/library/skyswift-gestao-de-pedidos:local
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          ports:
+            - containerPort: 3005
+          envFrom:
+            - configMapRef:
+                name: skyswift-config
+          env:
+            - name: PORT
+              value: '3005'
+            - name: SERVICE_URL
+              value: http://gestao-de-pedidos:3005
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: skyswift-secrets
+                  key: DB_PASSWORD
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          startupProbe:
+            httpGet: {path: /live, port: 3005}
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet: {path: /live, port: 3005}
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: {path: /ready, port: 3005}
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notificacoes
+spec:
+  selector:
+    app: notificacoes
+  ports:
+    - name: http
+      port: 3006
+      targetPort: 3006
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notificacoes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notificacoes
+  template:
+    metadata:
+      labels:
+        app: notificacoes
+    spec:
+      terminationGracePeriodSeconds: 15
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: notificacoes
+          image: docker.io/library/skyswift-notificacoes:local
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          ports:
+            - containerPort: 3006
+          envFrom:
+            - configMapRef:
+                name: skyswift-config
+          env:
+            - name: PORT
+              value: '3006'
+            - name: SERVICE_URL
+              value: http://notificacoes:3006
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: skyswift-secrets
+                  key: DB_PASSWORD
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          startupProbe:
+            httpGet: {path: /live, port: 3006}
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet: {path: /live, port: 3006}
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: {path: /ready, port: 3006}
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      terminationGracePeriodSeconds: 15
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+      containers:
+        - name: frontend
+          image: docker.io/library/skyswift-frontend:local
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          ports:
+            - containerPort: 8080
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {cpu: 250m, memory: 128Mi}
+          startupProbe:
+            httpGet: {path: /live, port: 8080}
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet: {path: /live, port: 8080}
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: {path: /ready, port: 8080}
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 2
