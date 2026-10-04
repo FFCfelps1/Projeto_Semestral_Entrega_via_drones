@@ -9,7 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = 3001;
+const PORT = Number(process.env.PORT || 3001);
 
 // Lista de serviços inscritos no barramento
 // Cada inscricao: { nome, url }

@@ -9,9 +9,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = 3003;
-const BARRAMENTO_URL = 'http://localhost:3001';
-const CONTACT_RECIPIENT = 'entrega.drones@gmail.com';
+const PORT = Number(process.env.PORT || 3003);
+const BARRAMENTO_URL = process.env.BARRAMENTO_URL || 'http://localhost:3001';
+const SERVICE_URL = process.env.SERVICE_URL || `http://localhost:${Number(process.env.PORT || 3003)}`;
+const CONTACT_RECIPIENT = process.env.CONTACT_RECIPIENT || 'entrega.drones@gmail.com';
+const SMTP_AUTH_REQUIRED = process.env.SMTP_AUTH_REQUIRED !== 'false';
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
 const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
 const SMTP_SECURE = process.env.SMTP_SECURE === 'true';
@@ -54,10 +56,9 @@ function createMailer() {
     host: SMTP_HOST,
     port: SMTP_PORT,
     secure: SMTP_SECURE,
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS,
-    },
+    auth: SMTP_AUTH_REQUIRED ? { user: SMTP_USER, pass: SMTP_PASS } : undefined,
+    connectionTimeout: 5000,
+    socketTimeout: 10000,
   });
 }
 
@@ -68,7 +69,7 @@ async function publicarEvento(tipo, dados) {
       tipo,
       dados,
       origem: 'contato_email',
-    });
+    }, { timeout: 5000 });
     console.log(`[${new Date().toISOString()}] Evento publicado: ${tipo}`);
   } catch (erro) {
     console.error(`[${new Date().toISOString()}] Falha ao publicar evento: ${erro.message}`);
@@ -133,7 +134,7 @@ app.post('/email/enviar', async (req, res) => {
     });
   }
 
-  if (!SMTP_USER || !SMTP_PASS || !SMTP_FROM) {
+  if (!SMTP_FROM || (SMTP_AUTH_REQUIRED && (!SMTP_USER || !SMTP_PASS))) {
     return res.status(503).json({
       success: false,
       error: 'Serviço de envio não configurado no servidor. Defina SMTP_USER, SMTP_PASS e SMTP_FROM.',
@@ -198,7 +199,7 @@ app.listen(PORT, '0.0.0.0', async () => {
   try {
     await axios.post(`${BARRAMENTO_URL}/inscricao`, {
       nome: 'contato_email',
-      url: `http://localhost:${PORT}`,
+      url: SERVICE_URL,
     });
     console.log(`[${new Date().toISOString()}] Inscrito no barramento de eventos`);
   } catch (erro) {

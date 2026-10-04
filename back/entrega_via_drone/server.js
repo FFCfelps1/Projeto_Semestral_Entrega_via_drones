@@ -9,7 +9,8 @@ app.use(cors());          // libera chamadas vindas do front
 app.use(express.json());  // permite receber JSON no corpo das requisições
 
 const ROUTING_TIMEOUT_MS = 5000;                      // tempo limite para requisições de roteamento (5 segundos)
-const BARRAMENTO_URL = 'http://localhost:3001';       // URL do barramento de eventos para publicação e inscrição
+const BARRAMENTO_URL = process.env.BARRAMENTO_URL || 'http://localhost:3001';
+const SERVICE_URL = process.env.SERVICE_URL || `http://localhost:${Number(process.env.PORT || 3002)}`;       // URL do barramento de eventos para publicação e inscrição
 const ROUTING_PROVIDERS = [                           // OSRM -> calcular rotas rodoviarias
   "https://router.project-osrm.org/route/v1/driving",
   "http://router.project-osrm.org/route/v1/driving",  
@@ -59,7 +60,7 @@ async function publicarEvento(tipo, dados) {  // Nome do evento e Informações 
       tipo,
       dados,
       origem: 'entrega_via_drone',
-    });
+    }, { timeout: 5000 });
     console.log(`[${new Date().toISOString()}] Evento publicado: ${tipo}`);
   } catch (erro) {
     console.error(`[${new Date().toISOString()}] Falha ao publicar evento: ${erro.message}`);
@@ -184,7 +185,7 @@ app.get('/rota', async (req, res) => {
   }
 });
 
-const PORT = 3002;
+const PORT = Number(process.env.PORT || 3002);
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Map service rodando na porta ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
@@ -193,7 +194,7 @@ app.listen(PORT, '0.0.0.0', async () => {
   try {
     await axios.post(`${BARRAMENTO_URL}/inscricao`, {
       nome: 'entrega_via_drone',
-      url: `http://localhost:${PORT}`,
+      url: SERVICE_URL,
     });
     console.log(`[${new Date().toISOString()}] Inscrito no barramento de eventos`);
   } catch (erro) {
