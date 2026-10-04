@@ -1,55 +1,16 @@
----
-Integrantes:
-- Arthur Gama Ruiz (RA: 23.01445-8)
-- Enzo Oliveira D’Onofrio (RA: 23.01561-6)
-- Felipe Fazio da Costa (RA: 23.00055-4)
-- João Vitor Morimoto Sesma (RA: 23.01516-0)
-- Leonardo Souza Olivieri (RA: 23.01512-8)
-- Pedro Wilian Palumbo Bevilacqua (RA: 23.01307-9)
+# Banco de dados e eventos
 
-Data: 04/06/2026
-Matérias: 
-- ECM516_Arquitetura_de_Computadores
-- ECM252_Linguagens_de_Programação_2
----
+O esquema real está em [`deploy_cloud.sql`](../../deploy_cloud.sql). MySQL persiste os dados tanto em `back/` quanto nas funções `api/` da Vercel. No Kubernetes, o banco é um StatefulSet MySQL 8.4 com PVC de 5 GiB; um Job aplica o esquema antes da aplicação. Detalhes e comandos estão no [guia Kubernetes](kubernetes.md).
 
-# Infraestrutura: Banco de Dados e Eventos
-**Pasta:** `/back/banco` e `/api/_utils.js`
-**Contexto de Desenvolvimento:** O projeto utiliza uma estratégia híbrida. MySQL para o ambiente estável de backend tradicional e SQLite para a versão serverless (Vercel), permitindo deploys rápidos e custo zero.
-**Descrição:** Definição das tabelas e conectores que sustentam a persistência do sistema.
+| Tabela | Dados |
+| --- | --- |
+| `usuarios` | ID numérico, nome, e-mail único, hash de senha e data de criação |
+| `pedidos` | UUID, pacote, peso, endereços, tipo, usuário opcional, preço, tempo, status, histórico JSON e datas |
+| `notificacoes` | Título, mensagem, pedido, evento, leitura e datas |
+| `inscricoes` | Nome único do consumidor, URL e atualização; usada pelo barramento serverless |
 
----
+Os pools usam `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` e `DB_CONNECTION_LIMIT`. Credenciais Kubernetes são geradas uma vez e fornecidas por Secret. O aplicativo usa um usuário próprio, sem credenciais root.
 
-### Esquema Relacional (SQL)
-As tabelas são desenhadas para suportar o relacionamento entre usuários e pedidos:
+As alterações de status/histórico em `back/gestao_de_pedidos` usam transações e bloqueio de linha. Ao excluir um usuário, pedidos preservam seus dados e `usuario_id` passa a NULL. A reaplicação do esquema usa `CREATE TABLE IF NOT EXISTS`, preservando registros; mudanças de estrutura posteriores exigem migrações.
 
-```sql
-CREATE TABLE usuarios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    senha VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE pedidos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario_id INT,
-    status ENUM('pendente', 'em_voo', 'entregue'),
-    origem_lat DECIMAL(10, 8),
-    destino_lat DECIMAL(10, 8),
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-);
-```
-
-### Conector MySQL (Pool)
-Utilizamos um `Pool` de conexões para evitar sobrecarga no banco de dados e garantir reaproveitamento de conexões ativas:
-
-```javascript
-conexao = mysql2.createPool({
-    host: process.env.DB_HOST, 
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    connectionLimit: 10
-});
-```
+O barramento tradicional mantém inscrições e eventos em memória. Inscrições se recuperam por renovação dos consumidores; eventos perdidos durante indisponibilidade não são reenviados. SQLite em `api/_utils.js` é um mock de desenvolvimento e não substitui MySQL externo no deploy da Vercel.
