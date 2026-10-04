@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 source "$(dirname "$0")/common.sh"
+[[ $# == 0 || ($# == 1 && "$1" == --no-build) ]] || { echo 'Opção inválida; use --no-build para reutilizar imagens.' >&2; exit 1; }
 require_cluster
 if [[ "${1:-}" != --no-build ]]; then "$ROOT/scripts/kubernetes/build.sh"; fi
 [[ -s "$STATE/image-tag" ]] || { echo 'Execute k8s:build antes de --no-build.' >&2; exit 1; }
 tag="$(cat "$STATE/image-tag")"
 # Verifica todas as imagens antes de alterar recursos da aplicação.
+node_arch="$(k get nodes -o 'jsonpath={.items[0].status.nodeInfo.architecture}')"
 for name in barramento-eventos entrega-via-drone contato-email cadastro-usuario gestao-de-pedidos notificacoes frontend; do
-  d image inspect "docker.io/library/skyswift-$name:$tag" --format '{{.Architecture}}'
+  image_arch="$(d image inspect "docker.io/library/skyswift-$name:$tag" --format '{{.Architecture}}')"
+  [[ "$image_arch" == "$node_arch" ]] || { echo "Imagem $name: $image_arch, nó: $node_arch. Reconstrua para linux/$node_arch." >&2; exit 1; }
 done
 k apply -f "$ROOT/infra/kubernetes/namespace.yaml"
 if ! k get secret skyswift-secrets >/dev/null 2>&1; then

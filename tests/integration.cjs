@@ -42,6 +42,20 @@ async function notification(id) {
     check(item, 'Notificacao criada pelo evento do pedido'); return item;
   });
 }
+async function proxyRecovery() {
+  try {
+    k(['scale','deployment/entrega-via-drone','--replicas=0']);
+    k(['wait','--for=delete','pod','-l','app=entrega-via-drone','--timeout=60s']);
+    const response = await fetch(`${app}/api/entrega_via_drone/rota`);
+    check(response.status === 503 && response.headers.get('content-type').includes('application/json'), 'Indisponibilidade da API retorna JSON com 503');
+    check((await response.json()).erro, 'Erro de API preservado pelo proxy');
+    check((await fetch(`${app}/pedido`)).ok, 'SPA disponivel durante falha de API');
+  } finally {
+    k(['scale','deployment/entrega-via-drone','--replicas=1']);
+    k(['rollout','status','deployment/entrega-via-drone','--timeout=180s']);
+  }
+  await eventually(() => request('entrega_via_drone','/ready'));
+}
 async function recovery(id, token, notificationId) {
   for (const name of ['gestao-de-pedidos','notificacoes','barramento-eventos','mysql']) {
     console.log(`Recuperacao: ${name}`);
@@ -77,6 +91,7 @@ async function main() {
   const missing = await fetch(`${app}/api/desconhecido`); check(missing.status === 404 && missing.headers.get('content-type').includes('application/json'), 'API desconhecida nao retorna HTML');
   for (const service of ['barramento_eventos','entrega_via_drone','contato_email','cadastro_usuario','gestao_de_pedidos','notificacoes']) await request(service,'/ready');
   await subscriptions();
+  if (!process.argv.includes('--skip-recovery')) await proxyRecovery();
   const email = `k8s-${run}@example.test`;
   const session = await request('cadastro_usuario','/auth/cadastro','POST',{nome:'Teste Kubernetes',email,senha:'Teste123!'},null,201);
   users.push(session.usuario.id);

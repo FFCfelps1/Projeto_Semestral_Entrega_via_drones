@@ -9,6 +9,8 @@ STATE="$ROOT/.kubernetes-local"
 mkdir -p "$STATE"
 k() { kubectl --context "$CONTEXT" --namespace "$NAMESPACE" "$@"; }
 d() { docker --context desktop-linux "$@"; }
+# Em background, exec mantém o PID capturado pelo script igual ao do kubectl.
+port_forward() { exec kubectl --context "$CONTEXT" --namespace "$NAMESPACE" port-forward --address 127.0.0.1 "$@"; }
 require_cluster() {
   command -v docker >/dev/null
   command -v kubectl >/dev/null
