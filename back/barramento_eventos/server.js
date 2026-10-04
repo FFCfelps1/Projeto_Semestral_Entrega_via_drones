@@ -34,9 +34,17 @@ async function distribuirEvento(evento) {
     }
 
     try {
-      await axios.post(`${servico.url}/eventos/receber`, evento, {
-        timeout: 5000,
-      });
+      // Uma recusa de conexão não entrega o evento. Tolera a propagação dos
+      // EndpointSlices após um rollout, sem repetir envios com resultado ambíguo.
+      for (let tentativa = 0; ; tentativa++) {
+        try {
+          await axios.post(`${servico.url}/eventos/receber`, evento, { timeout: 5000 });
+          break;
+        } catch (error) {
+          if (error.code !== 'ECONNREFUSED' || tentativa >= 2) throw error;
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
 
       console.log(`[${new Date().toISOString()}] Evento ${evento.tipo} entregue para ${servico.nome}`);
       resultados.push({ servico: servico.nome, status: 'entregue' });
@@ -114,8 +122,10 @@ app.post('/inscricao', (req, res) => {
 
   if (jaInscrito) {
     // Atualiza a url caso tenha mudado
-    jaInscrito.url = url;
-    console.log(`[${new Date().toISOString()}] Servico atualizado: ${nome} -> ${url}`);
+    if (jaInscrito.url !== url) {
+      jaInscrito.url = url;
+      console.log(`[${new Date().toISOString()}] Servico atualizado: ${nome} -> ${url}`);
+    }
 
     return res.json({
       success: true,

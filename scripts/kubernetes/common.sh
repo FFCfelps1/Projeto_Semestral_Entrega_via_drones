@@ -3,6 +3,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CONTEXT=docker-desktop
 NAMESPACE=skyswift
+# Docker Desktop grava o contexto neste arquivo; KUBECONFIG pode apontar apenas a clusters corporativos.
+export KUBECONFIG="${SKYSWIFT_KUBECONFIG:-$HOME/.kube/config}"
 STATE="$ROOT/.kubernetes-local"
 mkdir -p "$STATE"
 k() { kubectl --context "$CONTEXT" --namespace "$NAMESPACE" "$@"; }
