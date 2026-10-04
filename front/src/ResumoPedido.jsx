@@ -1,4 +1,8 @@
-return (
+import StatusPedido from './StatusPedido.jsx'
+
+export default function ResumoPedido({ pedido, handleConfirmar }) {
+  if (!pedido) return null
+  return (
     <div className="card mb-4">
       <div className="card-body">
         <h5 className="card-title">Resumo do pedido</h5>
@@ -51,3 +55,4 @@ return (
       </div>
     </div>
   )
+}
