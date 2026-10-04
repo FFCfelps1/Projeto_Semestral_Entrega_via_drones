@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { v4: uuidv4 } = require("uuid");
+const { randomUUID: uuidv4 } = require("node:crypto");
 const axios = require("axios");
 const { validarCamposObrigatorios , responderErro} = require("../middleware/validarPedido");
 

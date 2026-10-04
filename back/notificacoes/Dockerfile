@@ -1,19 +1,8 @@
-#alpine: imagem Linux "pequena"
-FROM node:alpine
-
-# um diretório no sistema de arquivos do contêiner para os comandos a seguir
+FROM node:24-alpine
 WORKDIR /app
-
-#copia o arquivo package.json para poder executar npm install
-COPY package.json .
-
-#instala as dependências
-RUN npm install
-
-#copia todo o conteúdo .local para a imagem
-COPY . .
-
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+COPY --chown=node:node . .
+USER node
 EXPOSE 3006
-
-#executa quando o contêiner entrar em execução
-CMD ["node", "index.js"]
+CMD ["node", "server.js"]
