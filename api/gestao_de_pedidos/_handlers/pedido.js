@@ -39,7 +39,9 @@ async function atualizar(req, res, id) {
   // Exceção: cancelado pode ser aplicado de qualquer status.
   const indexAtual = ORDEM_STATUS.indexOf(pedido.status);
   const indexNovo = ORDEM_STATUS.indexOf(status);
-  if (indexNovo <= indexAtual && status !== STATUS.CANCELADO) {
+  if ([STATUS.CANCELADO, STATUS.ENTREGUE].includes(pedido.status) ||
+      (status === STATUS.CANCELADO && pedido.status === STATUS.EM_ROTA) ||
+      (indexNovo <= indexAtual && status !== STATUS.CANCELADO)) {
     return responderErro(res, 400, "Transição de status inválida");
   }
 
@@ -58,7 +60,7 @@ async function atualizar(req, res, id) {
   );
 
   const atualizado = await buscarPedidoPorId(id);
-  emitirEvento("PEDIDO_ATUALIZADO", atualizado);
+  await emitirEvento("PEDIDO_ATUALIZADO", atualizado);
   return sendJson(res, 200, atualizado);
 }
 
@@ -87,7 +89,7 @@ async function cancelar(res, id) {
   );
 
   const cancelado = await buscarPedidoPorId(id);
-  emitirEvento("PEDIDO_CANCELADO", cancelado);
+  await emitirEvento("PEDIDO_CANCELADO", cancelado);
   return sendJson(res, 200, {
     mensagem: "Pedido cancelado com sucesso",
     pedido: cancelado,

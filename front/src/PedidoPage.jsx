@@ -61,6 +61,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
   // pedidos persistidos no localStorage ao abrir/recarregar a página.
   const {
     pedidos: pedidosSimulados,
+    erroPedidos,
     filtroStatus,
     setFiltroStatus,
     dadosHistorico,
@@ -531,6 +532,7 @@ const PedidoPage = ({ themeMode = "light" }) => {
                   <span className="badge bg-primary align-self-md-start">{pedidosSimulados.length} pedidos</span>
                 </div>
 
+                {erroPedidos && <div role="alert" className="alert alert-danger">{erroPedidos}</div>}
                 {/* Exibe o histórico do pedido selecionado */}
                 {dadosHistorico && pedidoHistoricoSelecionado && (
                   <div className={`${borderedPanelClassName} p-4 mb-4`}>

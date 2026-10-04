@@ -31,7 +31,7 @@ module.exports = async function handler(req, res) { if (req.method === 'OPTIONS'
 
       // Ajuste para SQLite (INSERT OR REPLACE)
       await query(
-        "INSERT OR REPLACE INTO inscricoes (nome, url) VALUES (?, ?)",
+        "INSERT INTO inscricoes (nome, url) VALUES (?, ?) ON DUPLICATE KEY UPDATE url = VALUES(url)",
         [nome, url]
       );
       return sendJson(res, 200, { success: true, message: `Servico ${nome} inscrito` });
@@ -53,12 +53,13 @@ module.exports = async function handler(req, res) { if (req.method === 'OPTIONS'
       for (const s of inscritos) {
         if (s.nome === origem) continue;
         try {
-          await fetch(`${s.url}/eventos/receber`, {
+          const response = await fetch(`${s.url}/eventos/receber`, {
             method: "POST",
             headers: { "content-type": "application/json" },
             body: JSON.stringify(evento),
             signal: AbortSignal.timeout(5000)
           });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
           resultados.push({ servico: s.nome, status: "entregue" });
         } catch (err) {
           resultados.push({ servico: s.nome, status: "falha", erro: err.message });

@@ -1,15 +1,20 @@
+const { createRuntime } = require('../shared/runtime');
 // Microsserviço de Barramento de Eventos
 // Responsável por receber e distribuir eventos entre os microsserviços
 
 const express = require('express');
 const axios = require('axios');
+const http = require('node:http');
+// Evita acumular listeners do cliente HTTP em sockets reaproveitados pelo Node 24.
+const deliveryAgent = new http.Agent({ keepAlive: false });
 const cors = require('cors');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = 3001;
+const PORT = Number(process.env.PORT || 3001);
+const runtime = createRuntime({ app, name: 'barramento_eventos', port: PORT });
 
 // Lista de serviços inscritos no barramento
 // Cada inscricao: { nome, url }
@@ -32,9 +37,17 @@ async function distribuirEvento(evento) {
     }
 
     try {
-      await axios.post(`${servico.url}/eventos/receber`, evento, {
-        timeout: 5000,
-      });
+      // Uma recusa de conexão não entrega o evento. Tolera a propagação dos
+      // EndpointSlices após um rollout, sem repetir envios com resultado ambíguo.
+      for (let tentativa = 0; ; tentativa++) {
+        try {
+          await axios.post(`${servico.url}/eventos/receber`, evento, { timeout: 5000, httpAgent: deliveryAgent });
+          break;
+        } catch (error) {
+          if (error.code !== 'ECONNREFUSED' || tentativa >= 2) throw error;
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
 
       console.log(`[${new Date().toISOString()}] Evento ${evento.tipo} entregue para ${servico.nome}`);
       resultados.push({ servico: servico.nome, status: 'entregue' });
@@ -112,8 +125,10 @@ app.post('/inscricao', (req, res) => {
 
   if (jaInscrito) {
     // Atualiza a url caso tenha mudado
-    jaInscrito.url = url;
-    console.log(`[${new Date().toISOString()}] Servico atualizado: ${nome} -> ${url}`);
+    if (jaInscrito.url !== url) {
+      jaInscrito.url = url;
+      console.log(`[${new Date().toISOString()}] Servico atualizado: ${nome} -> ${url}`);
+    }
 
     return res.json({
       success: true,
@@ -171,7 +186,4 @@ app.get('/inscricoes', (req, res) => {
   });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Barramento de eventos rodando na porta ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
-});
+runtime.listen();

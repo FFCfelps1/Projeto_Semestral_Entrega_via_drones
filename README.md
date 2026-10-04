@@ -29,10 +29,28 @@ Uma aplicação web moderna para gerenciamento de entregas autônomas via drones
 
 ## 📋 Pré-requisitos
 
-- Node.js (v16+)
+- Node.js 24
 - npm ou yarn
 
 ## 🛠️ Configuração e Instalação
+
+### Execução completa com Kubernetes (Docker Desktop)
+
+Habilite Kubernetes com kind, um nó e containerd no Docker Desktop. Na raiz:
+
+```bash
+npm ci
+npm ci --prefix front
+npm run k8s:check
+npm run k8s:up
+npm run k8s:access
+```
+
+A aplicação fica em `http://localhost:8080` e o Mailpit em `http://localhost:8025`, enquanto o comando de acesso estiver aberto. `npm run k8s:test` valida os fluxos e reinícios; `npm run k8s:down` preserva banco e credenciais.
+
+Consulte o [guia Kubernetes](docs/infra/kubernetes.md) para arquitetura, comandos, persistência, Vercel e diagnóstico, e o [relatório de testes](docs/infra/kubernetes-testes.md) para os resultados.
+
+### Desenvolvimento com processos locais
 
 1. Clone o repositório:
 ```bash
@@ -42,7 +60,8 @@ cd projeto_semestral_entrega_via_drones
 
 2. Instale as dependências:
 ```bash
-npm install
+npm ci
+npm ci --prefix front
 ```
 
 3. Inicie o servidor de desenvolvimento:
@@ -82,7 +101,7 @@ O projeto utiliza uma arquitetura de microsservicos Node.js no diretorio `back`,
 O barramento de eventos e o componente central da arquitetura de microsservicos. Ele recebe eventos publicados por qualquer servico e os distribui para todos os servicos inscritos.
 
 **Fluxo:**
-1. Cada microsservico se inscreve automaticamente ao iniciar (`POST /inscricao`)
+1. Os cinco consumidores se inscrevem ao iniciar e renovam a inscrição a cada cinco segundos (`POST /inscricao`)
 2. Quando algo acontece, o servico publica um evento (`POST /eventos`)
 3. O barramento distribui o evento para todos os inscritos via `POST /eventos/receber`
 
@@ -93,7 +112,7 @@ O barramento de eventos e o componente central da arquitetura de microsservicos.
 - `PEDIDO_CRIADO`, `PEDIDO_CONFIRMADO`, `PEDIDO_ATUALIZADO`, `PEDIDO_CANCELADO` — publicados pelo servico de pedidos a cada mudanca no ciclo de vida do pedido
 - `PEDIDO_CRIADO` tambem e consumido pelo servico de notificacoes para criar a mensagem "Pedido criado" exibida no sino e na pagina `/notificacoes`
 
-**Ordem de inicializacao:** O barramento deve ser iniciado ANTES dos demais servicos.
+**Ordem de inicializacao:** Inicie banco e esquema antes dos serviços dependentes. As inscrições tentam novamente se o barramento ainda não estiver disponível; no Kubernetes a subida automatiza essas etapas.
 
 ### Como iniciar o barramento de eventos (3001)
 

@@ -54,7 +54,7 @@ async function criarPedido(req, res) {
   const rows = await query("SELECT * FROM pedidos WHERE id = ? LIMIT 1", [id]);
   const novoPedido = formatarPedido(rows[0]);
 
-  emitirEvento("PEDIDO_CRIADO", novoPedido);
+  await emitirEvento("PEDIDO_CRIADO", novoPedido);
 
   return sendJson(res, 201, novoPedido);
 }

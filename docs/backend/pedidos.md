@@ -1,57 +1,9 @@
----
-Integrantes:
-- Arthur Gama Ruiz (RA: 23.01445-8)
-- Enzo Oliveira D’Onofrio (RA: 23.01561-6)
-- Felipe Fazio da Costa (RA: 23.00055-4)
-- João Vitor Morimoto Sesma (RA: 23.01516-0)
-- Leonardo Souza Olivieri (RA: 23.01512-8)
-- Pedro Wilian Palumbo Bevilacqua (RA: 23.01307-9)
+# Microsserviço de gestão de pedidos
 
-Data: 04/06/2026
-Matérias: 
-- ECM516_Arquitetura_de_Computadores
-- ECM252_Linguagens_de_Programação_2
----
+O serviço `back/gestao_de_pedidos` atende na porta 3005 e persiste pedidos em MySQL. Sua documentação de endpoints e configuração está no [README do serviço](../../back/gestao_de_pedidos/readme.md); a execução conjunta está no [guia Kubernetes](../infra/kubernetes.md).
 
-# Microsserviço: Gestão de Pedidos
-**Pasta:** `/back/gestao_de_pedidos`
-**Contexto de Desenvolvimento:** O coração operacional da SkySwift. Foi desenvolvido para suportar o fluxo desde a intenção de compra até a entrega final, utilizando middlewares para garantir a qualidade dos dados.
-**Descrição:** Gerencia o CRUD de pedidos e as atualizações de status (Pendente, Em Voo, Entregue).
+`POST /pedidos` recebe `item`, `peso`, `origem`, `destino`, `tipo`, `observacoes` opcional e `usuarioId` opcional. Cria um UUID com status `rascunho`, preço/tempo estimados e histórico inicial e publica `PEDIDO_CRIADO`. Não despacha um drone físico.
 
----
+O fluxo é `rascunho → confirmado → em_processamento → em_rota → entregue`. Cancelamento é permitido antes de `em_rota`. Mudanças de status/histórico são transacionais e não reativam estados terminais. `RotaCalculada`, quando inclui `pedidoId`, avança um pedido confirmado/em processamento para `em_rota`; eventos repetidos não duplicam seu histórico.
 
-### Middleware de Validação
-Antes de processar o pedido, verificamos se as coordenadas GPS e os dados do cliente são válidos:
-
-```javascript
-const validarPedido = (req, res, next) => {
-  const { destinoLat, destinoLng, itens } = req.body;
-  if (!destinoLat || !destinoLng) {
-    return res.status(400).json({ error: "Coordenadas de destino obrigatórias" });
-  }
-  if (!itens || itens.length === 0) {
-    return res.status(400).json({ error: "O pedido deve ter pelo menos um item" });
-  }
-  next();
-};
-```
-
-### Fluxo de Criação
-Ao criar um pedido, o status inicial é definido e o barramento é notificado para que o drone seja despachado:
-
-```javascript
-router.post("/novo", validarPedido, async (req, res) => {
-  const novoPedido = {
-    ...req.body,
-    id: Date.now(),
-    status: 'pendente',
-    dataCriacao: new Date()
-  };
-  
-  // Salva no banco e publica
-  await db.save(novoPedido);
-  await publicarNoBarramento('PEDIDO_CRIADO', novoPedido);
-  
-  res.status(201).json(novoPedido);
-});
-```
+O frontend guarda referências locais e as revalida pela API ao abrir a página. A listagem da API permite filtros por `usuarioId` e `status`; notificações são globais, mantendo os contratos anteriores.

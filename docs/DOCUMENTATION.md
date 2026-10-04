@@ -108,7 +108,7 @@ Desenvolvido em **React** com **Vite** e **Bootstrap**.
 ---
 
 ## 4. Banco de Dados
-O sistema utiliza **MySQL** (principalmente no cadastro) e **SQLite** (nas funções serverless da Vercel para persistência rápida).
+O sistema utiliza **MySQL** para usuários, pedidos e notificações, tanto nos serviços tradicionais quanto no deploy completo da Vercel. SQLite permanece apenas como mock local das funções, sem garantia de persistência entre execuções serverless. No Kubernetes, MySQL 8.4 usa PVC e recebe o esquema por um Job antes dos serviços. Consulte o [guia de execução Kubernetes](infra/kubernetes.md).
 
 *   **`deploy_cloud.sql`**: Script de criação das tabelas no ambiente de produção.
 *   **`back/banco/script.sql`**: Script para ambiente local.
@@ -120,4 +120,4 @@ O sistema utiliza **MySQL** (principalmente no cadastro) e **SQLite** (nas funç
 2.  O frontend chama o microsserviço `gestao_de_pedidos`.
 3.  `gestao_de_pedidos` salva o pedido e envia um evento `PEDIDO_CRIADO` ao `barramento_eventos`.
 4.  O `barramento_eventos` repassa o evento para `notificacoes` e `contato_email`.
-5.  O usuário recebe uma notificação na interface e um e-mail de confirmação.
+5.  O usuário recebe uma notificação na interface. O serviço de contato registra os eventos recebidos; e-mails são enviados quando o usuário usa o formulário de contato, sem envio automático na criação de pedidos.

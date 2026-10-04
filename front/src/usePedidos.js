@@ -1,109 +1,49 @@
-import { useState } from "react"
-import { cancelarPedido, confirmarPedido, buscarHistorico } from "./pedidosEntregaService.js"
+import { useEffect, useState } from 'react'
+import { cancelarPedido, confirmarPedido, buscarHistorico, buscarPedido } from './pedidosEntregaService.js'
 
-// Custom hook que centraliza a lógica de manipulação da lista de pedidos
-// Separa a lógica de negócio da interface visual do PedidoPage
-//
-// CORREÇÃO: agora aceita um inicializador (carregarIniciais) para restaurar os
-// pedidos salvos no localStorage. Antes a lista começava sempre vazia e a função
-// carregarPedidosSalvos do PedidoPage nunca era usada, então os pedidos eram
-// gravados mas sumiam ao recarregar a página.
-const usePedidos = (carregarIniciais) => {
+const mensagemErro = error => error?.response?.data?.erro || 'Nao foi possivel atualizar os pedidos. Tente novamente.'
 
-  // Lista de pedidos da sessão.
-  // useState com função = inicialização "preguiçosa": só roda uma vez, no
-  // primeiro render, evitando ler o localStorage a cada renderização.
-  const [pedidos, setPedidos] = useState(() =>
-    typeof carregarIniciais === "function" ? carregarIniciais() : []
-  )
-
-  // Filtro de status aplicado na lista
-  const [filtroStatus, setFiltroStatus] = useState("")
-
-  // ID do pedido com histórico aberto — null = nenhum
+// A lista continua restrita aos pedidos salvos neste navegador; a API valida seus dados.
+const usePedidos = carregarIniciais => {
+  const [pedidos, setPedidos] = useState(() => typeof carregarIniciais === 'function' ? carregarIniciais() : [])
+  const [erroPedidos, setErroPedidos] = useState('')
+  const [filtroStatus, setFiltroStatus] = useState('')
   const [pedidoHistoricoSelecionado, setPedidoHistoricoSelecionado] = useState(null)
-
-  // Dados do histórico retornados pelo back
   const [dadosHistorico, setDadosHistorico] = useState(null)
 
-  // Adiciona um novo pedido no início da lista
-  const adicionarPedido = (pedido) => {
-    setPedidos((atual) => [pedido, ...atual])
+  useEffect(() => {
+    let ativo = true
+    const iniciais = typeof carregarIniciais === 'function' ? carregarIniciais() : []
+    Promise.all(iniciais.map(async pedido => {
+      try { return await buscarPedido(pedido.id) }
+      catch (error) { if (error?.response?.status === 404) return null; throw error }
+    })).then(atualizados => {
+      if (ativo) setPedidos(atual => atual.map(pedido => atualizados.find(p => p?.id === pedido.id) ||
+        (iniciais.some(p => p.id === pedido.id) ? null : pedido)).filter(Boolean))
+    }).catch(error => { if (ativo) setErroPedidos(mensagemErro(error)) })
+    return () => { ativo = false }
+  }, [carregarIniciais])
+
+  const executar = async action => {
+    setErroPedidos('')
+    try { await action() } catch (error) { setErroPedidos(mensagemErro(error)) }
   }
-
-  // Remove um pedido da lista pelo id
-  const removerPedido = (pedidoId) => {
-    setPedidos((atual) => atual.filter((p) => p.id !== pedidoId))
-  }
-
-  // Cancela o pedido no back e atualiza o status na lista
-  const handleCancelarPedido = (pedidoId) => {
-    const aux = async () => {
-      const resposta = await cancelarPedido(pedidoId)
-
-      // Atualiza o status na lista sem recarregar a página
-      setPedidos((atual) =>
-        atual.map((p) =>
-          p.id === pedidoId ? { ...p, status: resposta.pedido.status } : p
-        )
-      )
-
-      // Fecha o histórico se estiver aberto para esse pedido
-      if (pedidoHistoricoSelecionado === pedidoId) {
-        setDadosHistorico(null)
-        setPedidoHistoricoSelecionado(null)
-      }
-    }
-    aux()
-  }
-
-  // Confirma o pedido no back e atualiza o status na lista
-  // Só faz sentido para pedidos em "rascunho" (regra validada pelo back).
-  const handleConfirmarPedido = (pedidoId) => {
-    const aux = async () => {
-      // POST /pedidos/:id/confirmar retorna o pedido já confirmado
-      const confirmado = await confirmarPedido(pedidoId)
-
-      // Atualiza o status na lista sem recarregar a página
-      setPedidos((atual) =>
-        atual.map((p) =>
-          p.id === pedidoId ? { ...p, status: confirmado.status } : p
-        )
-      )
-    }
-    aux()
-  }
-
-  // Busca o histórico de status de um pedido pelo id
-  const handleVerHistorico = (pedidoId) => {
-    const aux = async () => {
-      const historico = await buscarHistorico(pedidoId)
-      setDadosHistorico(historico)
-      setPedidoHistoricoSelecionado(pedidoId)
-    }
-    aux()
-  }
-
-  // Fecha o histórico aberto
-  const fecharHistorico = () => {
-    setDadosHistorico(null)
-    setPedidoHistoricoSelecionado(null)
-  }
-
-  // Retorna tudo que o PedidoPage precisa usar
-  return {
-    pedidos,
-    filtroStatus,
-    setFiltroStatus,
-    dadosHistorico,
-    pedidoHistoricoSelecionado,
-    adicionarPedido,
-    removerPedido,
-    handleConfirmarPedido,
-    handleCancelarPedido,
-    handleVerHistorico,
-    fecharHistorico,
-  }
+  const atualizar = pedido => setPedidos(atual => atual.map(p => p.id === pedido.id ? pedido : p))
+  const adicionarPedido = pedido => setPedidos(atual => [pedido, ...atual])
+  const removerPedido = id => setPedidos(atual => atual.filter(p => p.id !== id))
+  const fecharHistorico = () => { setDadosHistorico(null); setPedidoHistoricoSelecionado(null) }
+  const handleConfirmarPedido = id => executar(async () => { atualizar(await confirmarPedido(id)) })
+  const handleCancelarPedido = id => executar(async () => {
+    atualizar((await cancelarPedido(id)).pedido)
+    if (pedidoHistoricoSelecionado === id) fecharHistorico()
+  })
+  const handleVerHistorico = id => executar(async () => {
+    const historico = await buscarHistorico(id)
+    setDadosHistorico(historico)
+    setPedidoHistoricoSelecionado(id)
+    atualizar(await buscarPedido(id))
+  })
+  return { pedidos, erroPedidos, filtroStatus, setFiltroStatus, dadosHistorico, pedidoHistoricoSelecionado,
+    adicionarPedido, removerPedido, handleConfirmarPedido, handleCancelarPedido, handleVerHistorico, fecharHistorico }
 }
-
 export default usePedidos

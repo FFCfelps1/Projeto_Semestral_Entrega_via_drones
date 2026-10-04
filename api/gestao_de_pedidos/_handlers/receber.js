@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
     if (tipo === "RotaCalculada" && eventoDados.pedidoId) {
       const pedido = await buscarPedidoPorId(eventoDados.pedidoId);
 
-      if (pedido) {
+      if (pedido && [STATUS.CONFIRMADO, STATUS.EM_PROCESSAMENTO].includes(pedido.status)) {
         const novoHistorico = [
           ...pedido.statusHistorico,
           { status: STATUS.EM_ROTA, momento: new Date().toISOString() },
