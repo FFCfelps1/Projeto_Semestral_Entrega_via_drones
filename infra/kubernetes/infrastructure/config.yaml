@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: skyswift-config
+data:
+  NODE_ENV: production
+  BARRAMENTO_URL: http://barramento-eventos:3001
+  DB_HOST: mysql
+  DB_PORT: '3306'
+  DB_NAME: skyswift
+  DB_USER: skyswift
+  DB_CONNECTION_LIMIT: '5'
+  SMTP_HOST: mailpit
+  SMTP_PORT: '1025'
+  SMTP_SECURE: 'false'
+  SMTP_AUTH_REQUIRED: 'false'
+  SMTP_FROM: skyswift@example.test
+  CONTACT_RECIPIENT: contato@example.test

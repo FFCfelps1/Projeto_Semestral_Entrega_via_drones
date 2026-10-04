@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: schema-init
+  namespace: skyswift
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 180
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: schema
+          image: mysql:8.4
+          command: [sh, -c, 'mysql --connect-timeout=5 -h mysql -u skyswift -D skyswift < /schema/schema.sql']
+          env:
+            - name: MYSQL_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: skyswift-secrets
+                  key: DB_PASSWORD
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {cpu: 250m, memory: 128Mi}
+          volumeMounts:
+            - name: schema
+              mountPath: /schema
+              readOnly: true
+      volumes:
+        - name: schema
+          configMap:
+            name: skyswift-schema
