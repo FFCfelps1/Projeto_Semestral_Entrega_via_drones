@@ -1,3 +1,4 @@
+const { createRuntime } = require('../shared/runtime');
 require('dotenv').config()
 const express = require('express');
 const cors = require('cors')
@@ -20,6 +21,10 @@ const SERVICE_URL = process.env.SERVICE_URL || `http://localhost:${PORT}`
 const BARRAMENTO_URL = process.env.BARRAMENTO_URL || 'http://localhost:3001'
 const JWT_SECRET = process.env.JWT_SECRET || 'skyswift-dev-secret'
 const DB_RETRY_MS = Number(process.env.DB_RETRY_MS || 5000)
+const runtime = createRuntime({ app, name: 'cadastro_usuario', port: PORT,
+  databaseReady: async () => { const db = await obterConexao(); if (!db) throw new Error('MySQL indisponivel'); await db.query('SELECT id FROM usuarios LIMIT 1'); },
+  closeDatabase: async () => { if (conexao) await conexao.end(); },
+});
 
 //função para conectar com o banco
 const conectar = async () => {          //utilizando promise
@@ -67,7 +72,7 @@ async function publicarEvento(tipo, dados) {
             tipo,
             dados,
             origem: 'cadastro_usuario'
-        });
+        }, { timeout: 5000 });
         console.log(`Evento publicado: ${tipo}`);
     } catch (erro) {
         console.log('Erro ao publicar evento:', erro.message);
@@ -414,23 +419,4 @@ app.post('/eventos/receber', (req, res) => {
     res.json({ success: true, message: 'Evento recebido' });
 });
 
-//inscrever no barramento quando o servidor inicia 
-async function inscreverNoBarramento(){
-    try{
-        await axios.post(`${BARRAMENTO_URL}/inscricao`, {
-            nome: 'cadastro_usuario', 
-            url: SERVICE_URL
-        });
-        console.log('Inscrito no barramento de eventos')
-    }
-    catch(error){
-        console.log('Erro ao inscrever no barramento: ', error.message);
-    }
-}
-
-//executa o servidor 
-app.listen(PORT, () => {
-    console.log(`Servidor executando na porta ${PORT}`)
-    inscreverNoBarramento();
-})
-
+runtime.listen();

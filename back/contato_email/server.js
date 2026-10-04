@@ -1,3 +1,4 @@
+const { createRuntime } = require('../shared/runtime');
 require('dotenv').config();
 
 const express = require('express');
@@ -8,8 +9,10 @@ const axios = require('axios');
 const app = express();
 app.use(cors());
 app.use(express.json());
-
 const PORT = Number(process.env.PORT || 3003);
+const runtime = createRuntime({ app, name: 'contato_email', port: PORT });
+
+
 const BARRAMENTO_URL = process.env.BARRAMENTO_URL || 'http://localhost:3001';
 const SERVICE_URL = process.env.SERVICE_URL || `http://localhost:${Number(process.env.PORT || 3003)}`;
 const CONTACT_RECIPIENT = process.env.CONTACT_RECIPIENT || 'entrega.drones@gmail.com';
@@ -191,18 +194,4 @@ app.post('/email/enviar', async (req, res) => {
   }
 });
 
-app.listen(PORT, '0.0.0.0', async () => {
-  console.log(`Serviço de e-mail rodando na porta ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
-
-  // Auto-inscricao no barramento de eventos
-  try {
-    await axios.post(`${BARRAMENTO_URL}/inscricao`, {
-      nome: 'contato_email',
-      url: SERVICE_URL,
-    });
-    console.log(`[${new Date().toISOString()}] Inscrito no barramento de eventos`);
-  } catch (erro) {
-    console.error(`[${new Date().toISOString()}] Falha ao se inscrever no barramento: ${erro.message}`);
-  }
-});
+runtime.listen();

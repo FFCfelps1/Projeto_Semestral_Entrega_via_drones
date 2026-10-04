@@ -1,3 +1,4 @@
+const { createRuntime } = require('../shared/runtime');
 // Importações
 const express = require('express'); // Criar o servidor
 const axios = require('axios');     // Fazer requisições HTTP para serviços externos e para o barramento
@@ -6,7 +7,9 @@ const cors = require('cors');       // Permitir que o frontend acesse esse backe
 // Criação do servidor do primeiro microsserviço
 const app = express();    // servidor Express
 app.use(cors());          // libera chamadas vindas do front
-app.use(express.json());  // permite receber JSON no corpo das requisições
+app.use(express.json());
+const PORT = Number(process.env.PORT || 3002);
+const runtime = createRuntime({ app, name: 'entrega_via_drone', port: PORT });  // permite receber JSON no corpo das requisições
 
 const ROUTING_TIMEOUT_MS = 5000;                      // tempo limite para requisições de roteamento (5 segundos)
 const BARRAMENTO_URL = process.env.BARRAMENTO_URL || 'http://localhost:3001';
@@ -185,19 +188,5 @@ app.get('/rota', async (req, res) => {
   }
 });
 
-const PORT = Number(process.env.PORT || 3002);
-app.listen(PORT, '0.0.0.0', async () => {
-  console.log(`Map service rodando na porta ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
 
-  // Auto-inscricao no barramento de eventos -> registra esse microsserviço para receber eventos do barramento
-  try {
-    await axios.post(`${BARRAMENTO_URL}/inscricao`, {
-      nome: 'entrega_via_drone',
-      url: SERVICE_URL,
-    });
-    console.log(`[${new Date().toISOString()}] Inscrito no barramento de eventos`);
-  } catch (erro) {
-    console.error(`[${new Date().toISOString()}] Falha ao se inscrever no barramento: ${erro.message}`);
-  }
-});
+runtime.listen();

@@ -1,3 +1,4 @@
+const { createRuntime } = require('../shared/runtime');
 require("dotenv").config();
 
 const express = require("express");
@@ -13,6 +14,10 @@ const PORT = Number(process.env.PORT || 3006);
 const SERVICE_URL = process.env.SERVICE_URL || `http://localhost:${PORT}`;
 const BARRAMENTO_URL = process.env.BARRAMENTO_URL || "http://localhost:3001";
 const DB_RETRY_MS = Number(process.env.DB_RETRY_MS || 5000);
+const runtime = createRuntime({ app, name: 'notificacoes', port: PORT,
+  databaseReady: async () => { const db = await obterBanco(); if (!db) throw new Error('MySQL indisponivel'); await db.query('SELECT id FROM notificacoes LIMIT 1'); },
+  closeDatabase: async () => { if (pool) await pool.end(); },
+});
 
 let pool;
 let conectandoBanco = false;
@@ -190,21 +195,5 @@ app.post("/eventos/receber", async (req, res) => {
   }
 });
 
-async function inscreverNoBarramento() {
-  try {
-    await axios.post(`${BARRAMENTO_URL}/inscricao`, {
-      nome: "notificacoes",
-      url: SERVICE_URL,
-    });
-    console.log("Inscrito no barramento de eventos");
-  } catch (error) {
-    console.log("Erro ao inscrever no barramento:", error.message);
-  }
-}
-
 conectarBanco();
-
-app.listen(PORT, () => {
-  console.log(`notificacoes rodando na porta ${PORT}`);
-  inscreverNoBarramento();
-});
+runtime.listen();

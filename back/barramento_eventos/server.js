@@ -1,3 +1,4 @@
+const { createRuntime } = require('../shared/runtime');
 // Microsserviço de Barramento de Eventos
 // Responsável por receber e distribuir eventos entre os microsserviços
 
@@ -10,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = Number(process.env.PORT || 3001);
+const runtime = createRuntime({ app, name: 'barramento_eventos', port: PORT });
 
 // Lista de serviços inscritos no barramento
 // Cada inscricao: { nome, url }
@@ -171,7 +173,4 @@ app.get('/inscricoes', (req, res) => {
   });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Barramento de eventos rodando na porta ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
-});
+runtime.listen();
