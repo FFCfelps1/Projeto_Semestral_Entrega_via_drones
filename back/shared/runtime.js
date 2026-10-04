@@ -17,6 +17,7 @@ function createRuntime({ app, name, port, databaseReady = async () => {}, closeD
         signal: AbortSignal.timeout(2000),
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      await response.arrayBuffer();
       if (!registered) console.log(`${name}: inscrito no barramento`);
       registered = true;
       lastRegistration = Date.now();

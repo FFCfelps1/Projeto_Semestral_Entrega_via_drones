@@ -4,6 +4,9 @@ const { createRuntime } = require('../shared/runtime');
 
 const express = require('express');
 const axios = require('axios');
+const http = require('node:http');
+// Evita acumular listeners do cliente HTTP em sockets reaproveitados pelo Node 24.
+const deliveryAgent = new http.Agent({ keepAlive: false });
 const cors = require('cors');
 
 const app = express();
@@ -38,7 +41,7 @@ async function distribuirEvento(evento) {
       // EndpointSlices após um rollout, sem repetir envios com resultado ambíguo.
       for (let tentativa = 0; ; tentativa++) {
         try {
-          await axios.post(`${servico.url}/eventos/receber`, evento, { timeout: 5000 });
+          await axios.post(`${servico.url}/eventos/receber`, evento, { timeout: 5000, httpAgent: deliveryAgent });
           break;
         } catch (error) {
           if (error.code !== 'ECONNREFUSED' || tentativa >= 2) throw error;

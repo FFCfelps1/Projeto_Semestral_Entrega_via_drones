@@ -28,7 +28,7 @@ const runtime = createRuntime({ app, name: 'cadastro_usuario', port: PORT,
 
 //função para conectar com o banco
 const conectar = async () => {          //utilizando promise
-    if (conectandoBanco) return conexao
+    if (conexao || conectandoBanco) return conexao
 
     conectandoBanco = true
 
@@ -40,6 +40,7 @@ const conectar = async () => {          //utilizando promise
         password: process.env.DB_PASSWORD || process.env.PASSWORD,
         database: process.env.DB_NAME || process.env.DATABASE,
         port: Number(process.env.DB_PORT || 3306),
+        connectTimeout: 3000,
         waitForConnections: true,
         connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10)
         })
@@ -47,6 +48,7 @@ const conectar = async () => {          //utilizando promise
         console.log('Conectado ao MySQL')
     }
     catch(erro){
+        if (conexao) await conexao.end().catch(() => {})
         conexao = null
         console.log(`Erro ao conectar com o banco: ${erro.message}`)
         setTimeout(conectar, DB_RETRY_MS)

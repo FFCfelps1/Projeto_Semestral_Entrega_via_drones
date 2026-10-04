@@ -34,12 +34,14 @@ async function conectarBanco() {
       password: process.env.DB_PASSWORD || process.env.PASSWORD,
       database: process.env.DB_NAME || process.env.DATABASE,
       port: Number(process.env.DB_PORT || 3306),
+      connectTimeout: 3000,
       waitForConnections: true,
       connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10),
     });
     await pool.query("SELECT 1");
     console.log("Conectado ao MySQL");
   } catch (error) {
+    if (pool) await pool.end().catch(() => {});
     pool = null;
     console.log(`Erro ao conectar com o banco: ${error.message}`);
     setTimeout(conectarBanco, DB_RETRY_MS);
