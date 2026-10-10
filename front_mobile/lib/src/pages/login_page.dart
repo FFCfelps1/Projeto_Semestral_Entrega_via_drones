@@ -76,7 +76,6 @@ class _LoginPageState extends State<LoginPage>{
                           // print('''Email: ${emailController.text}
                           // Senha: ${senhaController.text}''');
                         }, 
-                                      
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Color(0xff256af4), //fundo azul primário
                                         foregroundColor: Colors.white   //texto banco no botão
@@ -93,7 +92,9 @@ class _LoginPageState extends State<LoginPage>{
                                   style:TextButton.styleFrom(
                                     foregroundColor: Color(0xff256af4),
                                   ),
-                                  child: Text('Criar conta'))
+                                  child: Text('Criar conta')),
+                                  SizedBox(height: 16,),
+                                  Image.asset('assets/images/drone.jpg',)
                         ],
                     ),
                 ),
