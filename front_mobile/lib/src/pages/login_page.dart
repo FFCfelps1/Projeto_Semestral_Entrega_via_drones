@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 
-class LoginPage extends State<App>{
+class _LoginPageState extends State<LoginPage>{
   @override
   Widget build(BuildContext context){
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Faça cadastro', style: TextStyle(color: Colors.red),),
-        ), body: Center(child: Text('Login')),
-      ),
-
+    return Scaffold(
+          appBar: AppBar(
+            title: Text('Faça cadastro', style: TextStyle(color: Colors.red),),
+          ), 
+          body: Center(child: Text('Login')),
     );
   }
 }
 
-class App extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   @override
-  State<App> createState() {
-    return LoginPage();
+  State<LoginPage> createState() {
+    return _LoginPageState();
   }
 }
