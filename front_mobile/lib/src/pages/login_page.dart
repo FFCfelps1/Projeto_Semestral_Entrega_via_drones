@@ -39,12 +39,17 @@ class _LoginPageState extends State<LoginPage>{
             body: Padding(padding: EdgeInsets.all(16.0), 
             //Column para empilhar widgets verticalmente
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: 
                       //dois campos de texto: email e senha
                       //obscureText: true --> esconde os caracteres da senha
                       //SizedBox cria um espaço entre o campo senha e os botões
                       
-                      [TextFormField(decoration: InputDecoration(labelText: 'Email', 
+                      [Expanded(child: ClipRRect(
+                                borderRadius: BorderRadiusGeometry.circular(10), 
+                                            child: Image.asset('assets/images/drone2.jpg', fit: BoxFit.cover,)),
+                            )
+                      ,TextFormField(decoration: InputDecoration(labelText: 'Email', 
                       hintText: 'exemplo@email.com', 
                       hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.5)), labelStyle: TextStyle(color: Color(0xff256af4)), 
                       //linha abaixo do campo de entrada email quando ele não está selecionado
@@ -93,8 +98,13 @@ class _LoginPageState extends State<LoginPage>{
                                     foregroundColor: Color(0xff256af4),
                                   ),
                                   child: Text('Criar conta')),
+
+                                  //adiciona imagem ao final e arredonda as bordas
                                   SizedBox(height: 16,),
-                                  Image.asset('assets/images/drone.jpg',)
+                                  Expanded(
+                                  child: ClipRRect(borderRadius: BorderRadiusGeometry.circular(10), 
+                                            child: Image.asset('assets/images/drone.jpg', fit: BoxFit.cover,)),
+                            )
                         ],
                     ),
                 ),
