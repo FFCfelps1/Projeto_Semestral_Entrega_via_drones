@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage>{
               title: Text('Faça cadastro', style: TextStyle(color: Colors.red),),actions: [IconButton(onPressed: (){
                 setState(() {temaEscuro = !temaEscuro;});
                 }, 
-              icon: Icon(temaEscuro ? Icons.light_mode: Icons.dark_mode))],
+              icon: Icon(temaEscuro ? Icons.light_mode: Icons.dark_mode, color: Color(0xff256af4),))],
           ), 
             body: Padding(padding: EdgeInsets.all(16.0), 
             //Column para empilhar widgets verticalmente
