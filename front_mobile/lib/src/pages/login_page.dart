@@ -39,13 +39,13 @@ class _LoginPageState extends State<LoginPage>{
                       
                       [TextFormField(decoration: InputDecoration(labelText: 'Email', 
                       hintText: 'exemplo@email.com', 
-                      hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.5))),
+                      hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.5)), labelStyle: TextStyle(color: Color(0xff256af4))),
                       controller: emailController,
                       ), 
                       TextFormField(
                         decoration: InputDecoration(labelText: 'Senha', 
                         hintText: 'senha123', 
-                        hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha:0.5) : Colors.black.withValues(alpha: 0.5)), labelStyle: TextStyle(color: Color(0xff256af4)), style), 
+                        hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha:0.5) : Colors.black.withValues(alpha: 0.5)), labelStyle: TextStyle(color: Color(0xff256af4)), ), 
                         obscureText: true, 
                         controller: senhaController,), 
                         SizedBox(height: 16), 
