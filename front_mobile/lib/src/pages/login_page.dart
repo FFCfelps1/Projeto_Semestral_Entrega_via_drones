@@ -23,6 +23,8 @@ class _LoginPageState extends State<LoginPage>{
       ) : ThemeData.light(),
       home: Scaffold(
             appBar: AppBar(
+              //alinha título no centro
+              centerTitle: true,
               //paddin para o ícone não ficar atrás da faixa 'debug'
               actionsPadding: EdgeInsets.fromLTRB(0, 8, 20, 0),
               title: Text('Faça Login e voe conosco!!', style: google.GoogleFonts.oswald(
