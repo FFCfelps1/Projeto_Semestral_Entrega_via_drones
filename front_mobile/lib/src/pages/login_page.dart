@@ -40,8 +40,13 @@ class _LoginPageState extends State<LoginPage>{
                       [TextFormField(decoration: InputDecoration(labelText: 'Email', 
                       hintText: 'exemplo@email.com', 
                       hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.5)), labelStyle: TextStyle(color: Color(0xff256af4)), 
+                      //linha abaixo do campo de entrada email quando ele não está selecionado
                       enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color:  Color(0xff256af4))
+                        ), 
+                        //linha abaixo do campo de entrada email quando ele está selecionado
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xff256af4), width: 2.0)
                         )),
                       controller: emailController,
                       ), 
@@ -50,9 +55,12 @@ class _LoginPageState extends State<LoginPage>{
                         hintText: 'senha123', 
                         hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha:0.5) : Colors.black.withValues(alpha: 0.5)), 
                         labelStyle: TextStyle(color: Color(0xff256af4)),
+                        //linha abaixo do campo de entrada senha quando ele não está selecionado
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color:  Color(0xff256af4))
-                        )), 
+                        ), //linha abaixo do campo de entrada senha quando ele está selecionado
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xff256af4), width: 2.0))), 
                         obscureText: true, 
                         controller: senhaController,), 
                         SizedBox(height: 16), 
