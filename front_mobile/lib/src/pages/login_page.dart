@@ -68,6 +68,9 @@ class _LoginPageState extends State<LoginPage>{
                                   child: Text('Esqueci minha senha'),),
                                   SizedBox(height: 10,),
                         TextButton(onPressed: (){},
+                                  style:TextButton.styleFrom(
+                                    foregroundColor: Color(0xff256af4),
+                                  ),
                                   child: Text('Criar conta'))
                         ],
                     ),
