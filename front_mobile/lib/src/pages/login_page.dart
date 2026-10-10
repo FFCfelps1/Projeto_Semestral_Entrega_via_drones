@@ -31,6 +31,9 @@ class _LoginPageState extends State<LoginPage>{
                         SizedBox(height: 16,),
                         TextButton(onPressed:(){}, 
                                   child: Text('Esqueci minha senha')),
+                                  SizedBox(height: 10,),
+                        TextButton(onPressed: (){},
+                                  child: Text('Criar conta'))
                         ],
                     ),
                 ),
