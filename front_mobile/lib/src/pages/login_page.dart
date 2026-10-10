@@ -15,7 +15,11 @@ class _LoginPageState extends State<LoginPage>{
       theme: temaEscuro ? ThemeData.dark() : ThemeData.light(),
       home: Scaffold(
             appBar: AppBar(
-              title: Text('Faça cadastro', style: TextStyle(color: Colors.red),),
+              actionsPadding: EdgeInsets.fromLTRB(0, 8, 20, 0),
+              title: Text('Faça cadastro', style: TextStyle(color: Colors.red),), actions: [IconButton(onPressed: (){
+                setState(() {temaEscuro = !temaEscuro;});
+                }, 
+              icon: Icon(temaEscuro ? Icons.light_mode: Icons.dark_mode))],
           ), 
             body: Padding(padding: EdgeInsets.all(16.0), 
             //Column para empilhar widgets verticalmente
