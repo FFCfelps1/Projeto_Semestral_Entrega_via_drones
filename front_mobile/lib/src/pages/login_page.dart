@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage>{
               centerTitle: true,
               //paddin para o ícone não ficar atrás da faixa 'debug'
               actionsPadding: EdgeInsets.fromLTRB(0, 8, 20, 0),
-              title: Text('Faça Login e voe conosco!!', style: google.GoogleFonts.oswald(
+              title: Text('🚁Faça Login e voe conosco!!🚁', style: google.GoogleFonts.oswald(
                 color: Color(0xff256af4),
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold
