@@ -14,7 +14,11 @@ class _LoginPageState extends State<LoginPage>{
     return MaterialApp(
       theme: temaEscuro ? ThemeData(
         brightness: Brightness.dark, //paleta (brilho) escura(o)
-        scaffoldBackgroundColor: Color(0xff101622), // 0xff é 100% de opacidade, 1e1e1e é código hexadecimal da cor
+        scaffoldBackgroundColor: Color(0xff101622), // 0xff é 100% de opacidade, 101622 é código hexadecimal da cor
+        //tema da AppBar
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xff101622),   //mesma cor
+        )
       ) : ThemeData.light(),
       home: Scaffold(
             appBar: AppBar(
@@ -50,7 +54,12 @@ class _LoginPageState extends State<LoginPage>{
                           // print('''Email: ${emailController.text}
                           // Senha: ${senhaController.text}''');
                         }, 
-                                      child: Text('Entrar')),
+                                      
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Color(0xff256af4), //fundo azul primário
+                                        foregroundColor: Colors.white   //texto banco no botão
+                                      ),
+                                      child: Text('Entrar'),),
                         SizedBox(height: 16,),
                         TextButton(onPressed:(){}, 
                                   child: Text('Esqueci minha senha')),
