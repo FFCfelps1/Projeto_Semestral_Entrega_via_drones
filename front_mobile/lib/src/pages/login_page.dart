@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
 class _LoginPageState extends State<LoginPage>{
+
+  //variáveis para capturar o que o usuário digitou
+  final emailController = TextEditingController();    //para email
+  final senhaController = TextEditingController();    //para senha
+
   @override
   Widget build(BuildContext context){
     return MaterialApp(
@@ -19,14 +24,20 @@ class _LoginPageState extends State<LoginPage>{
                       [TextFormField(decoration: InputDecoration(labelText: 'Email', 
                       hintText: 'exemplo@email.com', 
                       hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.5))),
+                      controller: emailController,
                       ), 
                       TextFormField(
                         decoration: InputDecoration(labelText: 'Senha', 
                         hintText: 'senha123', 
                         hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.5))), 
-                        obscureText: true,), 
+                        obscureText: true, 
+                        controller: senhaController,), 
                         SizedBox(height: 16), 
-                        ElevatedButton(onPressed: (){}, 
+                        ElevatedButton(onPressed: (){
+                          //teste 
+                          print('''Email: ${emailController.text}
+                          Senha: ${senhaController.text}''');
+                        }, 
                                       child: Text('Entrar')),
                         SizedBox(height: 16,),
                         TextButton(onPressed:(){}, 
