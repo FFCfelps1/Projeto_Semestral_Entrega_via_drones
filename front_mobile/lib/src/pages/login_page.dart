@@ -14,10 +14,11 @@ class _LoginPageState extends State<LoginPage>{
     return MaterialApp(
       theme: temaEscuro ? ThemeData(
         brightness: Brightness.dark, //paleta (brilho) escura(o)
-        scaffoldBackgroundColor: Color(0xff1e1e1e),
+        scaffoldBackgroundColor: Color(0xff101622), // 0xff é 100% de opacidade, 1e1e1e é código hexadecimal da cor
       ) : ThemeData.light(),
       home: Scaffold(
             appBar: AppBar(
+              //paddin para o ícone não ficar atrás da faixa 'debug'
               actionsPadding: EdgeInsets.fromLTRB(0, 8, 20, 0),
               title: Text('Faça cadastro', style: TextStyle(color: Colors.red),),actions: [IconButton(onPressed: (){
                 setState(() {temaEscuro = !temaEscuro;});
@@ -59,7 +60,7 @@ class _LoginPageState extends State<LoginPage>{
                         ],
                     ),
                 ),
-        ),
+        ), 
     );
   }
 }
