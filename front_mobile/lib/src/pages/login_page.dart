@@ -6,9 +6,13 @@ class _LoginPageState extends State<LoginPage>{
   final emailController = TextEditingController();    //para email
   final senhaController = TextEditingController();    //para senha
 
+  //variável que armazena o tema atual ()'claro' ou 'escuro')
+  bool temaEscuro = false;         //atualmente, tema 'claro'
+
   @override
   Widget build(BuildContext context){
     return MaterialApp(
+      theme: temaEscuro ? ThemeData.dark() : ThemeData.light(),
       home: Scaffold(
             appBar: AppBar(
               title: Text('Faça cadastro', style: TextStyle(color: Colors.red),),
@@ -35,8 +39,8 @@ class _LoginPageState extends State<LoginPage>{
                         SizedBox(height: 16), 
                         ElevatedButton(onPressed: (){
                           //teste 
-                          print('''Email: ${emailController.text}
-                          Senha: ${senhaController.text}''');
+                          // print('''Email: ${emailController.text}
+                          // Senha: ${senhaController.text}''');
                         }, 
                                       child: Text('Entrar')),
                         SizedBox(height: 16,),
