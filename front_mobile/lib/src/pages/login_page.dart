@@ -12,11 +12,14 @@ class _LoginPageState extends State<LoginPage>{
   @override
   Widget build(BuildContext context){
     return MaterialApp(
-      theme: temaEscuro ? ThemeData.dark() : ThemeData.light(),
+      theme: temaEscuro ? ThemeData(
+        brightness: Brightness.dark, //paleta (brilho) escura(o)
+        scaffoldBackgroundColor: Color(0xff1e1e1e),
+      ) : ThemeData.light(),
       home: Scaffold(
             appBar: AppBar(
               actionsPadding: EdgeInsets.fromLTRB(0, 8, 20, 0),
-              title: Text('Faça cadastro', style: TextStyle(color: Colors.red),), actions: [IconButton(onPressed: (){
+              title: Text('Faça cadastro', style: TextStyle(color: Colors.red),),actions: [IconButton(onPressed: (){
                 setState(() {temaEscuro = !temaEscuro;});
                 }, 
               icon: Icon(temaEscuro ? Icons.light_mode: Icons.dark_mode))],
