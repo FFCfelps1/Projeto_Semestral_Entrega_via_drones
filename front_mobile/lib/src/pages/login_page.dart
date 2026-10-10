@@ -14,10 +14,12 @@ class _LoginPageState extends State<LoginPage>{
                     children: 
                       //dois campos de texto: email e senha
                       //obscureText: true --> esconde os caracteres da senha
-                      //cria um espaço entre o campo senha e os botões
+                      //SizedBox cria um espaço entre o campo senha e os botões
+                      
                       [TextFormField(decoration: InputDecoration(labelText: 'Email', 
                       hintText: 'exemplo@email.com', 
-                      hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.5))),), 
+                      hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.5))),
+                      ), 
                       TextFormField(
                         decoration: InputDecoration(labelText: 'Senha', 
                         hintText: 'senha123', 
@@ -25,7 +27,11 @@ class _LoginPageState extends State<LoginPage>{
                         obscureText: true,), 
                         SizedBox(height: 16), 
                         ElevatedButton(onPressed: (){}, 
-                                      child: Text('Entrar'))],
+                                      child: Text('Entrar')),
+                        SizedBox(height: 16,),
+                        TextButton(onPressed:(){}, 
+                                  child: Text('Esqueci minha senha')),
+                        ],
                     ),
                 ),
         ),
