@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class _LoginPageState extends State<LoginPage>{
 
@@ -24,7 +25,7 @@ class _LoginPageState extends State<LoginPage>{
             appBar: AppBar(
               //paddin para o ícone não ficar atrás da faixa 'debug'
               actionsPadding: EdgeInsets.fromLTRB(0, 8, 20, 0),
-              title: Text('Faça cadastro', style: TextStyle(color: Colors.red),),actions: [IconButton(onPressed: (){
+              title: Text('Faça Login e voe conosco!!', style: TextStyle(color: Color(0xff256af4), fontSize: 20.0, fontFeatures:  ),),actions: [IconButton(onPressed: (){
                 setState(() {temaEscuro = !temaEscuro;});
                 }, 
               icon: Icon(temaEscuro ? Icons.light_mode: Icons.dark_mode, color: Color(0xff256af4),))],
