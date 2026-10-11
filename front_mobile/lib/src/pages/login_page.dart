@@ -86,7 +86,7 @@ class _LoginPageState extends State<LoginPage>{
                           borderSide: BorderSide(color: Color(0xff256af4), width: 2.0)),
                           suffixIcon: IconButton(onPressed: (){
                             setState(() {senhaVisivel = !senhaVisivel;});
-                          },icon: Icon(senhaVisivel ? Icons.visibility_off : Icons.visibility)),
+                          },icon: Icon(senhaVisivel ? Icons.visibility_off : Icons.visibility, size: 15.0,color: Color(0xff256af4),)),
                           ), 
                         obscureText: !senhaVisivel, 
                         controller: senhaController,), 
