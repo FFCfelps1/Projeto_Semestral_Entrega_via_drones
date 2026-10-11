@@ -55,9 +55,13 @@ class _LoginPageState extends State<LoginPage>{
                       //
                       //adiciona imagem antes dos campos preenchidos pelo usuário
                       //Expanded: filho ocupa todo o espaço disponível 
-                      [Expanded(flex: 2,child: ClipRRect(
+                      [Expanded(flex:2,     //imagem ocupa dois espaços
+                                child: Row(
+                                children: [ SizedBox(width: 40), //espaço do ícone
+                                Expanded(
+                                child:ClipRRect(
                                 borderRadius: BorderRadiusGeometry.circular(10), 
-                                            child: Image.asset('assets/images/drone2.jpg', fit: BoxFit.contain,)),
+                                            child: Image.asset('assets/images/drone2.jpg', fit: BoxFit.cover,)))]),
                             ), SizedBox(height: 16)
                       ,TextFormField(decoration: InputDecoration(icon: temaEscuro? Icon(Icons.email_outlined): Icon(Icons.email),
                       labelText: 'Email',
