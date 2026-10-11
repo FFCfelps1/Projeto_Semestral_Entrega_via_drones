@@ -58,32 +58,34 @@ class _LoginPageState extends State<LoginPage>{
                       [Expanded(child: ClipRRect(
                                 borderRadius: BorderRadiusGeometry.circular(10), 
                                             child: Image.asset('assets/images/drone2.jpg', fit: BoxFit.cover,)),
-                            )
-                      ,TextFormField(decoration: InputDecoration(labelText: 'Email', 
+                            ), SizedBox(height: 16)
+                      ,TextFormField(decoration: InputDecoration(icon: temaEscuro? Icon(Icons.email_outlined): Icon(Icons.email),
+                      labelText: 'Email',
                       hintText: 'exemplo@email.com', 
                       hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.5)), labelStyle: TextStyle(color: Color(0xff256af4)), 
                       //linha abaixo do campo de entrada email quando ele não está selecionado
-                      enabledBorder: UnderlineInputBorder(
+                      enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color:  Color(0xff256af4))
                         ), 
                         //linha abaixo do campo de entrada email quando ele está selecionado
-                        focusedBorder: UnderlineInputBorder(
+                        focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Color(0xff256af4), width: 2.0)
                         )),
                       controller: emailController,
-                      ), 
+                      ), SizedBox(height: 16),
                       TextFormField(
                         decoration: InputDecoration(labelText: 'Senha', 
                         hintText: 'senha123', 
                         hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha:0.5) : Colors.black.withValues(alpha: 0.5)),   //opacidade em 50% 
                         labelStyle: TextStyle(color: Color(0xff256af4)),
                         //linha abaixo do campo de entrada senha quando ele não está selecionado
-                        enabledBorder: UnderlineInputBorder(
+                        enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color:  Color(0xff256af4))
                         ), 
                         //linha abaixo do campo de entrada senha quando ele está selecionado
-                        focusedBorder: UnderlineInputBorder(
+                        focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Color(0xff256af4), width: 2.0)),
+                          //ícone de olho
                           suffixIcon: IconButton(onPressed: (){
                             setState(() {senhaVisivel = !senhaVisivel;});
                           },icon: Icon(senhaVisivel ? Icons.visibility_off : Icons.visibility, size: 15.0,color: Color(0xff256af4),)),
