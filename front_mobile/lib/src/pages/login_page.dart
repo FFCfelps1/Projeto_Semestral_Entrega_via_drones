@@ -55,9 +55,9 @@ class _LoginPageState extends State<LoginPage>{
                       //
                       //adiciona imagem antes dos campos preenchidos pelo usuário
                       //Expanded: filho ocupa todo o espaço disponível 
-                      [Expanded(child: ClipRRect(
+                      [Expanded(flex: 2,child: ClipRRect(
                                 borderRadius: BorderRadiusGeometry.circular(10), 
-                                            child: Image.asset('assets/images/drone2.jpg', fit: BoxFit.cover,)),
+                                            child: Image.asset('assets/images/drone2.jpg', fit: BoxFit.contain,)),
                             ), SizedBox(height: 16)
                       ,TextFormField(decoration: InputDecoration(icon: temaEscuro? Icon(Icons.email_outlined): Icon(Icons.email),
                       labelText: 'Email',
@@ -127,10 +127,10 @@ class _LoginPageState extends State<LoginPage>{
                                   child: Text('Criar conta')),
                                   SizedBox(height: 16,),
                                   //imagem ocupa todo o espaço permitido
-                                  Expanded(
-                                  child: ClipRRect(borderRadius: BorderRadiusGeometry.circular(10), 
-                                            child: Image.asset('assets/images/drone.jpg', fit: BoxFit.cover,)),
-                            )
+                            //       Expanded(
+                            //       child: ClipRRect(borderRadius: BorderRadiusGeometry.circular(10), 
+                            //                 child: Image.asset('assets/images/drone.jpg', fit: BoxFit.cover,)),
+                            // )
                         ],
                     ),
                 ),
