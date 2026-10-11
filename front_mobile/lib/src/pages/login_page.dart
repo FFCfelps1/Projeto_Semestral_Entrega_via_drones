@@ -9,6 +9,9 @@ class _LoginPageState extends State<LoginPage>{
 
   //variável que armazena o tema atual ()'claro' ou 'escuro')
   bool temaEscuro = false;         //atualmente, tema 'claro'
+  
+  //variável de estado que controla se a senha está visível ou não
+  bool senhaVisivel = false;    //senha começa escondida
 
   @override
   Widget build(BuildContext context){
@@ -80,9 +83,12 @@ class _LoginPageState extends State<LoginPage>{
                         ), 
                         //linha abaixo do campo de entrada senha quando ele está selecionado
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Color(0xff256af4), width: 2.0))
+                          borderSide: BorderSide(color: Color(0xff256af4), width: 2.0)),
+                          suffixIcon: IconButton(onPressed: (){
+                            setState(() {senhaVisivel = !senhaVisivel;});
+                          },icon: Icon(senhaVisivel ? Icons.visibility_off : Icons.visibility)),
                           ), 
-                        obscureText: true, 
+                        obscureText: !senhaVisivel, 
                         controller: senhaController,), 
                         SizedBox(height: 16),     //espaçamento entre os campos de entrada e o botão
                         ElevatedButton(onPressed: (){
