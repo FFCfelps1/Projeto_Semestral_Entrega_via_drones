@@ -74,7 +74,8 @@ class _LoginPageState extends State<LoginPage>{
                       controller: emailController,
                       ), SizedBox(height: 16),
                       TextFormField(
-                        decoration: InputDecoration(labelText: 'Senha', 
+                        decoration: InputDecoration(icon: temaEscuro ? Icon(Icons.lock) : Icon(Icons.lock_outline_rounded),
+                        labelText: 'Senha', 
                         hintText: 'senha123', 
                         hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha:0.5) : Colors.black.withValues(alpha: 0.5)),   //opacidade em 50% 
                         labelStyle: TextStyle(color: Color(0xff256af4)),
