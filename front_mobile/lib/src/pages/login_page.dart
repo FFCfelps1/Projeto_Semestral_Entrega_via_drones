@@ -7,7 +7,7 @@ class _LoginPageState extends State<LoginPage>{
   final emailController = TextEditingController();    //para email
   final senhaController = TextEditingController();    //para senha
 
-  //variável que armazena o tema atual ()'claro' ou 'escuro')
+  //variável que armazena o tema atual ('claro' ou 'escuro')
   bool temaEscuro = false;         //atualmente, tema 'claro'
   
   //variável de estado que controla se a senha está visível ou não
@@ -57,13 +57,14 @@ class _LoginPageState extends State<LoginPage>{
                       //Expanded: filho ocupa todo o espaço disponível 
                       [Expanded(flex:2,     //imagem ocupa dois espaços
                                 child: Row(
-                                children: [ SizedBox(width: 40), //espaço do ícone
+                                children: [
                                 Expanded(
                                 child:ClipRRect(
                                 borderRadius: BorderRadiusGeometry.circular(10), 
                                             child: Image.asset('assets/images/drone2.jpg', fit: BoxFit.cover,)))]),
                             ), SizedBox(height: 16)
-                      ,TextFormField(decoration: InputDecoration(icon: temaEscuro? Icon(Icons.email_outlined): Icon(Icons.email),
+                      ,TextFormField(decoration: InputDecoration(prefixIcon: temaEscuro? Icon(Icons.email_outlined): Icon(Icons.email),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: 'Email',
                       hintText: 'exemplo@email.com', 
                       hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.5)), labelStyle: TextStyle(color: Color(0xff256af4)), 
@@ -80,7 +81,9 @@ class _LoginPageState extends State<LoginPage>{
                       controller: emailController,
                       ), SizedBox(height: 16),
                       TextFormField(
-                        decoration: InputDecoration(icon: temaEscuro ? Icon(Icons.lock) : Icon(Icons.lock_outline_rounded),
+                        decoration: InputDecoration(
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                        prefixIcon: temaEscuro ? Icon(Icons.lock) : Icon(Icons.lock_outline_rounded),
                         labelText: 'Senha', 
                         hintText: 'senha123', 
                         hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha:0.5) : Colors.black.withValues(alpha: 0.5)),   //opacidade em 50% 
