@@ -1,30 +1,44 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:front_mobile/main.dart';
+import 'package:front_mobile/src/pages/login_page.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Exibe os campos e as ações da tela de login', (tester) async {
+    await tester.pumpWidget(const LoginPage());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.widgetWithText(TextFormField, 'Email'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'Senha'), findsOneWidget);
+    expect(find.widgetWithText(ElevatedButton, 'Entrar'), findsOneWidget);
+    expect(find.text('Esqueci minha senha'), findsOneWidget);
+    expect(find.text('Criar conta'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('Permite mostrar e ocultar a senha', (tester) async {
+    await tester.pumpWidget(const LoginPage());
+    final senha = find.byType(TextField).last;
+
+    expect(tester.widget<TextField>(senha).obscureText, isTrue);
+    await tester.tap(find.byIcon(Icons.visibility));
     await tester.pump();
+    expect(tester.widget<TextField>(senha).obscureText, isFalse);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.visibility_off));
+    await tester.pump();
+    expect(tester.widget<TextField>(senha).obscureText, isTrue);
+  });
+
+  testWidgets('Permite alternar o tema claro e escuro', (tester) async {
+    await tester.pumpWidget(const LoginPage());
+    final scaffold = find.byType(Scaffold);
+
+    expect(Theme.of(tester.element(scaffold)).brightness, Brightness.light);
+    await tester.tap(find.byIcon(Icons.dark_mode));
+    await tester.pumpAndSettle();
+    expect(Theme.of(tester.element(scaffold)).brightness, Brightness.dark);
+
+    await tester.tap(find.byIcon(Icons.light_mode));
+    await tester.pumpAndSettle();
+    expect(Theme.of(tester.element(scaffold)).brightness, Brightness.light);
   });
 }

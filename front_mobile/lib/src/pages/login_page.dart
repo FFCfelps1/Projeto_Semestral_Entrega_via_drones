@@ -147,6 +147,8 @@ class _LoginPageState extends State<LoginPage>{
 }
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   State<LoginPage> createState() {
     return _LoginPageState();
