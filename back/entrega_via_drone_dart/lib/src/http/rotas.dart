@@ -4,6 +4,8 @@
 /// para que o front, o proxy nginx e o servico de pedidos nao mudem.
 library;
 
+import 'dart:async';
+
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
@@ -86,6 +88,8 @@ class ServicoRota {
           ) ??
           _fallback(parametros);
 
+      // Nao aguarda o barramento: a resposta ao usuario nao depende dele.
+      unawaited(_publicarRotaCalculada(parametros, resultado));
       return respostaJson(resultado.toJson());
     } catch (erro) {
       registrarErro('Erro ao calcular rota: $erro');
@@ -103,6 +107,24 @@ class ServicoRota {
       parametros.destinoLng,
     );
   }
+
+  /// Publica RotaCalculada com o mesmo formato de dados da versao Node.
+  /// O servico de pedidos usa o `pedidoId` para mover o pedido para em_rota.
+  Future<void> _publicarRotaCalculada(
+    ParametrosRota parametros,
+    ResultadoRota resultado,
+  ) =>
+      _barramento.publicar('RotaCalculada', {
+        if (parametros.pedidoId != null) 'pedidoId': parametros.pedidoId,
+        'origemLat': parametros.origemLat,
+        'origemLng': parametros.origemLng,
+        'destinoLat': parametros.destinoLat,
+        'destinoLng': parametros.destinoLng,
+        'distancia': resultado.distancia,
+        'duracao': resultado.duracao,
+        'pontos': resultado.rota.length,
+        'fallback': resultado.fallback,
+      });
 
   /// Caminhos desconhecidos respondem JSON, como o restante da API.
   Response _naoEncontrado(Request requisicao) => respostaJson(
