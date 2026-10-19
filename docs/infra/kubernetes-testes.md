@@ -66,3 +66,25 @@ O formulário de contato exibiu `Mensagem enviada com sucesso.`. A caixa Mailpit
 Essas correções ficaram em quatro commits adicionais às 13 etapas planejadas. A branch é `feat/kubernetes-local`; mensagens seguem Conventional Commits em português. A sequência principal implementou Docker, configuração, inscrições/saúde, persistência, vínculo de eventos, frontend, Nginx, infraestrutura, workloads, scripts, Vercel, testes e documentação.
 
 Saídas detalhadas da sessão ficam em `.kubernetes-local/` (ignorado pelo Git): `rollout.log`, `build-amd64.log`, `integration.log`, `lifecycle.log`, `vercel.log`, `routes.log`, `lint.log` e `frontend-build.log`. Para reproduzir, siga o [guia Kubernetes](kubernetes.md).
+
+## Revalidação com o serviço de rotas em Dart (18/10/2026)
+
+Após a troca do Deployment `entrega-via-drone` para a imagem Dart, a solução completa foi reconstruída e testada novamente no Docker Desktop local.
+
+| Item | Ambiente verificado |
+| --- | --- |
+| Dart SDK (build local) / imagem base | 3.13.1 / `dart:3.13` |
+| Docker Engine | 29.5.2 |
+| Kubernetes / kubectl | 1.34.3, kind, um nó AMD64 / 1.34.1 |
+| Runtime do nó | containerd 2.2.0 |
+| Imagens em execução | `050d775-20261019013246`, Linux AMD64 |
+| Imagem Dart | `scratch` com executável AOT, 17,3 MB, cerca de 6 MiB de memória em repouso |
+
+| Comando | Resultado |
+| --- | --- |
+| `npm run test:dart` | `dart analyze` sem apontamentos e 34 testes aprovados |
+| `npm test` | 5 testes aprovados: contrato da rota (provedor funcional e indisponível) nas versões Node e Dart, e ids únicos no barramento após 1003 eventos |
+| `npm run k8s:up` | sete imagens construídas e oito Deployments com rollout concluído; pod Dart inscrito no barramento em cerca de 1 s |
+| `npm run k8s:test` | **304 verificações aprovadas**, incluindo cinco inscrições, rota com `pedidoId` movendo o pedido para `em_rota`, 400 para coordenadas inválidas, JSON 503 com o serviço escalado para zero e recuperação após reinícios |
+
+Também foram verificados manualmente, com o container Dart isolado: rota real pelo OSRM via HTTPS (158 pontos, `fallback: false`) e encerramento por `docker stop` em cerca de 1 s com código de saída 0. A diferença no total de verificações em relação a 04/10 (311) vem do ambiente atual, não de falhas: a execução terminou com `APROVADO`.
