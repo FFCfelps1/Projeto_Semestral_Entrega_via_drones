@@ -3,6 +3,25 @@ library;
 
 import 'package:shelf/shelf.dart';
 
+import '../log.dart';
+
+/// Caminhos consultados pelo Kubernetes a cada poucos segundos; ficam fora do
+/// log para nao esconder as requisicoes reais.
+const _caminhosSilenciosos = {'live', 'ready'};
+
+/// Registra metodo, caminho, status e duracao de cada requisicao.
+Middleware logRequisicoes() => (Handler proximo) => (Request requisicao) async {
+      final inicio = DateTime.now();
+      final resposta = await proximo(requisicao);
+
+      if (!_caminhosSilenciosos.contains(requisicao.url.path)) {
+        final ms = DateTime.now().difference(inicio).inMilliseconds;
+        registrar('${requisicao.method} /${requisicao.url} '
+            '${resposta.statusCode} ${ms}ms');
+      }
+      return resposta;
+    };
+
 /// Cabecalhos CORS equivalentes ao `cors()` padrao usado nos servicos Node:
 /// libera qualquer origem para que o front web e o app mobile chamem a API.
 const _cabecalhosCors = {
