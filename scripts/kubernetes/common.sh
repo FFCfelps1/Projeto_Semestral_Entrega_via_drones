@@ -7,7 +7,11 @@ NAMESPACE=skyswift
 export KUBECONFIG="${SKYSWIFT_KUBECONFIG:-$HOME/.kube/config}"
 STATE="$ROOT/.kubernetes-local"
 mkdir -p "$STATE"
-k() { kubectl --context "$CONTEXT" --namespace "$NAMESPACE" "$@"; }
+k() {
+  # O Git Bash deve preservar endpoints HTTP como --raw=/readyz.
+  MSYS2_ARG_CONV_EXCL="${MSYS2_ARG_CONV_EXCL:+$MSYS2_ARG_CONV_EXCL;}--raw=" \
+    kubectl --context "$CONTEXT" --namespace "$NAMESPACE" "$@"
+}
 d() { docker --context desktop-linux "$@"; }
 # Em background, exec mantém o PID capturado pelo script igual ao do kubectl.
 port_forward() { exec kubectl --context "$CONTEXT" --namespace "$NAMESPACE" port-forward --address 127.0.0.1 "$@"; }

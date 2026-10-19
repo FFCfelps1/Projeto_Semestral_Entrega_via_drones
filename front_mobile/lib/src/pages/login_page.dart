@@ -1,154 +1,368 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart' as google;
 
-class _LoginPageState extends State<LoginPage>{
+/// Página responsável somente pela apresentação e pelo estado do login.
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key, required this.onToggleTheme});
 
-  //variáveis para capturar o que o usuário digitou
-  final emailController = TextEditingController();    //para email
-  final senhaController = TextEditingController();    //para senha
-
-  //variável que armazena o tema atual ('claro' ou 'escuro')
-  bool temaEscuro = false;         //atualmente, tema 'claro'
-  
-  //variável de estado que controla se a senha está visível ou não
-  bool senhaVisivel = false;    //senha começa escondida
+  final VoidCallback onToggleTheme;
 
   @override
-  Widget build(BuildContext context){
-    return MaterialApp(
-      theme: temaEscuro ? ThemeData(
-        brightness: Brightness.dark, //paleta (brilho) escura(o)
-        scaffoldBackgroundColor: Color(0xff101622), // 0xff é 100% de opacidade, 101622 é código hexadecimal da cor
-        //tema da AppBar
-        appBarTheme: AppBarTheme(
-          backgroundColor: Color(0xff101622),   //mesma cor
-        )
-      ) : ThemeData.light(),
-      home: Scaffold(
-            appBar: AppBar(
-              //alinha título no centro
-              centerTitle: true,
-              //padding para o ícone não ficar atrás da faixa 'debug' durante os testes
-              actionsPadding: EdgeInsets.fromLTRB(0, 8, 20, 0),
-              title: Text('🚁Faça Login e voe conosco!!🚁', style: google.GoogleFonts.oswald(
-                color: Color(0xff256af4),
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold
-              )),
-              //actions: lista de widgets que ficam no canto superior direito
-              actions: [IconButton(onPressed: (){
-                setState(() {temaEscuro = !temaEscuro;});
-                }, 
-              //ícone dos temas escuro e claro na TopBar
-              icon: Icon(temaEscuro ? Icons.light_mode: Icons.dark_mode, color: Color(0xff256af4),))],
-          ), 
-            body: Padding(padding: EdgeInsets.all(16.0), 
-            //Column para empilhar widgets verticalmente, 
-            //adicionando-os a uma lista
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _senhaController = TextEditingController();
+  final _emailFocus = FocusNode();
+  final _senhaFocus = FocusNode();
+  static final _emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+  bool _senhaVisivel = false;
+  bool _tentouEnviar = false;
+
+  String? _validarEmail(String? valor) {
+    final email = valor?.trim() ?? '';
+    if (email.isEmpty) return 'Informe seu e-mail.';
+    if (!_emailPattern.hasMatch(email)) return 'Digite um e-mail válido.';
+    return null;
+  }
+
+  String? _validarSenha(String? valor) {
+    // Login aceita a senha existente, sem aplicar regras de criação de conta.
+    return valor == null || valor.isEmpty ? 'Informe sua senha.' : null;
+  }
+
+  void _enviarFormulario() {
+    // Os erros só aparecem depois da primeira tentativa; depois acompanham a edição.
+    setState(() => _tentouEnviar = true);
+    _formKey.currentState!.validate();
+    if (_validarEmail(_emailController.text) != null) {
+      _emailFocus.requestFocus();
+    } else if (_validarSenha(_senhaController.text) != null) {
+      _senhaFocus.requestFocus();
+    } else {
+      _mostrarAviso('Esta versão ainda não realiza login.');
+    }
+  }
+
+  void _mostrarAviso(String mensagem) {
+    // Esta etapa demonstra a interface; nenhuma ação simula sessão ou acesso real.
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(content: Text(mensagem)));
+  }
+
+  @override
+  void dispose() {
+    // Cada página libera os recursos que criou, sem guardar credenciais na sessão.
+    _emailController.dispose();
+    _senhaController.dispose();
+    _emailFocus.dispose();
+    _senhaFocus.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tecladoAberto = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: AutofillGroup(
+                // A demonstração não deve oferecer salvar uma autenticação inexistente.
+                onDisposeAction: AutofillContextAction.cancel,
+                child: Form(
+                  key: _formKey,
+                  autovalidateMode: _tentouEnviar
+                      ? AutovalidateMode.onUserInteraction
+                      : AutovalidateMode.disabled,
                   child: Column(
-                    //alinha
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: 
-                      //dois campos de texto: email e senha
-                      //obscureText: true --> esconde os caracteres da senha
-                      //SizedBox cria um espaço entre o campo senha e os botões
-                      //
-                      //adiciona imagem antes dos campos preenchidos pelo usuário
-                      //Expanded: filho ocupa todo o espaço disponível 
-                      [Expanded(flex:2,     //imagem ocupa dois espaços
-                                child: Row(
-                                children: [
-                                Expanded(
-                                child:ClipRRect(
-                                borderRadius: BorderRadiusGeometry.circular(10), 
-                                            child: Image.asset('assets/images/drone2.jpg', fit: BoxFit.cover,)))]),
-                            ), SizedBox(height: 16)
-                      ,TextFormField(decoration: InputDecoration(prefixIcon: temaEscuro? Icon(Icons.email_outlined): Icon(Icons.email),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      labelText: 'Email',
-                      hintText: 'exemplo@email.com', 
-                      hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.5)), labelStyle: TextStyle(color: Color(0xff256af4)), 
-                      //linha abaixo do campo de entrada email quando ele não está selecionado
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color:  Color(0xff256af4))
-                        ), 
-                        //linha abaixo do campo de entrada email quando ele está selecionado
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Color(0xff256af4), width: 2.0)
-                        )),
-                      controller: emailController,
-                      ), SizedBox(height: 16),
-                      TextFormField(
-                        decoration: InputDecoration(
-                        floatingLabelBehavior: FloatingLabelBehavior.always,
-                        prefixIcon: temaEscuro ? Icon(Icons.lock) : Icon(Icons.lock_outline_rounded),
-                        labelText: 'Senha', 
-                        hintText: 'senha123', 
-                        hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha:0.5) : Colors.black.withValues(alpha: 0.5)),   //opacidade em 50% 
-                        labelStyle: TextStyle(color: Color(0xff256af4)),
-                        //linha abaixo do campo de entrada senha quando ele não está selecionado
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color:  Color(0xff256af4))
-                        ), 
-                        //linha abaixo do campo de entrada senha quando ele está selecionado
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Color(0xff256af4), width: 2.0)),
-                          //ícone de olho
-                          suffixIcon: IconButton(onPressed: (){
-                            setState(() {senhaVisivel = !senhaVisivel;});
-                          },icon: Icon(senhaVisivel ? Icons.visibility_off : Icons.visibility, size: 15.0,color: Color(0xff256af4),)),
-                          ), 
-                        obscureText: !senhaVisivel, 
-                        controller: senhaController,), 
-                        SizedBox(height: 16),     //espaçamento entre os campos de entrada e o botão
-                        ElevatedButton(onPressed: (){
-                          //teste
-                          ////
-                          /// ******* ação realizada quando o botão é pressionado *******
-                          ///
-                          // print('''Email: ${emailController.text}
-                          // Senha: ${senhaController.text}''');
-                        }, 
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xff256af4), //fundo azul primário
-                                        foregroundColor: Colors.white       //texto banco no botão
-                                      ),
-                                      child: Text('Entrar'),),
-                        SizedBox(height: 16,),
-                        //opção 'esqueci minha senha'
-                        TextButton(onPressed:(){}, 
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Color(0xff256af4)
-                                  ), 
-                                  child: Text('Esqueci minha senha'),),
-                                  SizedBox(height: 10,),
-                        //opção 'criar conta'
-                        TextButton(onPressed: (){},
-                                  style:TextButton.styleFrom(
-                                    foregroundColor: Color(0xff256af4),
-                                  ),
-                                  child: Text('Criar conta')),
-                                  SizedBox(height: 16,),
-                                  //imagem ocupa todo o espaço permitido
-                            //       Expanded(
-                            //       child: ClipRRect(borderRadius: BorderRadiusGeometry.circular(10), 
-                            //                 child: Image.asset('assets/images/drone.jpg', fit: BoxFit.cover,)),
-                            // )
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // O controle de tema pertence à região de edição e não rouba seu foco.
+                      TextFieldTapRegion(
+                        child: _LoginHeader(
+                          onToggleTheme: widget.onToggleTheme,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // A arte é decorativa: com o teclado, o espaço pertence ao formulário.
+                      if (!tecladoAberto) ...[
+                        const _LoginIllustration(),
+                        const SizedBox(height: 24),
+                      ],
+                      Semantics(
+                        headingLevel: 1,
+                        child: Text(
+                          'Entre na sua conta',
+                          style: theme.textTheme.headlineMedium,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Acompanhe suas entregas por drone.',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      _LabeledField(
+                        label: 'E-mail',
+                        child: TextFormField(
+                          controller: _emailController,
+                          focusNode: _emailFocus,
+                          validator: _validarEmail,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [
+                            AutofillHints.username,
+                            AutofillHints.email,
+                          ],
+                          autocorrect: false,
+                          enableSuggestions: false,
+                          onFieldSubmitted: (_) => _senhaFocus.requestFocus(),
+                          style: theme.textTheme.bodyLarge,
+                          decoration: const InputDecoration(
+                            hintText: 'nome@exemplo.com',
+                            prefixIcon: Icon(Icons.email_outlined),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      _LabeledField(
+                        label: 'Senha',
+                        child: TextFormField(
+                          controller: _senhaController,
+                          focusNode: _senhaFocus,
+                          validator: _validarSenha,
+                          textInputAction: TextInputAction.done,
+                          autofillHints: const [AutofillHints.password],
+                          autocorrect: false,
+                          enableSuggestions: false,
+                          onFieldSubmitted: (_) => _enviarFormulario(),
+                          style: theme.textTheme.bodyLarge,
+                          obscureText: !_senhaVisivel,
+                          decoration: InputDecoration(
+                            hintText: 'Digite sua senha',
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            suffixIcon: IconButton(
+                              tooltip: _senhaVisivel
+                                  ? 'Ocultar senha'
+                                  : 'Mostrar senha',
+                              onPressed: () => setState(
+                                () => _senhaVisivel = !_senhaVisivel,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 48,
+                                minHeight: 48,
+                              ),
+                              icon: Icon(
+                                _senhaVisivel
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () => _mostrarAviso(
+                            'A recuperação de senha ainda não está disponível nesta versão.',
+                          ),
+                          child: const Text('Esqueci minha senha'),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: _enviarFormulario,
+                        child: const Text('Entrar'),
+                      ),
+                      const SizedBox(height: 24),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(
+                            'Não tem conta?',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => _mostrarAviso(
+                              'O cadastro ainda não está disponível nesta versão.',
+                            ),
+                            child: const Text('Criar conta'),
+                          ),
                         ],
-                    ),
+                      ),
+                    ],
+                  ),
                 ),
-        ), 
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
 
-class LoginPage extends StatefulWidget {
+/// O rótulo não desaparece ao digitar; erros podem ampliar o campo sem recorte.
+class _LabeledField extends StatelessWidget {
+  const _LabeledField({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
   @override
-  State<LoginPage> createState() {
-    return _LoginPageState();
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // O rótulo é anunciado junto ao campo, sem uma segunda leitura isolada.
+        ExcludeSemantics(
+          child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+        ),
+        const SizedBox(height: 8),
+        ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 56),
+          child: Semantics(label: label, child: child),
+        ),
+      ],
+    );
+  }
+}
+
+class _LoginHeader extends StatelessWidget {
+  const _LoginHeader({required this.onToggleTheme});
+
+  final VoidCallback onToggleTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final dark = colors.brightness == Brightness.dark;
+    return Row(
+      children: [
+        const Expanded(child: _BrandTitle()),
+        const SizedBox(width: 8),
+        IconButton.filledTonal(
+          tooltip: dark
+              ? 'Alternar para modo claro'
+              : 'Alternar para modo escuro',
+          onPressed: onToggleTheme,
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+          style: IconButton.styleFrom(
+            backgroundColor: colors.surfaceContainerHighest,
+            foregroundColor: colors.onSurfaceVariant,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          icon: Icon(dark ? Icons.light_mode : Icons.dark_mode),
+        ),
+      ],
+    );
+  }
+}
+
+class _BrandTitle extends StatelessWidget {
+  const _BrandTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.all(8),
+            child: CustomPaint(painter: _DroneMarkPainter()),
+          ),
+        ),
+        const SizedBox(width: 12),
+        const Flexible(
+          child: Text(
+            'SkySwift',
+            style: TextStyle(
+              fontFamily: 'Manrope',
+              fontSize: 21,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Símbolo vetorial simples: permanece nítido em qualquer escala do dispositivo.
+class _DroneMarkPainter extends CustomPainter {
+  const _DroneMarkPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 24, size.height / 24);
+    final stroke = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round;
+    for (final rotor in const [
+      Offset(4, 4),
+      Offset(20, 4),
+      Offset(4, 20),
+      Offset(20, 20),
+    ]) {
+      canvas.drawLine(const Offset(12, 12), rotor, stroke);
+      canvas.drawCircle(rotor, 3, stroke);
+    }
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(8, 9, 8, 6),
+        const Radius.circular(2),
+      ),
+      Paint()..color = Colors.white,
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_DroneMarkPainter oldDelegate) => false;
+}
+
+class _LoginIllustration extends StatelessWidget {
+  const _LoginIllustration();
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Image.asset(
+        dark ? 'assets/images/login-dark.png' : 'assets/images/login-light.png',
+        height: 130,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        excludeFromSemantics: true,
+      ),
+    );
   }
 }

@@ -2,15 +2,15 @@
 
 ---
 
-Nome: Felipe Fazio da Costa 				  RA: 23.00055-4
+Nome: Arthur Gama Ruiz 					      RA: 23.01445-8
 
 Nome: Enzo Oliveira D’Onofrio 				RA: 23.01561-6
 
-Nome: Leonardo Souza Olivieri 				RA: 23.01512-8
-
-Nome: Arthur Gama Ruiz 					      RA: 23.01445-8
+Nome: Felipe Fazio da Costa 				  RA: 23.00055-4
 
 Nome: João Vitor Morimoto Sesma			  RA: 23.01516-0
+
+Nome: Leonardo Souza Olivieri 				RA: 23.01512-8
 
 Nome: Pedro Wilian Palumbo Bevilacqua RA: 23.01307-9
 
