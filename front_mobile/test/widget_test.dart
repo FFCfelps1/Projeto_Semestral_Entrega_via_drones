@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,6 +13,73 @@ TextField _campoDeTexto(WidgetTester tester, Finder formulario) {
 
 void main() {
   WidgetController.hitTestWarningShouldBeFatal = true;
+  testWidgets('Identifica titulo, campos e controles para leitores de tela', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(const SkySwiftApp());
+      expect(find.byTooltip('Alternar para modo escuro'), findsOneWidget);
+      expect(find.byTooltip('Mostrar senha'), findsOneWidget);
+      expect(
+        tester
+            .getSemantics(find.text('Entre na sua conta'))
+            .getSemanticsData()
+            .headingLevel,
+        1,
+      );
+      expect(
+        tester
+            .getSemantics(find.byType(TextField).first)
+            .getSemanticsData()
+            .label,
+        contains('E-mail'),
+      );
+      expect(
+        tester
+            .getSemantics(find.byType(TextField).last)
+            .getSemanticsData()
+            .label,
+        contains('Senha'),
+      );
+      await tester.ensureVisible(find.byTooltip('Mostrar senha'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Mostrar senha'));
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Ocultar senha'), findsOneWidget);
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets('Mantem alvos acessiveis e controles de 56 nos dois temas', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final semantics = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(const SkySwiftApp());
+      for (var tema = 0; tema < 2; tema++) {
+        await tester.pumpAndSettle();
+        expect(
+          tester.getSize(find.widgetWithText(ElevatedButton, 'Entrar')).height,
+          greaterThanOrEqualTo(56),
+        );
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+        await expectLater(tester, meetsGuideline(textContrastGuideline));
+        if (tema == 0) await tester.tap(find.byIcon(Icons.dark_mode));
+      }
+    } finally {
+      semantics.dispose();
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+
   testWidgets('Entrar informa a limitacao da demonstracao com dados validos', (
     tester,
   ) async {
@@ -65,6 +133,20 @@ void main() {
       _campoDeTexto(
         tester,
         find.byType(TextFormField).first,
+      ).focusNode?.hasFocus,
+      isTrue,
+    );
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      'nome@exemplo.com',
+    );
+    await tester.ensureVisible(find.text('Entrar'));
+    await tester.tap(find.text('Entrar'));
+    await tester.pumpAndSettle();
+    expect(
+      _campoDeTexto(
+        tester,
+        find.byType(TextFormField).last,
       ).focusNode?.hasFocus,
       isTrue,
     );
@@ -211,6 +293,10 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    expect(
+      MediaQuery.textScalerOf(tester.element(find.byType(Scaffold))).scale(16),
+      32,
+    );
     await tester.ensureVisible(find.text('Criar conta'));
     expect(tester.takeException(), isNull);
   });

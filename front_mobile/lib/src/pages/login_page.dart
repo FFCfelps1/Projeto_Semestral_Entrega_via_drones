@@ -98,9 +98,12 @@ class _LoginPageState extends State<LoginPage> {
                         const _LoginIllustration(),
                         const SizedBox(height: 24),
                       ],
-                      Text(
-                        'Entre na sua conta',
-                        style: theme.textTheme.headlineMedium,
+                      Semantics(
+                        headingLevel: 1,
+                        child: Text(
+                          'Entre na sua conta',
+                          style: theme.textTheme.headlineMedium,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -150,6 +153,9 @@ class _LoginPageState extends State<LoginPage> {
                             hintText: 'Digite sua senha',
                             prefixIcon: const Icon(Icons.lock_outline),
                             suffixIcon: IconButton(
+                              tooltip: _senhaVisivel
+                                  ? 'Ocultar senha'
+                                  : 'Mostrar senha',
                               onPressed: () => setState(
                                 () => _senhaVisivel = !_senhaVisivel,
                               ),
@@ -223,11 +229,14 @@ class _LabeledField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(label, style: Theme.of(context).textTheme.labelLarge),
+        // O rótulo é anunciado junto ao campo, sem uma segunda leitura isolada.
+        ExcludeSemantics(
+          child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+        ),
         const SizedBox(height: 8),
         ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 56),
-          child: child,
+          child: Semantics(label: label, child: child),
         ),
       ],
     );
@@ -248,6 +257,9 @@ class _LoginHeader extends StatelessWidget {
         const Expanded(child: _BrandTitle()),
         const SizedBox(width: 8),
         IconButton.filledTonal(
+          tooltip: dark
+              ? 'Alternar para modo claro'
+              : 'Alternar para modo escuro',
           onPressed: onToggleTheme,
           constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
           style: IconButton.styleFrom(

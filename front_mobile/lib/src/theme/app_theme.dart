@@ -31,6 +31,8 @@ abstract final class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
+      // Mantém os alvos de toque também no navegador em plataformas de desktop.
+      visualDensity: VisualDensity.standard,
       colorScheme: colors,
       scaffoldBackgroundColor: colors.surface,
       fontFamily: 'Roboto',
