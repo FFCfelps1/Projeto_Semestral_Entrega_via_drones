@@ -508,6 +508,9 @@ Se quiser sobrescrever manualmente no frontend:
 | `npm run build` | Constrói a aplicação para produção |
 | `npm run preview` | Visualiza a build de produção localmente |
 | `npm run lint` | Executa ESLint para verificar código |
+| `npm test` | Testes de contrato do servico de rotas (Node e Dart) e do barramento |
+| `npm run test:dart` | Analise estatica e testes do servico de rotas em Dart |
+| `npm run k8s:up` / `npm run k8s:test` | Implanta e testa a solucao completa no Kubernetes local |
 
 ## 📁 Estrutura do Projeto
 
@@ -569,6 +572,13 @@ PROJETO_SEMESTRAL_ENTREGA_VIA_DRONES/
 │   │
 │   ├── entrega_via_drone/
 │   │   └── server.js                            # Microsserviço responsável pelas entregas via drone
+│   │
+│   ├── entrega_via_drone_dart/                  # Servico de rotas em Dart
+│   │   ├── bin/server.dart
+│   │   ├── lib/src/
+│   │   ├── test/
+│   │   ├── Dockerfile
+│   │   └── pubspec.yaml
 │   │
 │   ├── gestao_de_pedidos/
 │   │   ├── middleware/
@@ -750,6 +760,8 @@ git push origin v1.0.0
 | Bootstrap | 5.3.8 | Framework CSS |
 | FontAwesome | 7.2.0 | Ícones |
 | JavaScript | ES2020+ | Linguagem |
+| Dart | 3.x | Servico de rotas (`shelf`, `http`) |
+| Docker / Kubernetes | Docker Desktop (kind) | Implantacao dos microsservicos |
 
 ## 📱 Responsividade
 
