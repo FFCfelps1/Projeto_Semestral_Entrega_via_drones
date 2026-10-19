@@ -6,6 +6,8 @@ NAMESPACE=skyswift
 # Docker Desktop grava o contexto neste arquivo; KUBECONFIG pode apontar apenas a clusters corporativos.
 export KUBECONFIG="${SKYSWIFT_KUBECONFIG:-$HOME/.kube/config}"
 STATE="$ROOT/.kubernetes-local"
+# Imagens implantadas, na ordem de construcao: skyswift-<nome>:<tag>.
+IMAGES=(barramento-eventos entrega-via-drone contato-email cadastro-usuario gestao-de-pedidos notificacoes frontend)
 mkdir -p "$STATE"
 k() {
   # O Git Bash deve preservar endpoints HTTP como --raw=/readyz.
