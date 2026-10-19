@@ -10,6 +10,8 @@ for service in barramento_eventos entrega_via_drone contato_email cadastro_usuar
   name="${service//_/-}"
   d buildx build --platform "$platform" --load -t "docker.io/library/skyswift-$name:$tag" -f "$ROOT/back/$service/Dockerfile" "$ROOT/back"
 done
+# O servico de rotas em Dart tem contexto proprio: nao depende de back/shared.
+d buildx build --platform "$platform" --load -t "docker.io/library/skyswift-entrega-via-drone-dart:$tag" "$ROOT/back/entrega_via_drone_dart"
 d buildx build --platform "$platform" --load -t "docker.io/library/skyswift-frontend:$tag" "$ROOT/front"
 if [[ "${SAVE_TAG:-true}" == true ]]; then printf '%s\n' "$tag" > "$STATE/image-tag"; fi
 echo "Imagens construídas: $tag ($platform)"
