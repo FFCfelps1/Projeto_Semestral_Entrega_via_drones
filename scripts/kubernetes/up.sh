@@ -7,7 +7,7 @@ if [[ "${1:-}" != --no-build ]]; then "$ROOT/scripts/kubernetes/build.sh"; fi
 tag="$(cat "$STATE/image-tag")"
 # Verifica todas as imagens antes de alterar recursos da aplicação.
 node_arch="$(k get nodes -o 'jsonpath={.items[0].status.nodeInfo.architecture}')"
-for name in barramento-eventos entrega-via-drone contato-email cadastro-usuario gestao-de-pedidos notificacoes frontend; do
+for name in "${IMAGES[@]}"; do
   image_arch="$(d image inspect "docker.io/library/skyswift-$name:$tag" --format '{{.Architecture}}')"
   [[ "$image_arch" == "$node_arch" ]] || { echo "Imagem $name: $image_arch, nó: $node_arch. Reconstrua para linux/$node_arch." >&2; exit 1; }
 done
@@ -32,11 +32,11 @@ fi
 render="$(mktemp -d "$STATE/render.XXXXXX")"
 trap 'rm -rf "$render"' EXIT
 cp "$ROOT/infra/kubernetes/application/"*.yaml "$render/"
-node - "$render/kustomization.yaml" "$tag" <<'JS'
+node - "$render/kustomization.yaml" "$tag" "${IMAGES[@]}" <<'JS'
 const fs = require('node:fs');
-const [file, tag] = process.argv.slice(2);
+const [file, tag, ...images] = process.argv.slice(2);
 let content = fs.readFileSync(file, 'utf8') + 'images:\n';
-for (const name of ['barramento-eventos','entrega-via-drone','contato-email','cadastro-usuario','gestao-de-pedidos','notificacoes','frontend']) {
+for (const name of images) {
   content += `  - name: docker.io/library/skyswift-${name}\n    newTag: ${tag}\n`;
 }
 fs.writeFileSync(file, content);

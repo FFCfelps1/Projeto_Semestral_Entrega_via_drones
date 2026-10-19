@@ -100,8 +100,10 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
       containers:
+        # Implementacao em Dart (back/entrega_via_drone_dart). O nome do
+        # Deployment e do Service continua o mesmo para manter o DNS interno.
         - name: entrega-via-drone
-          image: docker.io/library/skyswift-entrega-via-drone:local
+          image: docker.io/library/skyswift-entrega-via-drone-dart:local
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
@@ -117,9 +119,10 @@ spec:
               value: '3002'
             - name: SERVICE_URL
               value: http://entrega-via-drone:3002
+          # O executavel AOT do Dart usa cerca de 6 MiB em repouso.
           resources:
-            requests: {cpu: 100m, memory: 128Mi}
-            limits: {cpu: 500m, memory: 256Mi}
+            requests: {cpu: 50m, memory: 32Mi}
+            limits: {cpu: 500m, memory: 128Mi}
           startupProbe:
             httpGet: {path: /live, port: 3002}
             failureThreshold: 30

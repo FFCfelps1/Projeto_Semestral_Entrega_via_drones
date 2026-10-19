@@ -53,3 +53,56 @@ app.post('/inscricao', (req, res) => {
   res.status(201).json({ success: true, message: `Serviço ${nome} inscrito` });
 });
 ```
+
+---
+
+## Contrato de eventos (atualizado em 18/10/2026)
+
+O barramento conversa apenas por HTTP e JSON, sem depender da linguagem dos
+serviços. Por isso o serviço de rotas pôde ser reimplementado em Dart
+(`back/entrega_via_drone_dart`) sem nenhuma mudança nos demais serviços.
+
+### Endpoints
+
+| Método e caminho | Quem chama | Corpo / parâmetros | Efeito |
+| --- | --- | --- | --- |
+| `POST /inscricao` | todo serviço consumidor, a cada 5 s | `{ "nome", "url" }` | inscreve ou atualiza a URL do serviço |
+| `POST /eventos` | serviço que publica | `{ "tipo", "dados", "origem" }` | registra e distribui o evento |
+| `GET /eventos` | depuração | `?tipo=&limite=` | histórico, do mais recente ao mais antigo |
+| `GET /inscricoes` | depuração e testes | — | serviços inscritos |
+| `POST {url}/eventos/receber` | o barramento | evento completo | entrega o evento a cada inscrito, exceto à origem |
+
+### Formato do evento distribuído
+
+```json
+{
+  "id": "4b0c1e9a-7f43-4a55-9c1e-2f1b8f0e6d21",
+  "tipo": "RotaCalculada",
+  "dados": { "pedidoId": "...", "distancia": 4170.7, "duracao": 446, "fallback": false },
+  "origem": "entrega_via_drone",
+  "timestamp": "2026-10-18T22:00:00.000Z"
+}
+```
+
+- `id`: UUID gerado com `crypto.randomUUID()`. Antes era `historico.length + 1`,
+  que repetia o valor `1001` para todo evento após o histórico atingir o limite
+  de 1000 entradas. O UUID também não se repete após reinícios do pod, o que
+  não aconteceria com um contador em memória. O teste `tests/barramento.cjs`
+  publica 1003 eventos e verifica que todos os ids são distintos.
+- `origem`: nome usado na inscrição; o barramento não devolve o evento a quem o publicou.
+
+### Quem publica e quem consome
+
+| Evento | Publicado por | Consumido por | Reação |
+| --- | --- | --- | --- |
+| `RotaCalculada` | `entrega_via_drone` (Dart) | `gestao_de_pedidos` | move o pedido de `confirmado`/`em_processamento` para `em_rota` |
+| `PEDIDO_CRIADO` | `gestao_de_pedidos` | `notificacoes` | cria a notificação "Pedido criado" |
+| `PEDIDO_CONFIRMADO`, `PEDIDO_ATUALIZADO`, `PEDIDO_CANCELADO` | `gestao_de_pedidos` | — | registrados no histórico |
+| `ContatoSolicitado`, `EmailEnviado` | `contato_email` | — | registrados no histórico |
+
+### Inscrições esperadas
+
+Cinco serviços se inscrevem: `entrega_via_drone`, `contato_email`,
+`cadastro_usuario`, `gestao_de_pedidos` e `notificacoes`. A versão Dart usa o
+mesmo nome `entrega_via_drone` da versão Node; por isso apenas uma das duas
+deve estar em execução por vez (no Kubernetes, sobe somente a versão Dart).
