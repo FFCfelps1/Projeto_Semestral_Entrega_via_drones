@@ -55,7 +55,7 @@ flowchart LR
   Front --> Auth[Cadastro :3004]
   Front --> Orders[Pedidos :3005]
   Front --> Notifications[Notificações :3006]
-  Front --> Route[Rotas :3002]
+  Front --> Route[Rotas Dart :3002]
   Front --> Email[Contato :3003]
   Front --> Bus[Barramento :3001]
   Auth & Orders & Notifications --> DB[(MySQL 8.4 / PVC 5 GiB)]
@@ -68,6 +68,10 @@ flowchart LR
 Cada componente tem uma réplica. Os Services são internos (`ClusterIP`), com DNS em hífens (`gestao-de-pedidos`). As APIs e nomes inscritos preservam os sublinhados (`gestao_de_pedidos`). Por exemplo, `/api/gestao_de_pedidos/pedidos?status=rascunho` chega a `http://gestao-de-pedidos:3005/pedidos?status=rascunho`. O proxy conserva métodos, corpo, parâmetros e cabeçalho Bearer. Rotas de páginas usam fallback da SPA; APIs desconhecidas retornam JSON 404 e falhas de conexão do proxy retornam JSON 503.
 
 Os manifests são organizados em `infra/kubernetes/infrastructure` e `infra/kubernetes/application`, usando o [Kustomize integrado ao kubectl](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/). `schema-job.yaml` é aplicado separadamente para aguardar a conclusão antes dos serviços. Os Dockerfiles Node usam contexto `back/`, necessário para copiar `back/shared/runtime.js`; o frontend usa contexto `front/`.
+
+### Serviço de rotas em Dart
+
+Desde a entrega de 18/10, o Deployment `entrega-via-drone` executa a imagem `skyswift-entrega-via-drone-dart`, construída a partir de `back/entrega_via_drone_dart` com contexto próprio (não depende de `back/shared`). O Dockerfile compila um executável nativo com `dart compile exe` e o copia, junto com o diretório `/runtime` da imagem oficial (libc, DNS e certificados TLS), para uma imagem `scratch` de cerca de 17 MB. O nome do Deployment, do Service e da inscrição no barramento continua o mesmo, então o proxy nginx, o serviço de pedidos e os testes não mudaram. Por usar cerca de 6 MiB em repouso, o pod solicita 50m de CPU e 32 MiB de memória (limite de 128 MiB). As sondas `/live` e `/ready` e o encerramento por SIGTERM seguem o mesmo comportamento dos serviços Node. A lista de imagens implantadas fica em `IMAGES`, no `scripts/kubernetes/common.sh`, compartilhada por `build.sh` e `up.sh`.
 
 ## Banco, configuração e credenciais
 
