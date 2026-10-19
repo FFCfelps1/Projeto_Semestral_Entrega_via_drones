@@ -14,6 +14,7 @@
     "k8s:test": "bash scripts/kubernetes/test.sh",
     "k8s:down": "bash scripts/kubernetes/down.sh",
     "test": "node --test tests/routes.cjs",
+    "test:dart": "cd back/entrega_via_drone_dart && dart pub get && dart analyze && dart test",
     "test:vercel": "bash scripts/kubernetes/test-vercel.sh"
   },
   "dependencies": {
