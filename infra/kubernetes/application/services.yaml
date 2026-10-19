@@ -100,8 +100,10 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
       containers:
+        # Implementacao em Dart (back/entrega_via_drone_dart). O nome do
+        # Deployment e do Service continua o mesmo para manter o DNS interno.
         - name: entrega-via-drone
-          image: docker.io/library/skyswift-entrega-via-drone:local
+          image: docker.io/library/skyswift-entrega-via-drone-dart:local
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
