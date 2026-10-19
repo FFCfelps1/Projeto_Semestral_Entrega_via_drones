@@ -34,6 +34,15 @@ abstract final class AppTheme {
       colorScheme: colors,
       scaffoldBackgroundColor: colors.surface,
       fontFamily: 'Roboto',
+      textTheme: ThemeData(brightness: brightness).textTheme.copyWith(
+        headlineMedium: TextStyle(
+          fontFamily: 'Manrope',
+          fontSize: 28,
+          height: 34 / 28,
+          fontWeight: FontWeight.w700,
+          color: colors.onSurface,
+        ),
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: colors.surface,
         foregroundColor: colors.onSurface,
