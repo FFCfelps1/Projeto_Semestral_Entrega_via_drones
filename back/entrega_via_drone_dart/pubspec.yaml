@@ -1,0 +1,18 @@
+# Microsservico de rotas da SkySwift reimplementado em Dart.
+# Mantem o mesmo contrato HTTP e de eventos da versao Node (back/entrega_via_drone).
+name: entrega_via_drone_dart
+description: Calcula rotas de entrega via drone e publica RotaCalculada no barramento de eventos.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  http: ^1.2.0          # chamadas ao OSRM e ao barramento
+  shelf: ^1.4.0         # servidor HTTP e middlewares
+  shelf_router: ^1.1.0  # roteamento por metodo e caminho
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0
