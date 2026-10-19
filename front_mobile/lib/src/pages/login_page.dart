@@ -11,9 +11,47 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
+  final _emailFocus = FocusNode();
+  final _senhaFocus = FocusNode();
+  static final _emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
   bool _senhaVisivel = false;
+  bool _tentouEnviar = false;
+
+  String? _validarEmail(String? valor) {
+    final email = valor?.trim() ?? '';
+    if (email.isEmpty) return 'Informe seu e-mail.';
+    if (!_emailPattern.hasMatch(email)) return 'Digite um e-mail válido.';
+    return null;
+  }
+
+  String? _validarSenha(String? valor) {
+    // Login aceita a senha existente, sem aplicar regras de criação de conta.
+    return valor == null || valor.isEmpty ? 'Informe sua senha.' : null;
+  }
+
+  void _enviarFormulario() {
+    // Os erros só aparecem depois da primeira tentativa; depois acompanham a edição.
+    setState(() => _tentouEnviar = true);
+    _formKey.currentState!.validate();
+    if (_validarEmail(_emailController.text) != null) {
+      _emailFocus.requestFocus();
+    } else if (_validarSenha(_senhaController.text) != null) {
+      _senhaFocus.requestFocus();
+    }
+  }
+
+  @override
+  void dispose() {
+    // Cada página libera os recursos que criou, sem guardar credenciais na sessão.
+    _emailController.dispose();
+    _senhaController.dispose();
+    _emailFocus.dispose();
+    _senhaFocus.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,92 +66,129 @@ class _LoginPageState extends State<LoginPage> {
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 440),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _LoginHeader(onToggleTheme: widget.onToggleTheme),
-                  const SizedBox(height: 16),
-                  // A arte é decorativa: com o teclado, o espaço pertence ao formulário.
-                  if (!tecladoAberto) ...[
-                    const _LoginIllustration(),
-                    const SizedBox(height: 24),
-                  ],
-                  Text(
-                    'Entre na sua conta',
-                    style: theme.textTheme.headlineMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Acompanhe suas entregas por drone.',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  _LabeledField(
-                    label: 'E-mail',
-                    child: TextFormField(
-                      controller: _emailController,
-                      style: theme.textTheme.bodyLarge,
-                      decoration: const InputDecoration(
-                        hintText: 'nome@exemplo.com',
-                        prefixIcon: Icon(Icons.email_outlined),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  _LabeledField(
-                    label: 'Senha',
-                    child: TextFormField(
-                      controller: _senhaController,
-                      style: theme.textTheme.bodyLarge,
-                      obscureText: !_senhaVisivel,
-                      decoration: InputDecoration(
-                        hintText: 'Digite sua senha',
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        suffixIcon: IconButton(
-                          onPressed: () =>
-                              setState(() => _senhaVisivel = !_senhaVisivel),
-                          constraints: const BoxConstraints(
-                            minWidth: 48,
-                            minHeight: 48,
-                          ),
-                          icon: Icon(
-                            _senhaVisivel
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
+              child: AutofillGroup(
+                // A demonstração não deve oferecer salvar uma autenticação inexistente.
+                onDisposeAction: AutofillContextAction.cancel,
+                child: Form(
+                  key: _formKey,
+                  autovalidateMode: _tentouEnviar
+                      ? AutovalidateMode.onUserInteraction
+                      : AutovalidateMode.disabled,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // O controle de tema pertence à região de edição e não rouba seu foco.
+                      TextFieldTapRegion(
+                        child: _LoginHeader(
+                          onToggleTheme: widget.onToggleTheme,
                         ),
                       ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: const Text('Esqueci minha senha'),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(onPressed: () {}, child: const Text('Entrar')),
-                  const SizedBox(height: 24),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
+                      const SizedBox(height: 16),
+                      // A arte é decorativa: com o teclado, o espaço pertence ao formulário.
+                      if (!tecladoAberto) ...[
+                        const _LoginIllustration(),
+                        const SizedBox(height: 24),
+                      ],
                       Text(
-                        'Não tem conta?',
-                        style: theme.textTheme.bodyMedium?.copyWith(
+                        'Entre na sua conta',
+                        style: theme.textTheme.headlineMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Acompanhe suas entregas por drone.',
+                        style: theme.textTheme.bodyLarge?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text('Criar conta'),
+                      const SizedBox(height: 24),
+                      _LabeledField(
+                        label: 'E-mail',
+                        child: TextFormField(
+                          controller: _emailController,
+                          focusNode: _emailFocus,
+                          validator: _validarEmail,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [
+                            AutofillHints.username,
+                            AutofillHints.email,
+                          ],
+                          autocorrect: false,
+                          enableSuggestions: false,
+                          onFieldSubmitted: (_) => _senhaFocus.requestFocus(),
+                          style: theme.textTheme.bodyLarge,
+                          decoration: const InputDecoration(
+                            hintText: 'nome@exemplo.com',
+                            prefixIcon: Icon(Icons.email_outlined),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      _LabeledField(
+                        label: 'Senha',
+                        child: TextFormField(
+                          controller: _senhaController,
+                          focusNode: _senhaFocus,
+                          validator: _validarSenha,
+                          textInputAction: TextInputAction.done,
+                          autofillHints: const [AutofillHints.password],
+                          autocorrect: false,
+                          enableSuggestions: false,
+                          onFieldSubmitted: (_) => _enviarFormulario(),
+                          style: theme.textTheme.bodyLarge,
+                          obscureText: !_senhaVisivel,
+                          decoration: InputDecoration(
+                            hintText: 'Digite sua senha',
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            suffixIcon: IconButton(
+                              onPressed: () => setState(
+                                () => _senhaVisivel = !_senhaVisivel,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 48,
+                                minHeight: 48,
+                              ),
+                              icon: Icon(
+                                _senhaVisivel
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {},
+                          child: const Text('Esqueci minha senha'),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: _enviarFormulario,
+                        child: const Text('Entrar'),
+                      ),
+                      const SizedBox(height: 24),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(
+                            'Não tem conta?',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {},
+                            child: const Text('Criar conta'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

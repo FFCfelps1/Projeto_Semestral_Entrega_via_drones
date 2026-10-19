@@ -1,9 +1,122 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:front_mobile/main.dart';
 
+TextField _campoDeTexto(WidgetTester tester, Finder formulario) {
+  return tester.widget<TextField>(
+    find.descendant(of: formulario, matching: find.byType(TextField)),
+  );
+}
+
 void main() {
+  WidgetController.hitTestWarningShouldBeFatal = true;
+  testWidgets('Valida campos vazios e foca o primeiro erro', (tester) async {
+    await tester.pumpWidget(const SkySwiftApp());
+    await tester.ensureVisible(find.text('Entrar'));
+    await tester.tap(find.text('Entrar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Informe seu e-mail.'), findsOneWidget);
+    expect(find.text('Informe sua senha.'), findsOneWidget);
+    expect(
+      _campoDeTexto(
+        tester,
+        find.byType(TextFormField).first,
+      ).focusNode?.hasFocus,
+      isTrue,
+    );
+  });
+
+  testWidgets('Valida email e atualiza o erro apos a primeira tentativa', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const SkySwiftApp());
+    final email = find.byType(TextFormField).first;
+    await tester.enterText(email, 'endereco-invalido');
+    expect(find.text('Digite um e-mail válido.'), findsNothing);
+    await tester.ensureVisible(find.text('Entrar'));
+    await tester.tap(find.text('Entrar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Digite um e-mail válido.'), findsOneWidget);
+    await tester.enterText(email, 'nome@exemplo.com');
+    await tester.pumpAndSettle();
+    expect(find.text('Digite um e-mail válido.'), findsNothing);
+  });
+
+  testWidgets('Proximo foca senha e Concluir valida sem impor tamanho minimo', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const SkySwiftApp());
+    final email = find.byType(TextFormField).first;
+    final senha = find.byType(TextFormField).last;
+    await tester.enterText(email, 'nome@exemplo.com');
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pump();
+    expect(_campoDeTexto(tester, senha).focusNode?.hasFocus, isTrue);
+    await tester.enterText(senha, ' x ');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(find.text('Informe sua senha.'), findsNothing);
+    expect(tester.widget<TextFormField>(senha).controller?.text, ' x ');
+    expect(
+      _campoDeTexto(tester, email).autofillHints,
+      contains(AutofillHints.username),
+    );
+    expect(
+      _campoDeTexto(tester, senha).autofillHints,
+      contains(AutofillHints.password),
+    );
+  });
+
+  testWidgets('Preserva texto, selecao e foco ao alternar senha e tema', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const SkySwiftApp());
+    final senha = find.byType(TextFormField).last;
+    await tester.enterText(senha, 'minha senha');
+    final controller = tester.widget<TextFormField>(senha).controller!;
+    controller.selection = const TextSelection(baseOffset: 1, extentOffset: 5);
+    await tester.ensureVisible(find.byIcon(Icons.visibility));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.visibility));
+    await tester.pumpAndSettle();
+    expect(_campoDeTexto(tester, senha).obscureText, isFalse);
+    expect(controller.text, 'minha senha');
+    expect(
+      controller.selection,
+      const TextSelection(baseOffset: 1, extentOffset: 5),
+    );
+    expect(_campoDeTexto(tester, senha).focusNode?.hasFocus, isTrue);
+    await tester.ensureVisible(find.byIcon(Icons.dark_mode));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.dark_mode));
+    await tester.pumpAndSettle();
+    expect(
+      Theme.of(tester.element(find.byType(Scaffold))).brightness,
+      Brightness.dark,
+    );
+    expect(
+      controller.selection,
+      const TextSelection(baseOffset: 1, extentOffset: 5),
+    );
+    expect(_campoDeTexto(tester, senha).focusNode?.hasFocus, isTrue);
+  });
+
+  testWidgets('Tab avanca do email para a senha', (tester) async {
+    await tester.pumpWidget(const SkySwiftApp());
+    await tester.tap(find.byType(TextFormField).first);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(
+      _campoDeTexto(
+        tester,
+        find.byType(TextFormField).last,
+      ).focusNode?.hasFocus,
+      isTrue,
+    );
+  });
+
   testWidgets('Oculta a ilustracao quando o teclado esta aberto', (
     tester,
   ) async {
