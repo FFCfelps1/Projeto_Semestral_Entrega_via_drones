@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:front_mobile/src/pages/login_page.dart';
+import 'package:front_mobile/main.dart';
 
 void main() {
   testWidgets('Exibe os campos e as ações da tela de login', (tester) async {
-    await tester.pumpWidget(const LoginPage());
+    await tester.pumpWidget(const SkySwiftApp());
 
     expect(find.widgetWithText(TextFormField, 'Email'), findsOneWidget);
     expect(find.widgetWithText(TextFormField, 'Senha'), findsOneWidget);
@@ -15,7 +15,7 @@ void main() {
   });
 
   testWidgets('Permite mostrar e ocultar a senha', (tester) async {
-    await tester.pumpWidget(const LoginPage());
+    await tester.pumpWidget(const SkySwiftApp());
     final senha = find.byType(TextField).last;
 
     expect(tester.widget<TextField>(senha).obscureText, isTrue);
@@ -29,7 +29,7 @@ void main() {
   });
 
   testWidgets('Permite alternar o tema claro e escuro', (tester) async {
-    await tester.pumpWidget(const LoginPage());
+    await tester.pumpWidget(const SkySwiftApp());
     final scaffold = find.byType(Scaffold);
 
     expect(Theme.of(tester.element(scaffold)).brightness, Brightness.light);

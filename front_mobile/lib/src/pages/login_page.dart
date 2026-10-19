@@ -1,156 +1,126 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart' as google;
+import 'package:google_fonts/google_fonts.dart';
 
-class _LoginPageState extends State<LoginPage>{
+/// Página responsável somente pela apresentação e pelo estado do login.
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key, required this.onToggleTheme});
 
-  //variáveis para capturar o que o usuário digitou
-  final emailController = TextEditingController();    //para email
-  final senhaController = TextEditingController();    //para senha
-
-  //variável que armazena o tema atual ('claro' ou 'escuro')
-  bool temaEscuro = false;         //atualmente, tema 'claro'
-  
-  //variável de estado que controla se a senha está visível ou não
-  bool senhaVisivel = false;    //senha começa escondida
+  final VoidCallback onToggleTheme;
 
   @override
-  Widget build(BuildContext context){
-    return MaterialApp(
-      theme: temaEscuro ? ThemeData(
-        brightness: Brightness.dark, //paleta (brilho) escura(o)
-        scaffoldBackgroundColor: Color(0xff101622), // 0xff é 100% de opacidade, 101622 é código hexadecimal da cor
-        //tema da AppBar
-        appBarTheme: AppBarTheme(
-          backgroundColor: Color(0xff101622),   //mesma cor
-        )
-      ) : ThemeData.light(),
-      home: Scaffold(
-            appBar: AppBar(
-              //alinha título no centro
-              centerTitle: true,
-              //padding para o ícone não ficar atrás da faixa 'debug' durante os testes
-              actionsPadding: EdgeInsets.fromLTRB(0, 8, 20, 0),
-              title: Text('🚁Faça Login e voe conosco!!🚁', style: google.GoogleFonts.oswald(
-                color: Color(0xff256af4),
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold
-              )),
-              //actions: lista de widgets que ficam no canto superior direito
-              actions: [IconButton(onPressed: (){
-                setState(() {temaEscuro = !temaEscuro;});
-                }, 
-              //ícone dos temas escuro e claro na TopBar
-              icon: Icon(temaEscuro ? Icons.light_mode: Icons.dark_mode, color: Color(0xff256af4),))],
-          ), 
-            body: Padding(padding: EdgeInsets.all(16.0), 
-            //Column para empilhar widgets verticalmente, 
-            //adicionando-os a uma lista
-                  child: Column(
-                    //alinha
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: 
-                      //dois campos de texto: email e senha
-                      //obscureText: true --> esconde os caracteres da senha
-                      //SizedBox cria um espaço entre o campo senha e os botões
-                      //
-                      //adiciona imagem antes dos campos preenchidos pelo usuário
-                      //Expanded: filho ocupa todo o espaço disponível 
-                      [Expanded(flex:2,     //imagem ocupa dois espaços
-                                child: Row(
-                                children: [
-                                Expanded(
-                                child:ClipRRect(
-                                borderRadius: BorderRadiusGeometry.circular(10), 
-                                            child: Image.asset('assets/images/drone2.jpg', fit: BoxFit.cover,)))]),
-                            ), SizedBox(height: 16)
-                      ,TextFormField(decoration: InputDecoration(prefixIcon: temaEscuro? Icon(Icons.email_outlined): Icon(Icons.email),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      labelText: 'Email',
-                      hintText: 'exemplo@email.com', 
-                      hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.5)), labelStyle: TextStyle(color: Color(0xff256af4)), 
-                      //linha abaixo do campo de entrada email quando ele não está selecionado
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color:  Color(0xff256af4))
-                        ), 
-                        //linha abaixo do campo de entrada email quando ele está selecionado
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Color(0xff256af4), width: 2.0)
-                        )),
-                      controller: emailController,
-                      ), SizedBox(height: 16),
-                      TextFormField(
-                        decoration: InputDecoration(
-                        floatingLabelBehavior: FloatingLabelBehavior.always,
-                        prefixIcon: temaEscuro ? Icon(Icons.lock) : Icon(Icons.lock_outline_rounded),
-                        labelText: 'Senha', 
-                        hintText: 'senha123', 
-                        hintStyle: TextStyle(color: temaEscuro ? Colors.white.withValues(alpha:0.5) : Colors.black.withValues(alpha: 0.5)),   //opacidade em 50% 
-                        labelStyle: TextStyle(color: Color(0xff256af4)),
-                        //linha abaixo do campo de entrada senha quando ele não está selecionado
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color:  Color(0xff256af4))
-                        ), 
-                        //linha abaixo do campo de entrada senha quando ele está selecionado
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Color(0xff256af4), width: 2.0)),
-                          //ícone de olho
-                          suffixIcon: IconButton(onPressed: (){
-                            setState(() {senhaVisivel = !senhaVisivel;});
-                          },icon: Icon(senhaVisivel ? Icons.visibility_off : Icons.visibility, size: 15.0,color: Color(0xff256af4),)),
-                          ), 
-                        obscureText: !senhaVisivel, 
-                        controller: senhaController,), 
-                        SizedBox(height: 16),     //espaçamento entre os campos de entrada e o botão
-                        ElevatedButton(onPressed: (){
-                          //teste
-                          ////
-                          /// ******* ação realizada quando o botão é pressionado *******
-                          ///
-                          // print('''Email: ${emailController.text}
-                          // Senha: ${senhaController.text}''');
-                        }, 
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xff256af4), //fundo azul primário
-                                        foregroundColor: Colors.white       //texto banco no botão
-                                      ),
-                                      child: Text('Entrar'),),
-                        SizedBox(height: 16,),
-                        //opção 'esqueci minha senha'
-                        TextButton(onPressed:(){}, 
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Color(0xff256af4)
-                                  ), 
-                                  child: Text('Esqueci minha senha'),),
-                                  SizedBox(height: 10,),
-                        //opção 'criar conta'
-                        TextButton(onPressed: (){},
-                                  style:TextButton.styleFrom(
-                                    foregroundColor: Color(0xff256af4),
-                                  ),
-                                  child: Text('Criar conta')),
-                                  SizedBox(height: 16,),
-                                  //imagem ocupa todo o espaço permitido
-                            //       Expanded(
-                            //       child: ClipRRect(borderRadius: BorderRadiusGeometry.circular(10), 
-                            //                 child: Image.asset('assets/images/drone.jpg', fit: BoxFit.cover,)),
-                            // )
-                        ],
-                    ),
-                ),
-        ), 
-    );
-  }
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class _LoginPageState extends State<LoginPage> {
+  final _emailController = TextEditingController();
+  final _senhaController = TextEditingController();
+  bool _senhaVisivel = false;
 
   @override
-  State<LoginPage> createState() {
-    return _LoginPageState();
+  Widget build(BuildContext context) {
+    final temaEscuro = Theme.of(context).brightness == Brightness.dark;
+    const azul = Color(0xff256af4);
+
+    InputDecoration decoracao(String label, String hint, IconData icon) {
+      return InputDecoration(
+        prefixIcon: Icon(icon),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelText: label,
+        hintText: hint,
+        labelStyle: const TextStyle(color: azul),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: azul),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: azul, width: 2),
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        actionsPadding: const EdgeInsets.fromLTRB(0, 8, 20, 0),
+        title: Text(
+          '🚁Faça Login e voe conosco!!🚁',
+          style: GoogleFonts.oswald(
+            color: azul,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: widget.onToggleTheme,
+            icon: Icon(
+              temaEscuro ? Icons.light_mode : Icons.dark_mode,
+              color: azul,
+            ),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 2,
+              child: SizedBox(
+                width: double.infinity,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
+                    'assets/images/drone2.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _emailController,
+              decoration: decoracao('Email', 'exemplo@email.com', Icons.email),
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _senhaController,
+              obscureText: !_senhaVisivel,
+              decoration: decoracao('Senha', 'senha123', Icons.lock_outline)
+                  .copyWith(
+                    suffixIcon: IconButton(
+                      onPressed: () =>
+                          setState(() => _senhaVisivel = !_senhaVisivel),
+                      icon: Icon(
+                        _senhaVisivel ? Icons.visibility_off : Icons.visibility,
+                        size: 15,
+                        color: azul,
+                      ),
+                    ),
+                  ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: azul,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Entrar'),
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () {},
+              child: const Text('Esqueci minha senha'),
+            ),
+            const SizedBox(height: 10),
+            TextButton(onPressed: () {}, child: const Text('Criar conta')),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
   }
 }
