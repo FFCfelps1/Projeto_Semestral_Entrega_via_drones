@@ -5,6 +5,7 @@
 library;
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
@@ -35,7 +36,8 @@ class ServicoRota {
     ..get('/health', _health)
     ..get('/live', _live)
     ..get('/ready', _ready)
-    ..get('/rota', _rota);
+    ..get('/rota', _rota)
+    ..post('/eventos/receber', _receberEvento);
 
   /// Verificacao simples de que o processo responde.
   Response _health(Request _) =>
@@ -125,6 +127,30 @@ class ServicoRota {
         'pontos': resultado.rota.length,
         'fallback': resultado.fallback,
       });
+
+  /// Recebe eventos distribuidos pelo barramento.
+  ///
+  /// Este servico apenas publica eventos; o endpoint existe porque todo
+  /// inscrito precisa aceitar a entrega, e registra o tipo para depuracao.
+  Future<Response> _receberEvento(Request requisicao) async {
+    Object? evento;
+    try {
+      evento = jsonDecode(await requisicao.readAsString());
+    } on FormatException {
+      evento = null;
+    }
+
+    final tipo = evento is Map<String, dynamic> ? evento['tipo'] : null;
+    if (tipo is! String || tipo.isEmpty) {
+      return respostaJson(
+        {'success': false, 'error': 'Evento invalido'},
+        status: 400,
+      );
+    }
+
+    registrar('Evento recebido do barramento: $tipo');
+    return respostaJson({'success': true, 'message': 'Evento recebido'});
+  }
 
   /// Caminhos desconhecidos respondem JSON, como o restante da API.
   Response _naoEncontrado(Request requisicao) => respostaJson(
