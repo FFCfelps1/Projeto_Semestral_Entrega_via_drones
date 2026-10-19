@@ -5,6 +5,7 @@ const { createRuntime } = require('../shared/runtime');
 const express = require('express');
 const axios = require('axios');
 const http = require('node:http');
+const { randomUUID } = require('node:crypto');
 // Evita acumular listeners do cliente HTTP em sockets reaproveitados pelo Node 24.
 const deliveryAgent = new http.Agent({ keepAlive: false });
 const cors = require('cors');
@@ -82,9 +83,12 @@ app.post('/eventos', async (req, res) => {
     });
   }
 
-  // Cria o registro do evento
+  // Cria o registro do evento.
+  // O id usa UUID: o calculo anterior (tamanho do historico + 1) repetia o
+  // valor 1001 depois que o limite de 1000 eventos era atingido, e um
+  // contador voltaria a 1 a cada reinicio do pod.
   const evento = {
-    id: historicoEventos.length + 1,
+    id: randomUUID(),
     tipo,
     dados: dados || {},
     origem: origem || 'desconhecido',
