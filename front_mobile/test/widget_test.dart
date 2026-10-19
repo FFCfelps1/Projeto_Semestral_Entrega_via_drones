@@ -4,6 +4,28 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:front_mobile/main.dart';
 
 void main() {
+  testWidgets('Segue o sistema ate a escolha manual do tema', (tester) async {
+    final plataforma = tester.binding.platformDispatcher;
+    plataforma.platformBrightnessTestValue = Brightness.dark;
+    addTearDown(plataforma.clearPlatformBrightnessTestValue);
+
+    await tester.pumpWidget(const SkySwiftApp());
+    final scaffold = find.byType(Scaffold);
+    expect(Theme.of(tester.element(scaffold)).brightness, Brightness.dark);
+
+    plataforma.platformBrightnessTestValue = Brightness.light;
+    await tester.pumpAndSettle();
+    expect(Theme.of(tester.element(scaffold)).brightness, Brightness.light);
+
+    await tester.tap(find.byIcon(Icons.dark_mode));
+    await tester.pumpAndSettle();
+    plataforma.platformBrightnessTestValue = Brightness.dark;
+    await tester.pumpAndSettle();
+    plataforma.platformBrightnessTestValue = Brightness.light;
+    await tester.pumpAndSettle();
+    expect(Theme.of(tester.element(scaffold)).brightness, Brightness.dark);
+  });
+
   testWidgets('Exibe os campos e as ações da tela de login', (tester) async {
     await tester.pumpWidget(const SkySwiftApp());
 
