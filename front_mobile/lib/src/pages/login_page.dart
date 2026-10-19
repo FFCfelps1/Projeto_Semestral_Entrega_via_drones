@@ -40,7 +40,16 @@ class _LoginPageState extends State<LoginPage> {
       _emailFocus.requestFocus();
     } else if (_validarSenha(_senhaController.text) != null) {
       _senhaFocus.requestFocus();
+    } else {
+      _mostrarAviso('Esta versão ainda não realiza login.');
     }
+  }
+
+  void _mostrarAviso(String mensagem) {
+    // Esta etapa demonstra a interface; nenhuma ação simula sessão ou acesso real.
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(content: Text(mensagem)));
   }
 
   @override
@@ -160,7 +169,9 @@ class _LoginPageState extends State<LoginPage> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () => _mostrarAviso(
+                            'A recuperação de senha ainda não está disponível nesta versão.',
+                          ),
                           child: const Text('Esqueci minha senha'),
                         ),
                       ),
@@ -181,7 +192,9 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () => _mostrarAviso(
+                              'O cadastro ainda não está disponível nesta versão.',
+                            ),
                             child: const Text('Criar conta'),
                           ),
                         ],

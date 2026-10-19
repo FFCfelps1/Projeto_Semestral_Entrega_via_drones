@@ -12,6 +12,48 @@ TextField _campoDeTexto(WidgetTester tester, Finder formulario) {
 
 void main() {
   WidgetController.hitTestWarningShouldBeFatal = true;
+  testWidgets('Entrar informa a limitacao da demonstracao com dados validos', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const SkySwiftApp());
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      'nome@exemplo.com',
+    );
+    await tester.enterText(find.byType(TextFormField).last, 'x');
+    await tester.ensureVisible(find.text('Entrar'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Entrar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Esta versão ainda não realiza login.'), findsOneWidget);
+    expect(find.text('Entre na sua conta'), findsOneWidget);
+  });
+
+  testWidgets('Recuperacao e cadastro mostram avisos sem navegar', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const SkySwiftApp());
+    await tester.ensureVisible(find.text('Esqueci minha senha'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Esqueci minha senha'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text(
+        'A recuperação de senha ainda não está disponível nesta versão.',
+      ),
+      findsOneWidget,
+    );
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Criar conta'));
+    await tester.tap(find.text('Criar conta'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('O cadastro ainda não está disponível nesta versão.'),
+      findsOneWidget,
+    );
+    expect(find.byType(TextFormField), findsNWidgets(2));
+  });
   testWidgets('Valida campos vazios e foca o primeiro erro', (tester) async {
     await tester.pumpWidget(const SkySwiftApp());
     await tester.ensureVisible(find.text('Entrar'));
