@@ -4,6 +4,62 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:front_mobile/main.dart';
 
 void main() {
+  testWidgets('Oculta a ilustracao quando o teclado esta aberto', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpWidget(const SkySwiftApp());
+    expect(find.byType(Image), findsOneWidget);
+
+    tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+    await tester.pumpAndSettle();
+    expect(find.byType(Image), findsNothing);
+    await tester.ensureVisible(find.text('Criar conta'));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Permite rolar em telas pequenas e em orientacao horizontal', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    for (final size in const [
+      Size(320, 568),
+      Size(360, 800),
+      Size(390, 844),
+      Size(844, 390),
+    ]) {
+      tester.view.physicalSize = size;
+      await tester.pumpWidget(const SkySwiftApp());
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Criar conta'));
+      expect(tester.takeException(), isNull, reason: 'Layout em $size');
+    }
+  });
+
+  testWidgets('Mantem o formulario utilizavel com texto em 200 por cento', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      const MediaQuery(
+        data: MediaQueryData(textScaler: TextScaler.linear(2)),
+        child: SkySwiftApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Criar conta'));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Segue o sistema ate a escolha manual do tema', (tester) async {
     final plataforma = tester.binding.platformDispatcher;
     plataforma.platformBrightnessTestValue = Brightness.dark;

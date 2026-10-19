@@ -17,7 +17,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final temaEscuro = Theme.of(context).brightness == Brightness.dark;
+    final tecladoAberto = MediaQuery.viewInsetsOf(context).bottom > 0;
     const azul = Color(0xff256af4);
 
     InputDecoration decoracao(String label, String hint, IconData icon) {
@@ -39,68 +39,109 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        actionsPadding: const EdgeInsets.fromLTRB(0, 8, 20, 0),
-        title: const _BrandTitle(),
-        actions: [
-          IconButton(
-            onPressed: widget.onToggleTheme,
-            icon: Icon(
-              temaEscuro ? Icons.light_mode : Icons.dark_mode,
-              color: azul,
-            ),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const _LoginIllustration(),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _emailController,
-              decoration: decoracao('Email', 'exemplo@email.com', Icons.email),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _senhaController,
-              obscureText: !_senhaVisivel,
-              decoration: decoracao('Senha', 'senha123', Icons.lock_outline)
-                  .copyWith(
-                    suffixIcon: IconButton(
-                      onPressed: () =>
-                          setState(() => _senhaVisivel = !_senhaVisivel),
-                      icon: Icon(
-                        _senhaVisivel ? Icons.visibility_off : Icons.visibility,
-                        size: 15,
-                        color: azul,
-                      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _LoginHeader(onToggleTheme: widget.onToggleTheme),
+                  const SizedBox(height: 16),
+                  // A arte é decorativa: com o teclado, o espaço pertence ao formulário.
+                  if (!tecladoAberto) ...[
+                    const _LoginIllustration(),
+                    const SizedBox(height: 16),
+                  ],
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: decoracao(
+                      'Email',
+                      'exemplo@email.com',
+                      Icons.email,
                     ),
                   ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: azul,
-                foregroundColor: Colors.white,
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _senhaController,
+                    obscureText: !_senhaVisivel,
+                    decoration:
+                        decoracao(
+                          'Senha',
+                          'senha123',
+                          Icons.lock_outline,
+                        ).copyWith(
+                          suffixIcon: IconButton(
+                            onPressed: () =>
+                                setState(() => _senhaVisivel = !_senhaVisivel),
+                            icon: Icon(
+                              _senhaVisivel
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              size: 15,
+                              color: azul,
+                            ),
+                          ),
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: azul,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Entrar'),
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text('Esqueci minha senha'),
+                  ),
+                  const SizedBox(height: 10),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text('Criar conta'),
+                  ),
+                ],
               ),
-              child: const Text('Entrar'),
             ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: () {},
-              child: const Text('Esqueci minha senha'),
-            ),
-            const SizedBox(height: 10),
-            TextButton(onPressed: () {}, child: const Text('Criar conta')),
-            const SizedBox(height: 16),
-          ],
+          ),
         ),
       ),
+    );
+  }
+}
+
+class _LoginHeader extends StatelessWidget {
+  const _LoginHeader({required this.onToggleTheme});
+
+  final VoidCallback onToggleTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final dark = colors.brightness == Brightness.dark;
+    return Row(
+      children: [
+        const Expanded(child: _BrandTitle()),
+        const SizedBox(width: 8),
+        IconButton.filledTonal(
+          onPressed: onToggleTheme,
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+          style: IconButton.styleFrom(
+            backgroundColor: colors.surfaceContainerHighest,
+            foregroundColor: colors.onSurfaceVariant,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          icon: Icon(dark ? Icons.light_mode : Icons.dark_mode),
+        ),
+      ],
     );
   }
 }
