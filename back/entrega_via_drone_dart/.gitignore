@@ -1,0 +1,4 @@
+# Artefatos gerados pelo Dart; dependencias sao resolvidas via pubspec.lock.
+.dart_tool/
+build/
+*.exe

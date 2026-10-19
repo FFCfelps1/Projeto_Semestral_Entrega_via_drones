@@ -1,0 +1,5 @@
+# Mantem o contexto de build enxuto e reprodutivel.
+.dart_tool/
+build/
+test/
+*.md
