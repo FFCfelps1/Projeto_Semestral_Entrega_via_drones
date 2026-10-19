@@ -85,10 +85,10 @@ http://localhost:5173
 
 ## Backend: Microsservicos
 
-O projeto utiliza uma arquitetura de microsservicos Node.js no diretorio `back`, conectados por um barramento de eventos:
+O projeto utiliza uma arquitetura de microsservicos no diretorio `back`, conectados por um barramento de eventos. Os servicos sao escritos em Node.js, exceto o de rotas, que no Docker/Kubernetes roda a versao reimplementada em Dart:
 
 1. `back/barramento_eventos` (porta `3001`): barramento central de eventos para comunicacao entre servicos. Não é um serviço a mais, mas sim um componente da infraestrutura do software.
-2. `back/entrega_via_drone` (porta `3002`): calcula rota para rastreamento.
+2. `back/entrega_via_drone_dart` (porta `3002`): calcula rota para rastreamento e publica `RotaCalculada`. Reimplementacao em **Dart** (`shelf`) do servico `back/entrega_via_drone`, com o mesmo contrato HTTP e de eventos; a versao Node permanece para desenvolvimento local e para a Vercel. Veja o [README do servico](back/entrega_via_drone_dart/README.md).
 3. `back/contato_email` (porta `3003`): oferece duas formas de contato:
   - abrir cliente de e-mail com `mailto`;
   - enviar mensagem direto no site (backend envia para `entrega.drones@gmail.com`).
@@ -123,6 +123,16 @@ npm run dev
 ```
 
 ### Como iniciar o microsservico de rota (3002)
+
+Versao Dart (a mesma usada no Docker/Kubernetes; requer Dart 3.5 ou superior):
+
+```bash
+cd back/entrega_via_drone_dart
+dart pub get
+dart run bin/server.dart
+```
+
+Versao Node (alternativa; nao execute as duas ao mesmo tempo, pois ambas se inscrevem no barramento como `entrega_via_drone`):
 
 ```bash
 cd back/entrega_via_drone
