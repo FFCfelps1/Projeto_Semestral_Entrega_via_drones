@@ -18,25 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final tecladoAberto = MediaQuery.viewInsetsOf(context).bottom > 0;
-    const azul = Color(0xff256af4);
-
-    InputDecoration decoracao(String label, String hint, IconData icon) {
-      return InputDecoration(
-        prefixIcon: Icon(icon),
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        labelText: label,
-        hintText: hint,
-        labelStyle: const TextStyle(color: azul),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: azul),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: azul, width: 2),
-        ),
-      );
-    }
+    final theme = Theme.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -54,57 +36,82 @@ class _LoginPageState extends State<LoginPage> {
                   // A arte é decorativa: com o teclado, o espaço pertence ao formulário.
                   if (!tecladoAberto) ...[
                     const _LoginIllustration(),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
                   ],
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: decoracao(
-                      'Email',
-                      'exemplo@email.com',
-                      Icons.email,
+                  Text(
+                    'Entre na sua conta',
+                    style: theme.textTheme.headlineMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Acompanhe suas entregas por drone.',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _senhaController,
-                    obscureText: !_senhaVisivel,
-                    decoration:
-                        decoracao(
-                          'Senha',
-                          'senha123',
-                          Icons.lock_outline,
-                        ).copyWith(
-                          suffixIcon: IconButton(
-                            onPressed: () =>
-                                setState(() => _senhaVisivel = !_senhaVisivel),
-                            icon: Icon(
-                              _senhaVisivel
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              size: 15,
-                              color: azul,
-                            ),
+                  const SizedBox(height: 24),
+                  _LabeledField(
+                    label: 'E-mail',
+                    child: TextFormField(
+                      controller: _emailController,
+                      style: theme.textTheme.bodyLarge,
+                      decoration: const InputDecoration(
+                        hintText: 'nome@exemplo.com',
+                        prefixIcon: Icon(Icons.email_outlined),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  _LabeledField(
+                    label: 'Senha',
+                    child: TextFormField(
+                      controller: _senhaController,
+                      style: theme.textTheme.bodyLarge,
+                      obscureText: !_senhaVisivel,
+                      decoration: InputDecoration(
+                        hintText: 'Digite sua senha',
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          onPressed: () =>
+                              setState(() => _senhaVisivel = !_senhaVisivel),
+                          constraints: const BoxConstraints(
+                            minWidth: 48,
+                            minHeight: 48,
+                          ),
+                          icon: Icon(
+                            _senhaVisivel
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                           ),
                         ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: azul,
-                      foregroundColor: Colors.white,
+                      ),
                     ),
-                    child: const Text('Entrar'),
                   ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text('Esqueci minha senha'),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {},
+                      child: const Text('Esqueci minha senha'),
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text('Criar conta'),
+                  const SizedBox(height: 8),
+                  ElevatedButton(onPressed: () {}, child: const Text('Entrar')),
+                  const SizedBox(height: 24),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        'Não tem conta?',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text('Criar conta'),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -112,6 +119,29 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// O rótulo não desaparece ao digitar; erros podem ampliar o campo sem recorte.
+class _LabeledField extends StatelessWidget {
+  const _LabeledField({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(label, style: Theme.of(context).textTheme.labelLarge),
+        const SizedBox(height: 8),
+        ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 56),
+          child: child,
+        ),
+      ],
     );
   }
 }

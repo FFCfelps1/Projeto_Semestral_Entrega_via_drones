@@ -35,6 +35,25 @@ abstract final class AppTheme {
       scaffoldBackgroundColor: colors.surface,
       fontFamily: 'Roboto',
       textTheme: ThemeData(brightness: brightness).textTheme.copyWith(
+        bodyLarge: TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 16,
+          height: 1.5,
+          color: colors.onSurface,
+        ),
+        bodyMedium: TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 16,
+          height: 1.5,
+          color: colors.onSurface,
+        ),
+        labelLarge: TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 14,
+          height: 1.4,
+          fontWeight: FontWeight.w500,
+          color: colors.onSurface,
+        ),
         headlineMedium: TextStyle(
           fontFamily: 'Manrope',
           fontSize: 28,
@@ -43,13 +62,70 @@ abstract final class AppTheme {
           color: colors.onSurface,
         ),
       ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: colors.surfaceContainerHighest,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 16,
+          color: dark ? colors.onSurfaceVariant : const Color(0xff64748b),
+        ),
+        prefixIconColor: colors.onSurfaceVariant,
+        suffixIconColor: colors.onSurfaceVariant,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colors.outline),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colors.secondary, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colors.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colors.error, width: 2),
+        ),
+        errorMaxLines: 3,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size.fromHeight(56),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          backgroundColor: colors.primary,
+          foregroundColor: colors.onPrimary,
+          elevation: 0,
+          textStyle: const TextStyle(
+            fontFamily: 'Roboto',
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: colors.surface,
         foregroundColor: colors.onSurface,
         surfaceTintColor: Colors.transparent,
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: colors.secondary),
+        style: TextButton.styleFrom(
+          foregroundColor: colors.secondary,
+          minimumSize: const Size(48, 48),
+          textStyle: const TextStyle(
+            fontFamily: 'Roboto',
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
     );
   }

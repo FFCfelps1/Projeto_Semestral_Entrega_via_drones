@@ -85,8 +85,9 @@ void main() {
   testWidgets('Exibe os campos e as ações da tela de login', (tester) async {
     await tester.pumpWidget(const SkySwiftApp());
 
-    expect(find.widgetWithText(TextFormField, 'Email'), findsOneWidget);
-    expect(find.widgetWithText(TextFormField, 'Senha'), findsOneWidget);
+    expect(find.text('E-mail'), findsOneWidget);
+    expect(find.text('Senha'), findsOneWidget);
+    expect(find.byType(TextFormField), findsNWidgets(2));
     expect(find.widgetWithText(ElevatedButton, 'Entrar'), findsOneWidget);
     expect(find.text('Esqueci minha senha'), findsOneWidget);
     expect(find.text('Criar conta'), findsOneWidget);
