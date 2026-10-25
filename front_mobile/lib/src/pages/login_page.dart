@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 
-/// Página responsável somente pela apresentação e pelo estado do login.
+/// Formulário acessível; a sessão é controlada pela aplicação.
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key, required this.onToggleTheme});
+  const LoginPage({
+    super.key,
+    required this.onToggleTheme,
+    required this.onLogin,
+    required this.onCreateAccount,
+  });
 
   final VoidCallback onToggleTheme;
+  final Future<void> Function(String email, String senha) onLogin;
+  final Future<void> Function() onCreateAccount;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -19,6 +26,8 @@ class _LoginPageState extends State<LoginPage> {
   static final _emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
   bool _senhaVisivel = false;
   bool _tentouEnviar = false;
+  bool _processando = false;
+  String? _erro;
 
   String? _validarEmail(String? valor) {
     final email = valor?.trim() ?? '';
@@ -32,7 +41,8 @@ class _LoginPageState extends State<LoginPage> {
     return valor == null || valor.isEmpty ? 'Informe sua senha.' : null;
   }
 
-  void _enviarFormulario() {
+  Future<void> _enviarFormulario() async {
+    if (_processando) return;
     // Os erros só aparecem depois da primeira tentativa; depois acompanham a edição.
     setState(() => _tentouEnviar = true);
     _formKey.currentState!.validate();
@@ -41,7 +51,17 @@ class _LoginPageState extends State<LoginPage> {
     } else if (_validarSenha(_senhaController.text) != null) {
       _senhaFocus.requestFocus();
     } else {
-      _mostrarAviso('Esta versão ainda não realiza login.');
+      setState(() {
+        _processando = true;
+        _erro = null;
+      });
+      try {
+        await widget.onLogin(_emailController.text, _senhaController.text);
+      } catch (erro) {
+        if (mounted) setState(() => _erro = erro.toString());
+      } finally {
+        if (mounted) setState(() => _processando = false);
+      }
     }
   }
 
@@ -76,7 +96,6 @@ class _LoginPageState extends State<LoginPage> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 440),
               child: AutofillGroup(
-                // A demonstração não deve oferecer salvar uma autenticação inexistente.
                 onDisposeAction: AutofillContextAction.cancel,
                 child: Form(
                   key: _formKey,
@@ -182,9 +201,20 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
+                      if (_erro != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Semantics(
+                            liveRegion: true,
+                            child: Text(
+                              _erro!,
+                              style: TextStyle(color: theme.colorScheme.error),
+                            ),
+                          ),
+                        ),
                       ElevatedButton(
-                        onPressed: _enviarFormulario,
-                        child: const Text('Entrar'),
+                        onPressed: _processando ? null : _enviarFormulario,
+                        child: Text(_processando ? 'Entrando...' : 'Entrar'),
                       ),
                       const SizedBox(height: 24),
                       Wrap(
@@ -198,9 +228,18 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           TextButton(
-                            onPressed: () => _mostrarAviso(
-                              'O cadastro ainda não está disponível nesta versão.',
-                            ),
+                            onPressed: _processando
+                                ? null
+                                : () async {
+                                    try {
+                                      await widget.onCreateAccount();
+                                    } catch (_) {
+                                      if (mounted)
+                                        _mostrarAviso(
+                                          'Não foi possível abrir o cadastro no site.',
+                                        );
+                                    }
+                                  },
                             child: const Text('Criar conta'),
                           ),
                         ],

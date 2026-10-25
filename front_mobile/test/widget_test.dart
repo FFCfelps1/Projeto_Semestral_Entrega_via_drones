@@ -2,8 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 import 'package:front_mobile/main.dart';
+import 'package:front_mobile/src/services/skyswift_api.dart';
 
 TextField _campoDeTexto(WidgetTester tester, Finder formulario) {
   return tester.widget<TextField>(
@@ -80,27 +83,47 @@ void main() {
     }
   });
 
-  testWidgets('Entrar informa a limitacao da demonstracao com dados validos', (
-    tester,
-  ) async {
-    await tester.pumpWidget(const SkySwiftApp());
-    await tester.enterText(
-      find.byType(TextFormField).first,
-      'nome@exemplo.com',
-    );
-    await tester.enterText(find.byType(TextFormField).last, 'x');
-    await tester.ensureVisible(find.text('Entrar'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Entrar'));
-    await tester.pumpAndSettle();
-    expect(find.text('Esta versão ainda não realiza login.'), findsOneWidget);
-    expect(find.text('Entre na sua conta'), findsOneWidget);
-  });
+  testWidgets(
+    'Entrar envia dados ao backend e apresenta credenciais inválidas',
+    (tester) async {
+      final api = SkySwiftApi(
+        client: MockClient((request) async {
+          expect(request.url.path, '/api/cadastro_usuario/auth/login');
+          expect(request.body, '{"email":"nome@exemplo.com","senha":"x"}');
+          return http.Response(
+            '{"error":"Credenciais inválidas."}',
+            401,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          );
+        }),
+      );
+      addTearDown(api.close);
+      await tester.pumpWidget(SkySwiftApp(api: api));
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'nome@exemplo.com',
+      );
+      await tester.enterText(find.byType(TextFormField).last, 'x');
+      await tester.ensureVisible(find.text('Entrar'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Entrar'));
+      await tester.pumpAndSettle();
+      expect(find.text('Credenciais inválidas.'), findsOneWidget);
+      expect(find.text('Entre na sua conta'), findsOneWidget);
+    },
+  );
 
-  testWidgets('Recuperacao e cadastro mostram avisos sem navegar', (
+  testWidgets('Recuperacao informa disponibilidade e cadastro abre o site', (
     tester,
   ) async {
-    await tester.pumpWidget(const SkySwiftApp());
+    var abriuCadastro = false;
+    await tester.pumpWidget(
+      SkySwiftApp(
+        onOpenRegistration: () async {
+          abriuCadastro = true;
+        },
+      ),
+    );
     await tester.ensureVisible(find.text('Esqueci minha senha'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Esqueci minha senha'));
@@ -116,10 +139,7 @@ void main() {
     await tester.ensureVisible(find.text('Criar conta'));
     await tester.tap(find.text('Criar conta'));
     await tester.pumpAndSettle();
-    expect(
-      find.text('O cadastro ainda não está disponível nesta versão.'),
-      findsOneWidget,
-    );
+    expect(abriuCadastro, isTrue);
     expect(find.byType(TextFormField), findsNWidgets(2));
   });
   testWidgets('Valida campos vazios e foca o primeiro erro', (tester) async {
