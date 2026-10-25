@@ -66,4 +66,18 @@ function resumoPedidos(rows, filtros, agora = new Date()) {
     pedidosPorDia: [...dias].map(([data, quantidade]) => ({ data, quantidade })), geradoEm: agora.toISOString() };
 }
 
-module.exports = { FUSO, STATUS, TIPOS, filtrosRelatorio, selecionarPedidos, resumoPedidos };
+function gerarCsv(rows) {
+  const cabecalho = ['id', 'item', 'modalidade', 'status', 'peso_kg', 'origem', 'destino', 'preco_estimado', 'criado_em', 'atualizado_em'];
+  function celula(valor) {
+    let texto = String(valor ?? '');
+    if (/^\s*[=+@-]/u.test(texto)) texto = `'${texto}`;
+    return `"${texto.replaceAll('"', '""')}"`;
+  }
+  const instante = epoch => DateTime.fromSeconds(Number(epoch), { zone: FUSO }).toISO({ suppressMilliseconds: true });
+  const linhas = [cabecalho, ...rows.map(row => [row.id, row.item, row.tipo, row.status,
+    String(row.peso).replace('.', ','), row.origem, row.destino, String(row.preco_estimado).replace('.', ','),
+    instante(row.criado_epoch), instante(row.atualizado_epoch)])];
+  return '\uFEFF' + linhas.map(linha => linha.map(celula).join(';')).join('\r\n') + '\r\n';
+}
+
+module.exports = { FUSO, STATUS, TIPOS, filtrosRelatorio, selecionarPedidos, resumoPedidos, gerarCsv };

@@ -1,12 +1,13 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { pool } = require('../database');
-const { filtrosRelatorio, selecionarPedidos, resumoPedidos } = require('../relatorios');
+const { filtrosRelatorio, selecionarPedidos, resumoPedidos, gerarCsv } = require('../relatorios');
 
 function criarRelatoriosRouter({ database = pool, secret = process.env.JWT_SECRET,
   agora = () => new Date() } = {}) {
   const router = express.Router();
   router.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store');
     if (!secret) return res.status(503).json({ erro: 'Autenticação dos relatórios não configurada.' });
     const token = /^Bearer ([^\s]+)$/.exec(req.headers.authorization || '')?.[1];
     if (!token) return res.status(401).json({ erro: 'Token de autenticação não informado.' });
@@ -24,6 +25,10 @@ function criarRelatoriosRouter({ database = pool, secret = process.env.JWT_SECRE
     }
   };
   router.get('/resumo', endpoint((res, rows, filtros) => res.json(resumoPedidos(rows, filtros, agora()))));
+  router.get('/exportar', endpoint((res, rows, filtros) => {
+    res.set('Content-Disposition', `attachment; filename="skyswift-pedidos-${filtros.inicio}-${filtros.fim}.csv"`);
+    res.type('text/csv').send(gerarCsv(rows));
+  }));
   return router;
 }
 module.exports = { criarRelatoriosRouter };
