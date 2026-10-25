@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'src/pages/login_page.dart';
+import 'src/pages/relatorios_page.dart';
 import 'src/theme/app_theme.dart';
 import 'src/services/skyswift_api.dart';
 import 'src/services/sessao_controller.dart';
@@ -76,17 +77,11 @@ class _SkySwiftAppState extends State<SkySwiftApp> {
                     }
                   },
             )
-          : Scaffold(
-              appBar: AppBar(
-                title: const Text('Relatórios SkySwift'),
-                actions: [
-                  TextButton(
-                    onPressed: _sessao.sair,
-                    child: const Text('Sair'),
-                  ),
-                ],
-              ),
-              body: const Center(child: Text('Sessão autenticada.')),
+          : RelatoriosPage(
+              api: _api,
+              sessao: _sessao.sessao!,
+              onLogout: _sessao.sair,
+              onToggleTheme: _alternarTema,
             ),
     );
   }

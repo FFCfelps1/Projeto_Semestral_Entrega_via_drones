@@ -234,10 +234,11 @@ class _LoginPageState extends State<LoginPage> {
                                     try {
                                       await widget.onCreateAccount();
                                     } catch (_) {
-                                      if (mounted)
+                                      if (mounted) {
                                         _mostrarAviso(
                                           'Não foi possível abrir o cadastro no site.',
                                         );
+                                      }
                                     }
                                   },
                             child: const Text('Criar conta'),

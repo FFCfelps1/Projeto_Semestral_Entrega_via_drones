@@ -15,8 +15,9 @@ class SessaoController extends ChangeNotifier {
     final usuario = await api.perfil(login.token);
     if (_descartado) return;
     final duracao = login.expiracao.difference(DateTime.now().toUtc());
-    if (duracao <= Duration.zero)
+    if (duracao <= Duration.zero) {
       throw const ApiException('A sessão expirou. Entre novamente.', 401);
+    }
     sessao = Sessao(login.token, usuario);
     _expiracao?.cancel();
     _expiracao = Timer(duracao, sair);

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/relatorio.dart';
+
 class ApiException implements Exception {
   const ApiException(this.mensagem, [this.status]);
   final String mensagem;
@@ -73,8 +75,9 @@ class SkySwiftApi {
                       body: jsonEncode(body),
                     ))
               .timeout(const Duration(seconds: 20));
-      if (response.statusCode >= 200 && response.statusCode < 300)
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         return response;
+      }
       String mensagem =
           'Não foi possível concluir a solicitação. Tente novamente.';
       try {
@@ -116,4 +119,17 @@ class SkySwiftApi {
         as Map<String, dynamic>,
   );
   void close() => _client.close();
+
+  Future<ResumoRelatorio> resumo(
+    String token,
+    FiltrosRelatorio filtros,
+  ) async => ResumoRelatorio.fromJson(
+    objeto(
+      await requisicao(
+        '/api/gestao_de_pedidos/relatorios/resumo',
+        token: token,
+        query: filtros.query,
+      ),
+    ),
+  );
 }
