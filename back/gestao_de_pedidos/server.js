@@ -19,6 +19,7 @@ const pedidosRouter = require("./routes/pedidos");
 
 // Registra as rotas no servidor
 app.use("/", pedidosRouter);
+app.use('/relatorios', require('./routes/relatorios').criarRelatoriosRouter());
 
 // Inicia o servidor na porta definida no .env (ou 3005 como padrão)
 runtime.listen();
