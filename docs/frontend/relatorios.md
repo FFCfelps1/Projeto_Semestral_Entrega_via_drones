@@ -1,6 +1,6 @@
 # Relatórios e Indicadores de Entregas
 
-A entrega v1.13.0 acrescenta uma tela Flutter inédita em <http://localhost:8080/relatorios/>. Ela não substitui as páginas React de pedidos, rastreamento, conta ou notificações. São duas funcionalidades novas no serviço de pedidos: indicadores agregados e exportação CSV. Não foi criado outro microsserviço.
+A entrega 1.2.0-mobile acrescenta uma tela Flutter inédita em <http://localhost:8080/relatorios/>. Ela não substitui as páginas React de pedidos, rastreamento, conta ou notificações. São duas funcionalidades novas no serviço de pedidos: indicadores agregados e exportação CSV. Não foi criado outro microsserviço.
 
 ## Acesso e utilização
 

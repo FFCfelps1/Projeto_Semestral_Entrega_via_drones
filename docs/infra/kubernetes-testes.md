@@ -1,6 +1,6 @@
 # Relatório de execução Kubernetes
 
-## Entrega v1.13.0 — Relatórios Flutter (25/10/2026)
+## Entrega 1.2.0-mobile — Relatórios Flutter (25/10/2026)
 
 Foi implementada uma tela inédita em `/relatorios/`, sem substituir as páginas React. Indicadores e CSV são fornecidos por novos endpoints autenticados no serviço de pedidos. Flutter e React utilizam a mesma imagem Nginx: continuam sete imagens, oito Deployments e um StatefulSet, com nove pods de longa duração.
 
@@ -29,6 +29,8 @@ Foram reiniciados frontend, pedidos e MySQL durante a verificação dos relatór
 O Chrome baixou o CSV pelo botão real da interface, verificando nome, BOM, conteúdo, filtros, acentos, aspas e quebra de linha. O token foi enviado em cabeçalho, nunca na URL. Os testes removeram somente seus próprios usuários, pedidos e notificações. Não houve testes ou alterações para publicação Vercel nesta entrega.
 
 Os logs e artefatos estão em `.kubernetes-local/`, ignorado pelo Git: `flutter-final-test.log`, `dart-test.log`, `unit-test-clean.log`, `browser-run.log`, `browser-results.json`, `relatorios-k8s-full.log`, `relatorios-integration.log`, `relatorios-lifecycle.log` e `relatorios-amd64.log`. Os testes de navegador geram capturas e o CSV baixado nesse mesmo diretório. Reproduza pelos comandos do [guia de relatórios](../frontend/relatorios.md).
+
+A identificação desta entrega foi corrigida para a tag `1.2.0-mobile`, com versão Flutter `1.2.0-mobile+2`, sem mudanças funcionais. Após a correção, a análise Flutter, os 24 testes e a compilação Web foram novamente aprovados; o arquivo gerado `version.json` identifica `1.2.0-mobile`, build `2`. Logs: `mobile-version-flutter-test.log` e `mobile-version-flutter-build.log`, no mesmo diretório local ignorado pelo Git.
 
 ---
 
