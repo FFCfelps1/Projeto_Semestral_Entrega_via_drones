@@ -1,10 +1,12 @@
 # SkySwift no Kubernetes local
 
-O ambiente executa o frontend, os seis serviços Node.js, MySQL e Mailpit no Kubernetes do Docker Desktop. Os recursos ficam exclusivamente no contexto `docker-desktop`, namespace `skyswift`. A Vercel continua independente.
+O ambiente executa React e Flutter no mesmo frontend Nginx, cinco serviços Node.js, um serviço Dart, MySQL e Mailpit no Kubernetes do Docker Desktop. Os recursos ficam exclusivamente no contexto `docker-desktop`, namespace `skyswift`. A Vercel continua independente.
 
 ## Preparação e execução
 
 Instale Node.js 24, npm, Docker Desktop e `kubectl`. No Docker Desktop, crie ou habilite o cluster Kubernetes com provisionador **kind**, **um nó** e armazenamento de imagens **containerd**. O modo kind exige containerd, conforme a [documentação do Docker Desktop](https://docs.docker.com/desktop/use-desktop/kubernetes/). O ambiente foi validado com 8 GiB disponíveis para o Docker.
+
+Para construir as imagens da v1.13.0, instale também Flutter com Dart >=3.13.1 no PATH (validado com Flutter 3.47.1). O build gera Flutter Web localmente antes de montar a imagem Nginx; a execução das imagens já construídas não exige SDK no cluster.
 
 Na raiz do repositório:
 
@@ -17,6 +19,8 @@ npm run k8s:access
 ```
 
 Mantenha o último comando aberto. A aplicação fica em <http://localhost:8080> e a caixa de e-mails em <http://localhost:8025>. Todos os encaminhamentos escutam apenas em `127.0.0.1`; `Ctrl+C` os encerra. É possível escolher outras portas: `APP_PORT=8081 MAIL_PORT=8026 npm run k8s:access`.
+
+Os [relatórios Flutter](../frontend/relatorios.md) estão em <http://localhost:8080/relatorios/> e utilizam o mesmo proxy `/api/...`. Os novos endpoints do serviço de pedidos exigem JWT, com `JWT_SECRET` fornecido pelo Secret existente. Não há novo Deployment ou migração de banco.
 
 Os scripts usam o Docker `desktop-linux` e passam `--context docker-desktop` explicitamente ao `kubectl`. Para evitar configurações de clusters externos em `KUBECONFIG`, leem por padrão `$HOME/.kube/config`. Se o contexto local estiver em outro arquivo, use `SKYSWIFT_KUBECONFIG=/caminho/config npm run k8s:check`. O contexto ativo do usuário não é alterado.
 
@@ -36,10 +40,13 @@ Os scripts usam o Docker `desktop-linux` e passam `--context docker-desktop` exp
 | `npm run k8s:test -- --lifecycle` | Reaplica a subida duas vezes e testa parada/subida com dados persistidos |
 | `npm run test:vercel` | Executa os seis handlers serverless localmente contra MySQL e SMTP de testes |
 | `npm test` | Testa rota normal e alternativa usando provedores HTTP simulados |
+| `npm run test:flutter` | Analisa e executa testes unitários/de widgets do Flutter |
+| `npm run test:browser` | Testa o Flutter publicado e o download CSV no Chrome, com `k8s:access` aberto |
+| `npm run k8s:test:relatorios` | Testa relatórios no MySQL real e recuperação de frontend, pedidos e banco |
 | `npm run k8s:down` | Para workloads e preserva namespace, Services, PVC e Secrets |
 | `npm run k8s:down -- --purge-data` | Exclui o namespace, o PVC, credenciais e referência local de imagens |
 
-Os testes usam dados sintéticos e removem seus registros ao concluir. Testes de recuperação e ciclo interrompem componentes temporariamente. Os encaminhamentos de `k8s:access` são vinculados aos pods: após substituir frontend/Mailpit ou executar parada/subida, execute o comando novamente. As portas de testes HTTP são 18080/18025; os testes Vercel usam MySQL 13307 e SMTP 11025.
+Os testes usam dados sintéticos e removem seus registros ao concluir. Testes de recuperação e ciclo interrompem componentes temporariamente. Os encaminhamentos de `k8s:access` são vinculados aos pods: após substituir frontend/Mailpit ou executar parada/subida, execute o comando novamente. As portas de testes HTTP são 18080/18025 e 18081 para relatórios; os testes Vercel usam MySQL 13307 e SMTP 11025. Execute o navegador separadamente de reinícios/rollouts. `npm test` prepara as dependências dos serviços testados antes da execução.
 
 Para verificar AMD64 em uma máquina ARM64 sem trocar a tag usada pela subida:
 
@@ -67,7 +74,7 @@ flowchart LR
 
 Cada componente tem uma réplica. Os Services são internos (`ClusterIP`), com DNS em hífens (`gestao-de-pedidos`). As APIs e nomes inscritos preservam os sublinhados (`gestao_de_pedidos`). Por exemplo, `/api/gestao_de_pedidos/pedidos?status=rascunho` chega a `http://gestao-de-pedidos:3005/pedidos?status=rascunho`. O proxy conserva métodos, corpo, parâmetros e cabeçalho Bearer. Rotas de páginas usam fallback da SPA; APIs desconhecidas retornam JSON 404 e falhas de conexão do proxy retornam JSON 503.
 
-Os manifests são organizados em `infra/kubernetes/infrastructure` e `infra/kubernetes/application`, usando o [Kustomize integrado ao kubectl](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/). `schema-job.yaml` é aplicado separadamente para aguardar a conclusão antes dos serviços. Os Dockerfiles Node usam contexto `back/`, necessário para copiar `back/shared/runtime.js`; o frontend usa contexto `front/`.
+Os manifests são organizados em `infra/kubernetes/infrastructure` e `infra/kubernetes/application`, usando o [Kustomize integrado ao kubectl](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/). `schema-job.yaml` é aplicado separadamente para aguardar a conclusão antes dos serviços. Os Dockerfiles Node usam contexto `back/`, necessário para copiar `back/shared/runtime.js`; o frontend usa contexto na raiz para incorporar React e o Flutter Web compilado. O `.dockerignore` da raiz limita os arquivos enviados ao build e exclui credenciais.
 
 ### Serviço de rotas em Dart
 

@@ -1,5 +1,39 @@
 # Relatório de execução Kubernetes
 
+## Entrega v1.13.0 — Relatórios Flutter (25/10/2026)
+
+Foi implementada uma tela inédita em `/relatorios/`, sem substituir as páginas React. Indicadores e CSV são fornecidos por novos endpoints autenticados no serviço de pedidos. Flutter e React utilizam a mesma imagem Nginx: continuam sete imagens, oito Deployments e um StatefulSet, com nove pods de longa duração.
+
+Ambiente: Flutter 3.47.1 / Dart 3.13.1, Node 24.13.1 / npm 11.8.0, Docker Engine 29.9.2, Kubernetes 1.36.1 em kind ARM64, kubectl 1.37.1, Kustomize 5.8.1 e containerd 2.3.1. O navegador de teste foi Google Chrome 155 via Playwright. A data desta seção usa São Paulo; logs e tags de imagens usam UTC e podem indicar 26/10.
+
+| Verificação executada | Resultado |
+| --- | --- |
+| Análise e testes Flutter | 24 testes aprovados, incluindo login, sessão, erros, filtros, CSV, três tamanhos de tela, dois temas e texto em 200% |
+| Serviço Dart | Análise sem problemas e 34 testes aprovados |
+| `npm test` | 13 testes aprovados, sem ignorados: relatórios, barramento e contratos de rotas Node/Dart |
+| Preparação limpa dos testes | Dependências preparadas pelos scripts e os mesmos 13 testes aprovados |
+| React | Lint e build aprovados |
+| Chrome sobre o Nginx | Dois cenários aprovados: login, seleção de status, aplicação explícita, download e conteúdo do CSV, tema, tela pequena, período vazio, recarga e cadastro React |
+| `npm run k8s:test` | 299 verificações da suíte anterior e 22 dos relatórios aprovadas, totalizando 321 nesta execução |
+| `npm run k8s:test -- --lifecycle` | Duas reaplicações e um ciclo parada/subida aprovados, preservando dados, PVC e Secret |
+| Imagens Linux ARM64 | Sete imagens construídas e executadas no cluster |
+| Imagens Linux AMD64 | Sete imagens construídas; a execução do cluster permaneceu ARM64 |
+| Manifests e scripts | Kustomize, validação no servidor com `--dry-run=server`, sintaxe Bash e `git diff --check` aprovados |
+
+A execução principal da suíte Kubernetes foi `c47bf45d-7d61-4a02-92a5-de7a00fe4711`. O número de verificações varia com as tentativas de espera por recuperação; não corresponde ao número de casos de teste.
+
+O teste de MySQL real criou registros em torno da meia-noite de São Paulo, conferindo inclusão/exclusão dos limites, soma `0.21`, média arredondada `0.11`, filtros combinados e CSV com exatamente os mesmos pedidos. A suíte HTTP também verificou JWT ausente, inválido e expirado, configuração ausente, datas inválidas, categorias vazias, precisão monetária e a mudança histórica de horário de verão de 2018.
+
+Foram reiniciados frontend, pedidos e MySQL durante a verificação dos relatórios; indicadores foram preservados. A regressão geral também reiniciou notificações e barramento, verificou as cinco inscrições, o fluxo de pedidos/eventos/rotas Dart, persistência e envio efetivo ao Mailpit.
+
+O Chrome baixou o CSV pelo botão real da interface, verificando nome, BOM, conteúdo, filtros, acentos, aspas e quebra de linha. O token foi enviado em cabeçalho, nunca na URL. Os testes removeram somente seus próprios usuários, pedidos e notificações. Não houve testes ou alterações para publicação Vercel nesta entrega.
+
+Os logs e artefatos estão em `.kubernetes-local/`, ignorado pelo Git: `flutter-final-test.log`, `dart-test.log`, `unit-test-clean.log`, `browser-run.log`, `browser-results.json`, `relatorios-k8s-full.log`, `relatorios-integration.log`, `relatorios-lifecycle.log` e `relatorios-amd64.log`. Os testes de navegador geram capturas e o CSV baixado nesse mesmo diretório. Reproduza pelos comandos do [guia de relatórios](../frontend/relatorios.md).
+
+---
+
+## Histórico das entregas anteriores
+
 Validação realizada em **04/10/2026**, no Docker Desktop local, contexto `docker-desktop`, namespace `skyswift`. Os testes utilizaram dados sintéticos, MySQL e SMTP locais. Nenhum deploy da Vercel foi publicado.
 
 ## Ambiente e construção

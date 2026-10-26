@@ -8,7 +8,7 @@ Para executar diretamente, crie o banco e aplique `deploy_cloud.sql`, configure 
 cd back/gestao_de_pedidos
 cp .env.example .env
 npm ci
-npm run dev
+npm start
 ```
 
 | Variável | Padrão |
@@ -20,6 +20,7 @@ npm run dev
 | `DB_USER` / `DB_NAME` | `root` / `skyswift` (Kubernetes usa usuário próprio) |
 | `DB_PASSWORD` | Defina para o seu banco |
 | `DB_CONNECTION_LIMIT` | `10` |
+| `JWT_SECRET` | Mesmo segredo do serviço de autenticação; obrigatório nos relatórios |
 
 | Método | Rota | Resultado |
 | --- | --- | --- |
@@ -32,6 +33,10 @@ npm run dev
 | DELETE | `/pedidos/:id` | Cancela; não apaga o registro |
 | GET | `/pedidos/:id/historico` | Retorna histórico de status |
 | POST | `/eventos/receber` | Consome eventos, incluindo `RotaCalculada` com `pedidoId` |
+| GET | `/relatorios/resumo` | Indicadores agregados com filtros, exige JWT |
+| GET | `/relatorios/exportar` | Download CSV com os mesmos filtros, exige JWT |
+
+Os relatórios aceitam `inicio`/`fim` em YYYY-MM-DD (dias inclusivos de São Paulo, até 366 dias), `status` e `tipo` opcionais. Sem datas, usam os últimos 30 dias. Não alteram pedidos nem o esquema do banco. Consulte o [guia de relatórios](../../docs/frontend/relatorios.md) para respostas e formato CSV. Somente os dois novos endpoints exigem autenticação; os contratos anteriores foram preservados.
 
 O preço é `(10 + peso × 5) × multiplicador`. Para 2 kg:
 

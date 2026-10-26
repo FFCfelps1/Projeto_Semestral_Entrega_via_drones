@@ -13,9 +13,16 @@
     "k8s:logs": "bash scripts/kubernetes/logs.sh",
     "k8s:test": "bash scripts/kubernetes/test.sh",
     "k8s:down": "bash scripts/kubernetes/down.sh",
-    "test": "node --test tests/routes.cjs tests/barramento.cjs",
+    "test": "node --test tests/routes.cjs tests/barramento.cjs tests/relatorios.cjs",
     "test:dart": "cd back/entrega_via_drone_dart && dart pub get && dart analyze && dart test",
-    "test:vercel": "bash scripts/kubernetes/test-vercel.sh"
+    "test:vercel": "bash scripts/kubernetes/test-vercel.sh",
+    "build:flutter": "bash scripts/flutter/build-web.sh",
+    "test:flutter": "cd front_mobile && flutter analyze && flutter test",
+    "test:relatorios": "node --test tests/relatorios.cjs",
+    "test:browser": "playwright test",
+    "k8s:test:relatorios": "node tests/relatorios-integration.cjs",
+    "pretest": "bash scripts/tests/prepare.sh",
+    "pretest:relatorios": "npm ci --prefix back/gestao_de_pedidos"
   },
   "dependencies": {
     "axios": "^1.16.0",
@@ -27,5 +34,8 @@
     "mysql2": "^3.22.3",
     "nodemailer": "^8.0.5",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
   }
 }
