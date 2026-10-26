@@ -13,6 +13,12 @@ class ApiException implements Exception {
   String toString() => mensagem;
 }
 
+class ArquivoRelatorio {
+  const ArquivoRelatorio(this.bytes, this.nome);
+  final Uint8List bytes;
+  final String nome;
+}
+
 class Usuario {
   const Usuario({required this.id, required this.nome, required this.email});
   factory Usuario.fromJson(Map<String, dynamic> json) => Usuario(
@@ -119,6 +125,28 @@ class SkySwiftApi {
         as Map<String, dynamic>,
   );
   void close() => _client.close();
+
+  Future<ArquivoRelatorio> exportar(
+    String token,
+    FiltrosRelatorio filtros,
+  ) async {
+    final response = await requisicao(
+      '/api/gestao_de_pedidos/relatorios/exportar',
+      token: token,
+      query: filtros.query,
+    );
+    if (!(response.headers['content-type'] ?? '').startsWith('text/csv')) {
+      throw const ApiException(
+        'O servidor não retornou um arquivo CSV válido.',
+      );
+    }
+    final nome =
+        RegExp(r'filename="([a-zA-Z0-9_.-]+)"')
+            .firstMatch(response.headers['content-disposition'] ?? '')
+            ?.group(1) ??
+        'skyswift-pedidos-${filtros.inicio}-${filtros.fim}.csv';
+    return ArquivoRelatorio(response.bodyBytes, nome);
+  }
 
   Future<ResumoRelatorio> resumo(
     String token,

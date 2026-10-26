@@ -1,4 +1,7 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
+
+import '../services/download.dart';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -14,7 +17,9 @@ class RelatoriosPage extends StatefulWidget {
     required this.sessao,
     required this.onLogout,
     required this.onToggleTheme,
+    this.onDownload,
   });
+  final Future<void> Function(Uint8List bytes, String nome)? onDownload;
   final SkySwiftApi api;
   final Sessao sessao;
   final VoidCallback onLogout;
@@ -24,15 +29,23 @@ class RelatoriosPage extends StatefulWidget {
 }
 
 class _RelatoriosPageState extends State<RelatoriosPage> {
-  final FiltrosRelatorio _filtros = FiltrosRelatorio.padrao();
+  FiltrosRelatorio _filtros = FiltrosRelatorio.padrao();
   ResumoRelatorio? _resumo;
   bool _carregando = true;
   String? _erro;
   int _geracao = 0;
+  late final TextEditingController _inicio;
+  late final TextEditingController _fim;
+  String? _status;
+  String? _tipo;
+  bool _exportando = false;
+  String? _mensagemExportacao;
   final _moeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
   @override
   void initState() {
     super.initState();
+    _inicio = TextEditingController(text: _data(_filtros.inicio));
+    _fim = TextEditingController(text: _data(_filtros.fim));
     _carregar();
   }
 
@@ -121,24 +134,15 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
                       'Olá, ${widget.sessao.usuario.nome}. Acompanhe os resultados dos pedidos e gere seus relatórios.',
                     ),
                     const SizedBox(height: 24),
-                    _painel(
-                      child: Wrap(
-                        spacing: 16,
-                        runSpacing: 12,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          const Icon(Icons.calendar_month_outlined),
-                          Text(
-                            '${_data(_filtros.inicio)} a ${_data(_filtros.fim)} · São Paulo',
-                          ),
-                          OutlinedButton.icon(
-                            onPressed: _carregando ? null : _carregar,
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('Atualizar'),
-                          ),
-                        ],
+                    _painel(child: _formulario()),
+                    if (_mensagemExportacao != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Semantics(
+                          liveRegion: true,
+                          child: Text(_mensagemExportacao!),
+                        ),
                       ),
-                    ),
                     const SizedBox(height: 24),
                     if (_carregando)
                       const Padding(
@@ -193,6 +197,232 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
           ),
         ),
       ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _inicio.dispose();
+    _fim.dispose();
+    super.dispose();
+  }
+
+  Future<void> _escolherData(TextEditingController controller) async {
+    DateTime atual;
+    try {
+      atual = DateFormat('dd/MM/yyyy').parseStrict(controller.text);
+    } catch (_) {
+      atual = DateTime.now();
+    }
+    final data = await showDatePicker(
+      context: context,
+      initialDate: atual,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (data != null && mounted) {
+      setState(() => controller.text = DateFormat('dd/MM/yyyy').format(data));
+    }
+  }
+
+  void _aplicar() {
+    try {
+      final inicio = DateFormat('dd/MM/yyyy').parseStrict(_inicio.text);
+      final fim = DateFormat('dd/MM/yyyy').parseStrict(_fim.text);
+      if (inicio.isAfter(fim)) throw const FormatException();
+      if (fim.difference(inicio).inDays >= 366) {
+        setState(() => _erro = 'Selecione um período de até 366 dias.');
+        return;
+      }
+      _filtros = FiltrosRelatorio(
+        inicio: DateFormat('yyyy-MM-dd').format(inicio),
+        fim: DateFormat('yyyy-MM-dd').format(fim),
+        status: _status,
+        tipo: _tipo,
+      );
+      _carregar();
+    } on FormatException {
+      setState(
+        () => _erro = 'Informe datas válidas em DD/MM/AAAA, com a inicial anterior ou igual à final.',
+      );
+    }
+  }
+
+  void _limpar() {
+    _filtros = FiltrosRelatorio.padrao();
+    _inicio.text = _data(_filtros.inicio);
+    _fim.text = _data(_filtros.fim);
+    _status = null;
+    _tipo = null;
+    _carregar();
+  }
+
+  Future<void> _exportar() async {
+    final filtros = _resumo?.filtros;
+    if (filtros == null || _exportando) return;
+    setState(() {
+      _exportando = true;
+      _mensagemExportacao = null;
+    });
+    try {
+      final arquivo = await widget.api.exportar(widget.sessao.token, filtros);
+      if (!mounted) return;
+      await (widget.onDownload ?? salvarCsv)(arquivo.bytes, arquivo.nome);
+      if (mounted) {
+        setState(
+          () => _mensagemExportacao =
+              'Relatório gerado. Confira os downloads do navegador.',
+        );
+      }
+    } catch (erro) {
+      if (!mounted) return;
+      if (erro is ApiException && erro.status == 401) {
+        widget.onLogout();
+        return;
+      }
+      setState(
+        () => _mensagemExportacao = erro is ApiException
+            ? erro.mensagem
+            : 'Não foi possível baixar o relatório. Tente novamente.',
+      );
+    } finally {
+      if (mounted) setState(() => _exportando = false);
+    }
+  }
+
+  Widget _formulario() {
+    final bloqueado = _carregando || _exportando;
+    final pendente =
+        _resumo != null &&
+        (_inicio.text != _data(_resumo!.filtros.inicio) ||
+            _fim.text != _data(_resumo!.filtros.fim) ||
+            _status != _resumo!.filtros.status ||
+            _tipo != _resumo!.filtros.tipo);
+    Widget campoData(
+      String rotulo,
+      TextEditingController controller,
+      String chave,
+    ) => SizedBox(
+      width: 205,
+      child: TextField(
+        key: ValueKey(chave),
+        controller: controller,
+        enabled: !bloqueado,
+        keyboardType: TextInputType.datetime,
+        onChanged: (_) => setState(() {}),
+        decoration: InputDecoration(
+          labelText: rotulo,
+          hintText: 'DD/MM/AAAA',
+          suffixIcon: IconButton(
+            tooltip: 'Escolher $rotulo',
+            onPressed: bloqueado ? null : () => _escolherData(controller),
+            icon: const Icon(Icons.calendar_month_outlined),
+          ),
+        ),
+      ),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Filtros do relatório',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: 8),
+        const Text('Datas no fuso de São Paulo · Até 366 dias por consulta'),
+        const SizedBox(height: 20),
+        Wrap(
+          spacing: 16,
+          runSpacing: 20,
+          children: [
+            campoData('Data inicial', _inicio, 'inicio'),
+            campoData('Data final', _fim, 'fim'),
+            SizedBox(
+              width: 205,
+              child: DropdownButtonFormField<String>(
+                key: ValueKey('status-${_status ?? "todos"}'),
+                initialValue: _status ?? '',
+                isExpanded: true,
+                decoration: const InputDecoration(labelText: 'Status'),
+                items: [
+                  const DropdownMenuItem(
+                    value: '',
+                    child: Text('Todos os status'),
+                  ),
+                  ...nomesStatus.entries.map(
+                    (item) => DropdownMenuItem(
+                      value: item.key,
+                      child: Text(item.value),
+                    ),
+                  ),
+                ],
+                onChanged: bloqueado
+                    ? null
+                    : (valor) =>
+                          setState(() => _status = valor == '' ? null : valor),
+              ),
+            ),
+            SizedBox(
+              width: 205,
+              child: DropdownButtonFormField<String>(
+                key: ValueKey('tipo-${_tipo ?? "todos"}'),
+                initialValue: _tipo ?? '',
+                isExpanded: true,
+                decoration: const InputDecoration(labelText: 'Modalidade'),
+                items: [
+                  const DropdownMenuItem(
+                    value: '',
+                    child: Text('Todas as modalidades'),
+                  ),
+                  ...nomesModalidades.entries.map(
+                    (item) => DropdownMenuItem(
+                      value: item.key,
+                      child: Text(item.value),
+                    ),
+                  ),
+                ],
+                onChanged: bloqueado
+                    ? null
+                    : (valor) =>
+                          setState(() => _tipo = valor == '' ? null : valor),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            ElevatedButton.icon(
+              key: const ValueKey('aplicar'),
+              onPressed: bloqueado ? null : _aplicar,
+              icon: const Icon(Icons.filter_alt_outlined),
+              label: const Text('Aplicar filtros'),
+            ),
+            OutlinedButton.icon(
+              onPressed: bloqueado ? null : _limpar,
+              icon: const Icon(Icons.restart_alt),
+              label: const Text('Limpar'),
+            ),
+            OutlinedButton.icon(
+              key: const ValueKey('exportar'),
+              onPressed: bloqueado || _erro != null || _resumo == null
+                  ? null
+                  : _exportar,
+              icon: const Icon(Icons.download_outlined),
+              label: Text(_exportando ? 'Exportando...' : 'Exportar CSV'),
+            ),
+          ],
+        ),
+        if (pendente)
+          const Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text(
+              'Há filtros não aplicados. Os indicadores e o CSV usam a última consulta realizada.',
+            ),
+          ),
+      ],
     );
   }
 
@@ -358,9 +588,8 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
                 value: total == 0 ? 0 : (quantidades[entrada.key] ?? 0) / total,
                 minHeight: 6,
                 borderRadius: BorderRadius.circular(4),
-                semanticsLabel: entrada.value,
-                semanticsValue:
-                    '${quantidades[entrada.key] ?? 0} de $total pedidos',
+                semanticsLabel:
+                    '${entrada.value}: ${quantidades[entrada.key] ?? 0} de $total pedidos',
               ),
             ],
           ),
