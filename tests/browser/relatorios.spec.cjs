@@ -32,7 +32,8 @@ test('login real, filtros explícitos e CSV baixado pelo navegador',async({page}
   await entrar(page);
   const antes=consultas;
   await page.getByRole('button',{name:'Status Todos os status',exact:true}).click();
-  await page.getByText('Entregue',{exact:true}).last().click();
+  await page.getByRole('menuitem',{name:'Entregue',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Status Entregue',exact:true})).toBeVisible();
   expect(consultas).toBe(antes);
   const resposta=page.waitForResponse(r=>r.url().includes('/relatorios/resumo')&&new URL(r.url()).searchParams.get('status')==='entregue');
   await page.getByRole('button',{name:'Aplicar filtros',exact:true}).click();
@@ -67,7 +68,7 @@ test('tela pequena, período vazio, sessão em memória e cadastro existente',as
     await page.waitForTimeout(100);await page.keyboard.type(valor,{delay:40});
   }
   await page.getByRole('button',{name:'Aplicar filtros',exact:true}).click();
-  await expect(page.getByText('Nenhum pedido neste período',{exact:true})).toBeAttached();
+  await expect(page.getByText(/Nenhum pedido neste período/).last()).toBeAttached();
   await page.screenshot({path:'.kubernetes-local/relatorios-mobile.png',fullPage:true});
   await page.reload();
   const ativar=page.getByRole('button',{name:'Enable accessibility'});
