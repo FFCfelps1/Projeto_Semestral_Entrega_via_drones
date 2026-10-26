@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -26,9 +28,11 @@ class _SkySwiftAppState extends State<SkySwiftApp> {
   ThemeMode _themeMode = ThemeMode.system;
   late final SkySwiftApi _api;
   late final SessaoController _sessao;
+  SemanticsHandle? _semantica;
   @override
   void initState() {
     super.initState();
+    if (kIsWeb) _semantica = SemanticsBinding.instance.ensureSemantics();
     _api = widget.api ?? SkySwiftApi();
     _sessao = SessaoController(_api)..addListener(_atualizar);
   }
@@ -39,6 +43,7 @@ class _SkySwiftAppState extends State<SkySwiftApp> {
 
   @override
   void dispose() {
+    _semantica?.dispose();
     _sessao.dispose();
     if (widget.api == null) _api.close();
     super.dispose();

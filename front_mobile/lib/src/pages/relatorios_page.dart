@@ -214,6 +214,9 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
     } catch (_) {
       atual = DateTime.now();
     }
+    if (atual.isBefore(DateTime(2000)) || atual.isAfter(DateTime(2100))) {
+      atual = DateTime.now();
+    }
     final data = await showDatePicker(
       context: context,
       initialDate: atual,

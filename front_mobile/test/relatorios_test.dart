@@ -9,6 +9,7 @@ import 'package:front_mobile/src/models/relatorio.dart';
 import 'package:front_mobile/src/pages/relatorios_page.dart';
 import 'package:front_mobile/src/services/skyswift_api.dart';
 import 'package:front_mobile/src/theme/app_theme.dart';
+import 'package:front_mobile/src/services/sessao_controller.dart';
 
 Map<String, dynamic> fixture(Map<String, String> filtros, {int total = 3}) => {
   'filtros': {
@@ -40,6 +41,40 @@ const sessao = Sessao(
 );
 
 void main() {
+  test('login valida perfil e expiração; sessão é descartada ao sair', () async {
+    final exp =
+        DateTime.now().add(const Duration(hours: 1)).millisecondsSinceEpoch ~/
+        1000;
+    final token =
+        'cabecalho.${base64Url.encode(utf8.encode(jsonEncode({'exp': exp})))}.assinatura';
+    final usuario = {
+      'id': 1,
+      'nome': 'Operador',
+      'email': 'teste@example.test',
+    };
+    final chamadas = <String>[];
+    final api = SkySwiftApi(
+      client: MockClient((request) async {
+        chamadas.add(request.url.path);
+        if (request.url.path.endsWith('/login')) {
+          return jsonResponse({'token': token, 'usuario': usuario});
+        }
+        expect(request.headers['authorization'], 'Bearer $token');
+        return jsonResponse({'usuario': usuario});
+      }),
+    );
+    final controller = SessaoController(api);
+    addTearDown(controller.dispose);
+    addTearDown(api.close);
+    await controller.entrar('Teste@example.test', 'senha');
+    expect(controller.sessao?.usuario.nome, 'Operador');
+    expect(chamadas, [
+      '/api/cadastro_usuario/auth/login',
+      '/api/cadastro_usuario/auth/me',
+    ]);
+    controller.sair();
+    expect(controller.sessao, isNull);
+  });
   test('período padrão usa o calendário de São Paulo e 30 dias', () {
     final filtros = FiltrosRelatorio.padrao(
       agora: DateTime.parse('2026-10-25T01:00:00Z'),
@@ -183,4 +218,81 @@ void main() {
     expect(expirada, isTrue);
     expect(tester.takeException(), isNull);
   });
+  testWidgets(
+    'falha de API permite tentar novamente sem inventar indicadores',
+    (tester) async {
+      var falha = true;
+      final api = SkySwiftApi(
+        client: MockClient(
+          (r) async => falha
+              ? jsonResponse({'erro': 'Banco indisponível'}, 503)
+              : jsonResponse(fixture(r.url.queryParameters)),
+        ),
+      );
+      addTearDown(api.close);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light,
+          home: RelatoriosPage(
+            api: api,
+            sessao: sessao,
+            onLogout: () {},
+            onToggleTheme: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Banco indisponível'), findsOneWidget);
+      expect(find.text('Total de pedidos'), findsNothing);
+      falha = false;
+      await tester.ensureVisible(find.text('Tentar novamente'));
+      await tester.tap(find.text('Tentar novamente'));
+      await tester.pumpAndSettle();
+      expect(find.text('Total de pedidos'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+  testWidgets(
+    'painel permanece utilizável em telas pequenas e texto ampliado nos dois temas',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final api = SkySwiftApi(
+        client: MockClient(
+          (r) async => jsonResponse(fixture(r.url.queryParameters)),
+        ),
+      );
+      addTearDown(api.close);
+      for (final tamanho in [
+        const Size(390, 844),
+        const Size(844, 390),
+        const Size(1440, 1000),
+      ]) {
+        tester.view.physicalSize = tamanho;
+        for (final tema in [AppTheme.light, AppTheme.dark]) {
+          await tester.pumpWidget(
+            MaterialApp(
+              theme: tema,
+              home: MediaQuery(
+                data: MediaQueryData(
+                  size: tamanho,
+                  textScaler: const TextScaler.linear(2),
+                ),
+                child: RelatoriosPage(
+                  key: UniqueKey(),
+                  api: api,
+                  sessao: sessao,
+                  onLogout: () {},
+                  onToggleTheme: () {},
+                ),
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull);
+        }
+      }
+    },
+  );
 }
