@@ -16,7 +16,7 @@ Nome: Pedro Wilian Palumbo Bevilacqua RA: 23.01307-9
 
 ---
 
-Uma aplicação web moderna para gerenciamento de entregas autônomas via drones, construída com React, Vite, Bootstrap e FontAwesome.
+Uma aplicação para gerenciamento de entregas via drones, com site React, relatórios em Flutter e microsserviços Node.js e Dart.
 
 ## 🚀 Características
 
@@ -26,11 +26,13 @@ Uma aplicação web moderna para gerenciamento de entregas autônomas via drones
 - 💰 Página de preços com três planos e FAQ interativo
 - 🔧 Commits estruturados seguindo padrão semântico
 - 📦 Versionamento semântico com tags Git
+- 📊 Relatórios e indicadores em Flutter, com filtros e exportação CSV autenticada
 
 ## 📋 Pré-requisitos
 
 - Node.js 24
 - npm ou yarn
+- Flutter compatível com Dart >= 3.13.1 para compilar os relatórios (validado com Flutter 3.47.1)
 
 ## 🛠️ Configuração e Instalação
 
@@ -47,6 +49,8 @@ npm run k8s:access
 ```
 
 A aplicação fica em `http://localhost:8080` e o Mailpit em `http://localhost:8025`, enquanto o comando de acesso estiver aberto. `npm run k8s:test` valida os fluxos e reinícios; `npm run k8s:down` preserva banco e credenciais.
+
+O novo painel Flutter fica em **http://localhost:8080/relatorios/**. Entre com uma conta cadastrada pelo React para consultar indicadores por período, status e modalidade e baixar o CSV. A tela é inédita e não substitui as páginas existentes. React e Flutter são servidos pela mesma imagem Nginx. Veja o [guia de relatórios](docs/frontend/relatorios.md) para contratos, autenticação, compilação e testes.
 
 Consulte o [guia Kubernetes](docs/infra/kubernetes.md) para arquitetura, comandos, persistência, Vercel e diagnóstico, e o [relatório de testes](docs/infra/kubernetes-testes.md) para os resultados.
 
@@ -82,6 +86,7 @@ http://localhost:5173
 - `/rastreamento` — Rastreamento de entrega por drone com mapa interativo
 - `/suporte` — Central de ajuda com busca e tópicos expansíveis
 - `/notificacoes` — Central de notificacoes recebidas pelo usuario, com leitura individual ou em lote
+- `/relatorios/` — Nova tela Flutter: indicadores agregados e exportação CSV autenticada, disponível no Kubernetes
 
 ## Backend: Microsservicos
 
