@@ -94,6 +94,12 @@ const TopBar = ({ themeMode = "light", onToggleTheme, usuario, onLogout, notific
                 )}
               </a>
             </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/relatorios/">
+                <i className="fa fa-chart-column me-1" aria-hidden="true"></i>
+                Relatórios
+              </a>
+            </li>
             {usuario ? (
               <>
                 <li className="nav-item">
