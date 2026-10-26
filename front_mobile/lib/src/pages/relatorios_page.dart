@@ -89,7 +89,9 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
         title: const Text('SkySwift'),
         actions: [
           IconButton(
-            tooltip: 'Alternar tema',
+            tooltip: escuro
+                ? 'Alternar para modo claro'
+                : 'Alternar para modo escuro',
             onPressed: widget.onToggleTheme,
             icon: Icon(
               escuro ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
@@ -373,10 +375,7 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
                 isExpanded: true,
                 decoration: const InputDecoration(labelText: 'Modalidade'),
                 items: [
-                  const DropdownMenuItem(
-                    value: '',
-                    child: Text('Todas as modalidades'),
-                  ),
+                  const DropdownMenuItem(value: '', child: Text('Todas')),
                   ...nomesModalidades.entries.map(
                     (item) => DropdownMenuItem(
                       value: item.key,
