@@ -53,3 +53,44 @@ test('CSV preserva acentos, aspas e quebras, neutraliza fórmulas e inclui BOM',
   assert.ok(csv.includes('2026-10-25T00:00:00-03:00'));
   assert.equal(gerarCsv([]).split('\r\n').length,2);
 });
+test('limites respeitam o dia de 23 horas na mudança histórica de horário de verão', async () => {
+  let params;
+  await selecionarPedidos({execute:async (_sql, valores) => {params=valores;return [[]];}},
+    filtrosRelatorio({inicio:'2018-11-04',fim:'2018-11-04'},agora));
+  assert.deepEqual(params,[Date.parse('2018-11-04T03:00:00Z')/1000,Date.parse('2018-11-05T02:00:00Z')/1000]);
+});
+test('média arredonda meio centavo para cima sem ponto flutuante', () => {
+  const filtros = filtrosRelatorio({},agora);
+  const rows = ['0.10','0.11'].map(preco_estimado => ({preco_estimado,status:'rascunho',tipo:'padrao',criado_epoch:agora.getTime()/1000}));
+  assert.equal(resumoPedidos(rows,filtros,agora).ticketMedioEstimado,'0.11');
+});
+test('contratos HTTP: JWT, erros, resumo e download autenticado', async t => {
+  const express = require('../back/gestao_de_pedidos/node_modules/express');
+  const jwt = require('../back/gestao_de_pedidos/node_modules/jsonwebtoken');
+  const { criarRelatoriosRouter } = require('../back/gestao_de_pedidos/routes/relatorios');
+  const secret = 'segredo-exclusivo-dos-testes-unitarios';
+  let indisponivel = false;
+  const app = express();
+  app.use('/relatorios',criarRelatoriosRouter({secret,agora:()=>agora,
+    database:{execute:async()=>{if(indisponivel) throw Object.assign(new Error('offline'),{code:'TEST_OFFLINE'}); return [[]];}}}));
+  app.use('/sem-configuracao',criarRelatoriosRouter({secret:''}));
+  const server = await new Promise((resolve,reject) => {const s=app.listen(0,'127.0.0.1',erro=>erro?reject(erro):resolve(s));s.once('error',reject);});
+  t.after(()=>{server.closeAllConnections();server.close();});
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const valid = jwt.sign({id:1},secret,{expiresIn:'1h'});
+  for(const path of ['/resumo','/exportar']) {
+    for(const token of [undefined,'invalido',jwt.sign({id:1},secret,{expiresIn:-1}),jwt.sign({id:1},'outro-segredo')]) {
+      const r = await fetch(`${base}/relatorios${path}`,{headers:token?{authorization:`Bearer ${token}`}:{}});
+      assert.equal(r.status,401);
+    }
+    const r = await fetch(`${base}/relatorios${path}`,{headers:{authorization:`Bearer ${valid}`}});
+    assert.equal(r.status,200); assert.equal(r.headers.get('cache-control'),'no-store');
+    if(path==='/resumo') assert.equal((await r.json()).totalPedidos,0);
+    else {assert.match(r.headers.get('content-type'),/text\/csv/);assert.match(r.headers.get('content-disposition'),/2026-09-26-2026-10-25\.csv/);assert.deepEqual([...new Uint8Array(await r.arrayBuffer()).slice(0,3)],[239,187,191]);}
+    const bad = await fetch(`${base}/relatorios${path}?inicio=2026-02-30`,{headers:{authorization:`Bearer ${valid}`}});
+    assert.equal(bad.status,400);
+  }
+  assert.equal((await fetch(`${base}/sem-configuracao/resumo`)).status,503);
+  indisponivel = true;
+  assert.equal((await fetch(`${base}/relatorios/resumo`,{headers:{authorization:`Bearer ${valid}`}})).status,503);
+});

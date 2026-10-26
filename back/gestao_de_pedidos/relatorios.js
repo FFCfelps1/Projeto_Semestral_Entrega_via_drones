@@ -30,7 +30,7 @@ function filtrosRelatorio(query = {}, agora = new Date()) {
 async function selecionarPedidos(database, filtros) {
   // FROM_UNIXTIME e UNIX_TIMESTAMP mantêm a seleção independente do fuso da conexão MySQL.
   const inicio = DateTime.fromISO(filtros.inicio, { zone: FUSO });
-  const fim = DateTime.fromISO(filtros.fim, { zone: FUSO }).plus({ days: 1 });
+  const fim = DateTime.fromISO(filtros.fim, { zone: FUSO }).plus({ days: 1 }).startOf('day');
   const condicoes = ['criado_em >= FROM_UNIXTIME(?)', 'criado_em < FROM_UNIXTIME(?)'];
   const params = [inicio.toSeconds(), fim.toSeconds()];
   for (const [chave, coluna] of [['status', 'status'], ['tipo', 'tipo']]) {
