@@ -6,7 +6,7 @@ O ambiente executa React e Flutter no mesmo frontend Nginx, cinco serviços Node
 
 Instale Node.js 24, npm, Docker Desktop e `kubectl`. No Docker Desktop, crie ou habilite o cluster Kubernetes com provisionador **kind**, **um nó** e armazenamento de imagens **containerd**. O modo kind exige containerd, conforme a [documentação do Docker Desktop](https://docs.docker.com/desktop/use-desktop/kubernetes/). O ambiente foi validado com 8 GiB disponíveis para o Docker.
 
-Para construir as imagens da v1.13.0, instale também Flutter com Dart >=3.13.1 no PATH (validado com Flutter 3.47.1). O build gera Flutter Web localmente antes de montar a imagem Nginx; a execução das imagens já construídas não exige SDK no cluster.
+Para construir as imagens da versão 1.2.0-mobile, instale também Flutter com Dart >=3.13.1 no PATH (validado com Flutter 3.47.1). O build gera Flutter Web localmente antes de montar a imagem Nginx; a execução das imagens já construídas não exige SDK no cluster.
 
 Na raiz do repositório:
 

@@ -1,6 +1,6 @@
 # Histórico de versões
 
-## v1.13.0 — 25/10/2026
+## 1.2.0-mobile — 25/10/2026
 
 - Acrescenta a tela inédita de Relatórios e Indicadores em Flutter Web, em `/relatorios/`, junto ao site React no mesmo Nginx.
 - Integra login e validação de perfil ao backend, mantendo a sessão Flutter em memória.
