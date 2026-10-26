@@ -54,7 +54,7 @@ test('login real, filtros explícitos e CSV baixado pelo navegador',async({page}
   await expect(page.getByRole('button',{name:'Exportar CSV',exact:true})).toBeEnabled();
   await page.screenshot({path:'.kubernetes-local/relatorios-desktop.png',fullPage:true});
   await page.getByRole('button',{name:'Alternar para modo escuro',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Alternar para modo claro',exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:/Alternar para modo claro/})).toBeVisible();
   await page.waitForTimeout(250);
   await page.screenshot({path:'.kubernetes-local/relatorios-escuro.png',fullPage:true});
   await page.getByRole('button',{name:'Sair',exact:true}).click();
