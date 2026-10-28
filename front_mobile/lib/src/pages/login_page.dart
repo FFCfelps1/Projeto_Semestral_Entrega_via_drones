@@ -236,7 +236,7 @@ class _LoginPageState extends State<LoginPage> {
                                     } catch (_) {
                                       if (mounted) {
                                         _mostrarAviso(
-                                          'Não foi possível abrir o cadastro no site.',
+                                          'Não foi possível abrir o cadastro.',
                                         );
                                       }
                                     }
