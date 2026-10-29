@@ -113,17 +113,10 @@ void main() {
     },
   );
 
-  testWidgets('Recuperacao informa disponibilidade e cadastro abre o site', (
+  testWidgets('Recuperacao informa disponibilidade e cadastro abre no app', (
     tester,
   ) async {
-    var abriuCadastro = false;
-    await tester.pumpWidget(
-      SkySwiftApp(
-        onOpenRegistration: () async {
-          abriuCadastro = true;
-        },
-      ),
-    );
+    await tester.pumpWidget(const SkySwiftApp());
     await tester.ensureVisible(find.text('Esqueci minha senha'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Esqueci minha senha'));
@@ -139,8 +132,11 @@ void main() {
     await tester.ensureVisible(find.text('Criar conta'));
     await tester.tap(find.text('Criar conta'));
     await tester.pumpAndSettle();
-    expect(abriuCadastro, isTrue);
-    expect(find.byType(TextFormField), findsNWidgets(2));
+    expect(find.text('Crie sua conta SkySwift'), findsOneWidget);
+    expect(find.byType(TextFormField), findsNWidgets(4));
+    await tester.tap(find.text('Já tenho conta'));
+    await tester.pumpAndSettle();
+    expect(find.text('Entre na sua conta'), findsOneWidget);
   });
   testWidgets('Valida campos vazios e foca o primeiro erro', (tester) async {
     await tester.pumpWidget(const SkySwiftApp());
