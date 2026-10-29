@@ -210,7 +210,7 @@ class SkySwiftApi {
       _pedidos,
       query: {
         if (usuarioId != null) 'usuarioId': '$usuarioId',
-        if (status != null) 'status': status,
+       'status': ?status,
       },
     ),
   ).map((p) => Pedido.fromJson(p as Map<String, dynamic>)).toList();
@@ -290,7 +290,7 @@ class SkySwiftApi {
           'origemLng': '${origem.lng}',
           'destinoLat': '${destino.lat}',
           'destinoLng': '${destino.lng}',
-          if (pedidoId != null) 'pedidoId': pedidoId,
+         'pedidoId': ?pedidoId,
         },
         tempoLimite: const Duration(seconds: 60),
       ),

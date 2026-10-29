@@ -116,8 +116,19 @@ class _Metrica extends StatelessWidget {
     children: [
       Icon(icone, size: 20, color: Theme.of(context).colorScheme.primary),
       const SizedBox(width: 6),
-      Text('$rotulo: ', style: const TextStyle(fontWeight: FontWeight.w500)),
-      Text(valor),
+            Flexible(
+        child: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: '$rotulo: ',
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+              TextSpan(text: valor),
+            ],
+          ),
+        ),
+      ),
     ],
   );
 }

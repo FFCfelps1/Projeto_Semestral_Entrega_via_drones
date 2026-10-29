@@ -134,6 +134,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Crie sua conta SkySwift'), findsOneWidget);
     expect(find.byType(TextFormField), findsNWidgets(4));
+    await tester.ensureVisible(find.text('Já tenho conta'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Já tenho conta'));
     await tester.pumpAndSettle();
     expect(find.text('Entre na sua conta'), findsOneWidget);

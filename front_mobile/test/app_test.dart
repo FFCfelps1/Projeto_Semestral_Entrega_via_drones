@@ -26,6 +26,9 @@ Future<void> tocar(WidgetTester tester, Finder alvo) async {
   await tester.tap(alvo);
   await tester.pumpAndSettle();
 }
+/// O app usa pt-BR: o botão de voltar tem a dica "Voltar", não "Back".
+Future<void> voltar(WidgetTester tester) =>
+    tocar(tester, find.byTooltip('Voltar'));
 
 Future<void> abrirAba(WidgetTester tester, String nome) => tocar(
   tester,
@@ -149,8 +152,7 @@ void main() {
         ['rascunho', 'confirmado', 'em_rota', 'entregue'],
       );
 
-      await tester.pageBack();
-      await tester.pumpAndSettle();
+      await voltar(tester);
       expect(find.text('1 pedido'), findsOneWidget);
     },
   );
@@ -348,8 +350,7 @@ void main() {
     await entrar(tester, backend);
     await tocar(tester, find.text('Medicamentos'));
     expect(find.text('Detalhes'), findsOneWidget);
-    await tester.pageBack();
-    await tester.pumpAndSettle();
+    await voltar(tester);
     await tocar(tester, find.byTooltip('Sair'));
     expect(find.text('Entre na sua conta'), findsOneWidget);
   });
