@@ -1,5 +1,7 @@
 # Relatórios e Indicadores de Entregas
 
+> A partir da 1.3.0-mobile, os relatórios são uma das áreas do aplicativo Flutter completo; veja o [guia do aplicativo](mobile.md). Depois do login, abra **Relatórios** na navegação.
+
 A entrega 1.2.0-mobile acrescenta uma tela Flutter inédita em <http://localhost:8080/relatorios/>. Ela não substitui as páginas React de pedidos, rastreamento, conta ou notificações. São duas funcionalidades novas no serviço de pedidos: indicadores agregados e exportação CSV. Não foi criado outro microsserviço.
 
 ## Acesso e utilização
