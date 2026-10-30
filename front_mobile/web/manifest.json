@@ -1,11 +1,11 @@
 {
-  "name": "Relatórios SkySwift",
+  "name": "SkySwift",
   "short_name": "SkySwift",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#0175C2",
   "theme_color": "#0175C2",
-  "description": "Indicadores e relatórios de entregas.",
+  "description": "Pedidos, rotas, notificações e relatórios de entregas por drone.",
   "orientation": "portrait-primary",
   "prefer_related_applications": false,
   "icons": [

@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- O app consome o backend por HTTP; em desenvolvimento, o Nginx local não usa TLS. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
-        android:label="front_mobile"
+        android:label="SkySwift"
+        android:usesCleartextTraffic="true"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

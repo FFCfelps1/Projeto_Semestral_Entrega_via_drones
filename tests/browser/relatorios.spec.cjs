@@ -20,8 +20,12 @@ async function entrar(page) {
   await page.getByRole('textbox',{name:/Senha/}).click();
   await page.waitForTimeout(100);
   await page.keyboard.type(fixture.senha,{delay:40});
-  const resumoCarregado=page.waitForResponse(r=>r.url().includes('/relatorios/resumo'));
   await page.getByRole('button',{name:'Entrar',exact:true}).click();
+  // Desde a 1.3.0-mobile o login abre Pedidos; Relatórios é uma das áreas da navegação.
+  await expect(page.getByRole('heading',{name:/^Olá,/})).toBeVisible();
+  const resumoCarregado=page.waitForResponse(r=>r.url().includes('/relatorios/resumo'));
+  const aba=page.getByRole('tab',{name:/^Relatórios/}).or(page.getByRole('button',{name:/^Relatórios/}));
+  await aba.first().click();
   await expect(page.getByRole('heading',{name:'Relatórios de Entregas',exact:true})).toBeVisible();
   expect((await resumoCarregado).status()).toBe(200);
 }
@@ -61,7 +65,7 @@ test('login real, filtros explícitos e CSV baixado pelo navegador',async({page}
   await expect(page.getByRole('heading',{name:'Entre na sua conta'})).toBeVisible();
   expect(erros).toEqual([]);
 });
-test('tela pequena, período vazio, sessão em memória e cadastro existente',async({page})=>{
+test('tela pequena, período vazio, sessão em memória e cadastro no app',async({page})=>{
   await page.setViewportSize({width:390,height:844});
   const erros=[];page.on('pageerror',e=>erros.push(e.message));
   await entrar(page);
@@ -79,6 +83,6 @@ test('tela pequena, período vazio, sessão em memória e cadastro existente',as
   if(await ativar.count()) await ativar.dispatchEvent('click');
   await expect(page.getByRole('heading',{name:'Entre na sua conta'})).toBeVisible();
   await page.getByRole('button',{name:'Criar conta',exact:true}).click();
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole('heading',{name:'Crie sua conta SkySwift'})).toBeVisible();
   expect(erros).toEqual([]);
 });

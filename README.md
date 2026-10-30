@@ -16,7 +16,23 @@ Nome: Pedro Wilian Palumbo Bevilacqua RA: 23.01307-9
 
 ---
 
-Uma aplicação para gerenciamento de entregas via drones, com site React, relatórios em Flutter e microsserviços Node.js e Dart.
+Uma aplicação para gerenciamento de entregas via drones, com site React, aplicativo Flutter e microsserviços Node.js e Dart.
+
+## 📱 SkySwift Mobile
+
+**Sua encomenda no ar em minutos.** O SkySwift Mobile coloca a operação de entregas por drone na palma da mão: em poucos toques você cadastra a encomenda, vê na hora quanto vai custar e em quanto tempo chega, confirma e despacha o drone. A rota é calculada pelo nosso serviço de rotas e o pedido passa sozinho para **Em rota**, sem planilhas nem ligações para a central.
+
+Para quem envia, a vantagem é previsibilidade: preço e prazo aparecem antes de criar o pedido, cada mudança de status fica registrada com data e hora e as notificações avisam quando algo acontece. Para quem opera, o app reúne num só lugar os indicadores de volume, faturamento estimado e entregas concluídas, com exportação CSV para a planilha da equipe.
+
+O que o app oferece:
+
+- **Pedidos** — criação com prévia de preço por modalidade (padrão, expressa, prioritária), filtros por status, histórico completo, confirmação, processamento, despacho, conclusão e cancelamento
+- **Rotas** — simulação do trajeto do drone a partir do centro logístico, com distância, tempo estimado e atalho para o OpenStreetMap
+- **Notificações** — central com contador de não lidas, leitura individual ou em lote e atalho para o pedido
+- **Relatórios** — indicadores por período, status e modalidade, gráfico diário e CSV
+- **Conta** — cadastro, login, edição de perfil, troca de senha, exclusão de conta, contato com a equipe e painel de saúde dos microsserviços
+
+Roda no navegador (publicado em `/relatorios/` no Kubernetes), adapta a navegação a celulares e telas largas e está configurado para Android (permissão de rede e HTTP local). Detalhes, endpoints e testes no [guia do aplicativo](docs/frontend/mobile.md).
 
 ## 🚀 Características
 
@@ -26,13 +42,14 @@ Uma aplicação para gerenciamento de entregas via drones, com site React, relat
 - 💰 Página de preços com três planos e FAQ interativo
 - 🔧 Commits estruturados seguindo padrão semântico
 - 📦 Versionamento semântico com tags Git
+- 📱 Aplicativo Flutter com acesso a todas as funcionalidades do backend
 - 📊 Relatórios e indicadores em Flutter, com filtros e exportação CSV autenticada
 
 ## 📋 Pré-requisitos
 
 - Node.js 24
 - npm ou yarn
-- Flutter compatível com Dart >= 3.13.1 para compilar os relatórios (validado com Flutter 3.47.1)
+- Flutter compatível com Dart >= 3.13.1 para compilar o aplicativo (validado com Flutter 3.47.1)
 
 ## 🛠️ Configuração e Instalação
 
@@ -50,7 +67,7 @@ npm run k8s:access
 
 A aplicação fica em `http://localhost:8080` e o Mailpit em `http://localhost:8025`, enquanto o comando de acesso estiver aberto. `npm run k8s:test` valida os fluxos e reinícios; `npm run k8s:down` preserva banco e credenciais.
 
-O novo painel Flutter fica em **http://localhost:8080/relatorios/**. Entre com uma conta cadastrada pelo React para consultar indicadores por período, status e modalidade e baixar o CSV. A tela é inédita e não substitui as páginas existentes. React e Flutter são servidos pela mesma imagem Nginx. Veja o [guia de relatórios](docs/frontend/relatorios.md) para contratos, autenticação, compilação e testes.
+O aplicativo Flutter fica em **http://localhost:8080/relatorios/**. Crie uma conta no próprio app (ou use a do site React) para gerenciar pedidos, rotas, notificações, relatórios e conta. React e Flutter são servidos pela mesma imagem Nginx. Veja o [guia do aplicativo](docs/frontend/mobile.md) e o [guia de relatórios](docs/frontend/relatorios.md) para contratos, autenticação, compilação e testes.
 
 Consulte o [guia Kubernetes](docs/infra/kubernetes.md) para arquitetura, comandos, persistência, Vercel e diagnóstico, e o [relatório de testes](docs/infra/kubernetes-testes.md) para os resultados.
 
@@ -86,7 +103,7 @@ http://localhost:5173
 - `/rastreamento` — Rastreamento de entrega por drone com mapa interativo
 - `/suporte` — Central de ajuda com busca e tópicos expansíveis
 - `/notificacoes` — Central de notificacoes recebidas pelo usuario, com leitura individual ou em lote
-- `/relatorios/` — Nova tela Flutter: indicadores agregados e exportação CSV autenticada, disponível no Kubernetes
+- `/relatorios/` — Aplicativo Flutter completo (pedidos, rotas, notificações, relatórios e conta), disponível no Kubernetes
 
 ## Backend: Microsservicos
 
@@ -597,6 +614,14 @@ PROJETO_SEMESTRAL_ENTREGA_VIA_DRONES/
 │   └── notificacoes/
 │       └── server.js                            # Microsserviço de notificações
 │
+├── front_mobile/                                # Aplicativo Flutter
+│   ├── lib/main.dart                            # Sessão, tema e troca entre login e navegação
+│   ├── lib/src/models/                          # Pedido, relatório, notificação, rota e sistema
+│   ├── lib/src/pages/                           # Login, cadastro, pedidos, rotas, notificações, relatórios e conta
+│   ├── lib/src/services/                        # Cliente HTTP dos microsserviços e sessão em memória
+│   ├── lib/src/widgets/                         # Componentes compartilhados e desenho da rota
+│   └── test/                                    # Testes de widgets com backend simulado
+│
 └── front/                                       # Aplicação React
     │
     ├── public/
@@ -766,6 +791,7 @@ git push origin v1.0.0
 | FontAwesome | 7.2.0 | Ícones |
 | JavaScript | ES2020+ | Linguagem |
 | Dart | 3.x | Servico de rotas (`shelf`, `http`) |
+| Flutter | 3.47 | Aplicativo mobile e web (`front_mobile`) |
 | Docker / Kubernetes | Docker Desktop (kind) | Implantacao dos microsservicos |
 
 ## 📱 Responsividade

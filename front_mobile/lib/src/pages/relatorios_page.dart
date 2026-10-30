@@ -1,9 +1,10 @@
+import 'dart:convert';
 import 'dart:math' as math;
-import 'dart:typed_data';
 
 import '../services/download.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -272,7 +273,13 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
     try {
       final arquivo = await widget.api.exportar(widget.sessao.token, filtros);
       if (!mounted) return;
-      await (widget.onDownload ?? salvarCsv)(arquivo.bytes, arquivo.nome);
+      try {
+        await (widget.onDownload ?? salvarCsv)(arquivo.bytes, arquivo.nome);
+      } on UnsupportedError {
+        // Fora do navegador, o conteúdo é exibido para copiar ou compartilhar.
+        if (mounted) await _mostrarCsv(arquivo);
+        return;
+      }
       if (mounted) {
         setState(
           () => _mensagemExportacao =
@@ -292,6 +299,45 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
       );
     } finally {
       if (mounted) setState(() => _exportando = false);
+    }
+  }
+
+  Future<void> _mostrarCsv(ArquivoRelatorio arquivo) async {
+    final texto = utf8.decode(arquivo.bytes).replaceFirst('\uFEFF', '');
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(arquivo.nome),
+        content: SizedBox(
+          width: 560,
+          child: SingleChildScrollView(
+            child: SelectableText(
+              texto,
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Fechar'),
+          ),
+          FilledButton.icon(
+            onPressed: () async {
+              await Clipboard.setData(ClipboardData(text: texto));
+              if (context.mounted) Navigator.pop(context);
+            },
+            icon: const Icon(Icons.copy_outlined),
+            label: const Text('Copiar CSV'),
+          ),
+        ],
+      ),
+    );
+    if (mounted) {
+      setState(
+        () => _mensagemExportacao =
+            'Relatório gerado. Neste dispositivo o CSV é exibido para copiar.',
+      );
     }
   }
 

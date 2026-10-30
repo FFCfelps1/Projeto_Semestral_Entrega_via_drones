@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import 'src/pages/cadastro_page.dart';
+import 'src/pages/home_page.dart';
 import 'src/pages/login_page.dart';
-import 'src/pages/relatorios_page.dart';
 import 'src/theme/app_theme.dart';
 import 'src/services/skyswift_api.dart';
 import 'src/services/sessao_controller.dart';
@@ -14,11 +14,10 @@ void main() {
   runApp(const SkySwiftApp());
 }
 
-/// A configuração global fica fora da página para acompanhar futuras telas.
+/// A configuração global fica fora das páginas e acompanha a sessão.
 class SkySwiftApp extends StatefulWidget {
-  const SkySwiftApp({super.key, this.api, this.onOpenRegistration});
+  const SkySwiftApp({super.key, this.api});
   final SkySwiftApi? api;
-  final Future<void> Function()? onOpenRegistration;
 
   @override
   State<SkySwiftApp> createState() => _SkySwiftAppState();
@@ -28,6 +27,7 @@ class _SkySwiftAppState extends State<SkySwiftApp> {
   ThemeMode _themeMode = ThemeMode.system;
   late final SkySwiftApi _api;
   late final SessaoController _sessao;
+  final _navegador = GlobalKey<NavigatorState>();
   SemanticsHandle? _semantica;
   @override
   void initState() {
@@ -37,7 +37,15 @@ class _SkySwiftAppState extends State<SkySwiftApp> {
     _sessao = SessaoController(_api)..addListener(_atualizar);
   }
 
+  String? _tokenAtual;
+
   void _atualizar() {
+    // Entrar, cadastrar ou sair troca a tela inicial; rotas abertas são fechadas.
+    final token = _sessao.sessao?.token;
+    if (token != _tokenAtual) {
+      _tokenAtual = token;
+      _navegador.currentState?.popUntil((rota) => rota.isFirst);
+    }
     if (mounted) setState(() {});
   }
 
@@ -58,10 +66,20 @@ class _SkySwiftAppState extends State<SkySwiftApp> {
     setState(() => _themeMode = escuro ? ThemeMode.light : ThemeMode.dark);
   }
 
+  Future<void> _abrirCadastro() async {
+    await _navegador.currentState?.push(
+      MaterialPageRoute<void>(
+        builder: (_) => CadastroPage(onCadastrar: _sessao.cadastrar),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final sessao = _sessao.sessao;
     return MaterialApp(
       title: 'SkySwift',
+      navigatorKey: _navegador,
       debugShowCheckedModeBanner: false,
       locale: const Locale('pt', 'BR'),
       supportedLocales: const [Locale('pt', 'BR')],
@@ -69,28 +87,19 @@ class _SkySwiftAppState extends State<SkySwiftApp> {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: _themeMode,
-      home: _sessao.sessao == null
+      home: sessao == null
           ? LoginPage(
               onToggleTheme: _alternarTema,
               onLogin: _sessao.entrar,
-              onCreateAccount:
-                  widget.onOpenRegistration ??
-                  () async {
-                    if (!await launchUrl(
-                      _api.base.resolve('/login'),
-                      webOnlyWindowName: '_self',
-                    )) {
-                      throw const ApiException(
-                        'Não foi possível abrir o cadastro.',
-                      );
-                    }
-                  },
+              onCreateAccount: _abrirCadastro,
             )
-          : RelatoriosPage(
+          : HomePage(
+              key: ValueKey('sessao-${sessao.usuario.id}'),
               api: _api,
-              sessao: _sessao.sessao!,
+              sessao: sessao,
               onLogout: _sessao.sair,
               onToggleTheme: _alternarTema,
+              onUsuarioAtualizado: _sessao.atualizarUsuario,
             ),
     );
   }
