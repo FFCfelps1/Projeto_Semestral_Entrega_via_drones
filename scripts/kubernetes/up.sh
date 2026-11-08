@@ -2,7 +2,7 @@
 source "$(dirname "$0")/common.sh"
 [[ $# == 0 || ($# == 1 && "$1" == --no-build) ]] || { echo 'Opção inválida; use --no-build para reutilizar imagens.' >&2; exit 1; }
 require_cluster
-if [[ "${1:-}" != --no-build ]]; then "$ROOT/scripts/kubernetes/build.sh"; fi
+if [[ "${1:-}" != --no-build ]]; then bash "$ROOT/scripts/kubernetes/build.sh"; fi
 [[ -s "$STATE/image-tag" ]] || { echo 'Execute k8s:build antes de --no-build.' >&2; exit 1; }
 tag="$(cat "$STATE/image-tag")"
 # Verifica todas as imagens antes de alterar recursos da aplicação.

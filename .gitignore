@@ -150,3 +150,6 @@ vite.config.ts.timestamp-*
 
 # Estado e credenciais do Kubernetes local
 .kubernetes-local/
+
+# Credenciais do Docker Compose local
+.docker-local/

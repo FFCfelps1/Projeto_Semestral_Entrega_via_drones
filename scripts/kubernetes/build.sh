@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 source "$(dirname "$0")/common.sh"
-platform="${PLATFORM:-linux/arm64}"
+platform="${PLATFORM:-}"
 if [[ -z "${PLATFORM:-}" ]]; then
   arch="$(d info --format '{{.Architecture}}')"
-  [[ "$arch" != x86_64 ]] || platform=linux/amd64
+  case "$arch" in
+    x86_64|amd64) platform=linux/amd64 ;;
+    aarch64|arm64) platform=linux/arm64 ;;
+    *) echo "Arquitetura Docker nao suportada: $arch. Defina PLATFORM." >&2; exit 1 ;;
+  esac
 fi
 tag="$(git -C "$ROOT" rev-parse --short HEAD)-$(date -u +%Y%m%d%H%M%S)"
-bash "$ROOT/scripts/flutter/build-web.sh"
+# React e Flutter sao compilados dentro do Dockerfile do frontend.
 for service in barramento_eventos contato_email cadastro_usuario gestao_de_pedidos notificacoes; do
   name="${service//_/-}"
   d buildx build --platform "$platform" --load -t "docker.io/library/skyswift-$name:$tag" -f "$ROOT/back/$service/Dockerfile" "$ROOT/back"

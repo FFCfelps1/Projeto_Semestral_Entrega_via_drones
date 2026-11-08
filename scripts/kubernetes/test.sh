@@ -21,4 +21,5 @@ for attempt in {1..30}; do
   sleep 1
 done
 APP_URL=http://127.0.0.1:18080 MAIL_URL=http://127.0.0.1:18025 node "$ROOT/tests/integration.cjs" "$@"
+APP_URL=http://127.0.0.1:18080 node "$ROOT/tests/deployment-smoke.cjs"
 node "$ROOT/tests/relatorios-integration.cjs" "$@"

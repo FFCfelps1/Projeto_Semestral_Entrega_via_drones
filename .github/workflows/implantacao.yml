@@ -1,0 +1,75 @@
+name: Implantacao final
+
+on:
+  push:
+    branches: [main, feat/implantacao-final-08-11]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: implantacao-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker-kubernetes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Preparar ferramentas e dependencias
+        run: |
+          docker context create desktop-linux --docker host=unix:///var/run/docker.sock
+          curl --fail --location --retry 3 https://kind.sigs.k8s.io/dl/v0.33.0/kind-linux-amd64 -o /tmp/kind
+          chmod +x /tmp/kind
+          sudo mv /tmp/kind /usr/local/bin/kind
+          npm ci
+      - name: Validar scripts e testes existentes
+        run: |
+          npm run docker:check
+          npm run test:infra
+          npm test
+          kubectl kustomize infra/kubernetes/infrastructure >/dev/null
+          kubectl kustomize infra/kubernetes/application >/dev/null
+      - name: Construir e testar Docker Compose
+        run: |
+          npm run docker:up
+          npm run docker:down
+          npm run docker:up -- --no-build
+          npm run docker:down
+      - name: Preparar cluster isolado com as mesmas imagens
+        run: |
+          kind create cluster --name docker-desktop --wait 180s
+          kubectl config rename-context kind-docker-desktop docker-desktop
+          mkdir -p .kubernetes-local
+          tag="ci-${GITHUB_SHA}"
+          printf '%s\n' "$tag" > .kubernetes-local/image-tag
+          for service in barramento-eventos entrega-via-drone-dart contato-email cadastro-usuario gestao-de-pedidos notificacoes frontend; do
+            image="docker.io/library/skyswift-$service:$tag"
+            docker tag "skyswift-$service:docker" "$image"
+            kind load docker-image "$image" --name docker-desktop
+          done
+      - name: Implantar e testar Kubernetes
+        run: |
+          npm run k8s:check
+          npm run k8s:up -- --no-build
+          npm run k8s:test
+          npm run k8s:test -- --lifecycle
+      - name: Diagnostico de falhas
+        if: failure()
+        run: |
+          npm run docker:status || true
+          kubectl --context docker-desktop -n skyswift get pods,events || true
+          kubectl --context docker-desktop -n skyswift logs -l app=frontend --tail=100 || true
+      - name: Encerrar ambiente temporario
+        if: always()
+        run: |
+          npm run docker:down || true
+          kind delete cluster --name docker-desktop || true

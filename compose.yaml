@@ -1,0 +1,162 @@
+name: skyswift
+
+x-environment: &environment
+  NODE_ENV: production
+  BARRAMENTO_URL: http://barramento-eventos:3001
+  DB_HOST: mysql
+  DB_PORT: '3306'
+  DB_NAME: skyswift
+  DB_USER: skyswift
+  DB_CONNECTION_LIMIT: '5'
+  SMTP_HOST: mailpit
+  SMTP_PORT: '1025'
+  SMTP_SECURE: 'false'
+  SMTP_AUTH_REQUIRED: 'false'
+  SMTP_FROM: skyswift@example.test
+  CONTACT_RECIPIENT: contato@example.test
+
+x-node: &node
+  restart: unless-stopped
+  init: true
+  stop_grace_period: 15s
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+  healthcheck:
+    test: [CMD, node, -e, "fetch('http://127.0.0.1:'+process.env.PORT+'/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+    interval: 5s
+    timeout: 5s
+    retries: 20
+    start_period: 20s
+
+x-dependencies: &dependencies
+  mysql: {condition: service_healthy}
+  barramento-eventos: {condition: service_healthy}
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: skyswift
+      MYSQL_USER: skyswift
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Use npm run docker:up para gerar as credenciais}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Credencial MySQL ausente}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_PASSWORD" mysql -h 127.0.0.1 -u "$$MYSQL_USER" -D "$$MYSQL_DATABASE" -e "SELECT 1" >/dev/null']
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 20s
+
+  # Executado pelo script antes de subir os servicos que consultam as tabelas.
+  schema-init:
+    image: mysql:8.4
+    profiles: [tools]
+    restart: 'no'
+    environment:
+      MYSQL_PWD: ${DB_PASSWORD:?Credencial MySQL ausente}
+    volumes:
+      - ./deploy_cloud.sql:/schema/schema.sql:ro
+    command: [sh, -c, 'mysql --connect-timeout=5 -h mysql -u skyswift -D skyswift < /schema/schema.sql']
+
+  mailpit:
+    image: axllent/mailpit:v1.27.4
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${MAIL_PORT:-8025}:8025'
+
+  barramento-eventos:
+    <<: *node
+    image: skyswift-barramento-eventos:docker
+    build: {context: ./back, dockerfile: barramento_eventos/Dockerfile}
+    environment:
+      <<: *environment
+      PORT: '3001'
+      SERVICE_URL: http://barramento-eventos:3001
+
+  entrega-via-drone:
+    image: skyswift-entrega-via-drone-dart:docker
+    build: {context: ./back/entrega_via_drone_dart}
+    restart: unless-stopped
+    stop_grace_period: 15s
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    depends_on:
+      barramento-eventos: {condition: service_healthy}
+    environment:
+      PORT: '3002'
+      SERVICE_URL: http://entrega-via-drone:3002
+      BARRAMENTO_URL: http://barramento-eventos:3001
+
+  contato-email:
+    <<: *node
+    image: skyswift-contato-email:docker
+    build: {context: ./back, dockerfile: contato_email/Dockerfile}
+    depends_on:
+      barramento-eventos: {condition: service_healthy}
+      mailpit: {condition: service_started}
+    environment:
+      <<: *environment
+      PORT: '3003'
+      SERVICE_URL: http://contato-email:3003
+
+  cadastro-usuario:
+    <<: *node
+    image: skyswift-cadastro-usuario:docker
+    build: {context: ./back, dockerfile: cadastro_usuario/Dockerfile}
+    depends_on: *dependencies
+    environment:
+      <<: *environment
+      PORT: '3004'
+      SERVICE_URL: http://cadastro-usuario:3004
+      DB_PASSWORD: ${DB_PASSWORD:?Credencial MySQL ausente}
+      JWT_SECRET: ${JWT_SECRET:?Segredo JWT ausente}
+
+  gestao-de-pedidos:
+    <<: *node
+    image: skyswift-gestao-de-pedidos:docker
+    build: {context: ./back, dockerfile: gestao_de_pedidos/Dockerfile}
+    depends_on: *dependencies
+    environment:
+      <<: *environment
+      PORT: '3005'
+      SERVICE_URL: http://gestao-de-pedidos:3005
+      DB_PASSWORD: ${DB_PASSWORD:?Credencial MySQL ausente}
+      JWT_SECRET: ${JWT_SECRET:?Segredo JWT ausente}
+
+  notificacoes:
+    <<: *node
+    image: skyswift-notificacoes:docker
+    build: {context: ./back, dockerfile: notificacoes/Dockerfile}
+    depends_on: *dependencies
+    environment:
+      <<: *environment
+      PORT: '3006'
+      SERVICE_URL: http://notificacoes:3006
+      DB_PASSWORD: ${DB_PASSWORD:?Credencial MySQL ausente}
+
+  frontend:
+    image: skyswift-frontend:docker
+    build: {context: ., dockerfile: front/Dockerfile}
+    restart: unless-stopped
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    depends_on:
+      barramento-eventos: {condition: service_healthy}
+      entrega-via-drone: {condition: service_started}
+      contato-email: {condition: service_healthy}
+      cadastro-usuario: {condition: service_healthy}
+      gestao-de-pedidos: {condition: service_healthy}
+      notificacoes: {condition: service_healthy}
+    ports:
+      - '127.0.0.1:${APP_PORT:-8080}:8080'
+    healthcheck:
+      test: [CMD, wget, -q, --spider, 'http://127.0.0.1:8080/ready']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  mysql-data:

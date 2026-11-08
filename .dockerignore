@@ -2,9 +2,14 @@
 !front/
 !front/**
 !front_mobile/
-!front_mobile/build/
-!front_mobile/build/web/
-!front_mobile/build/web/**
+!front_mobile/pubspec.yaml
+!front_mobile/pubspec.lock
+!front_mobile/lib/
+!front_mobile/lib/**
+!front_mobile/assets/
+!front_mobile/assets/**
+!front_mobile/web/
+!front_mobile/web/**
 **/node_modules
 **/.env
 **/.env.*

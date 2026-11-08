@@ -1,5 +1,16 @@
 # Histórico de versões
 
+## 1.4.0-infra — 08/11/2026
+
+- Implanta a solução final usando os serviços e o aplicativo Flutter 1.3.0-mobile das entregas anteriores.
+- Compila React e Flutter dentro do Docker, sem depender de SDK ou build Flutter no computador.
+- Adiciona Docker Compose com inicialização do esquema, credenciais locais e volume persistente MySQL.
+- Ajusta a execução dos scripts Kubernetes no Windows para selecionar Git Bash e preservar finais de linha LF.
+- Verifica assets e versão do Flutter, prontidão das seis APIs, DNS interno, inscrições no barramento e JWT.
+- Acrescenta testes dos scripts e workflow de validação Docker/Kubernetes com integração, recuperação e persistência.
+
+Guia: [implantação final de 08/11](docs/infra/entrega-08-11.md).
+
 ## 1.3.0-mobile — 01/11/2026
 
 - Completa o aplicativo Flutter: interface gráfica para todas as funcionalidades do backend, sempre por HTTP via proxy `/api`.

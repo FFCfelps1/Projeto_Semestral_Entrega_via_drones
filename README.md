@@ -49,9 +49,23 @@ Roda no navegador (publicado em `/relatorios/` no Kubernetes), adapta a navegaç
 
 - Node.js 24
 - npm ou yarn
-- Flutter compatível com Dart >= 3.13.1 para compilar o aplicativo (validado com Flutter 3.47.1)
+- Docker Desktop com containers Linux para a implantação completa; Git Bash no Windows para os comandos Kubernetes
+- Flutter com Dart >= 3.13.1 somente para desenvolvimento mobile fora do Docker (SDK 3.47.1 já incluído no build da imagem)
 
 ## 🛠️ Configuração e Instalação
+
+### Entrega final de infraestrutura — 08/11
+
+A solução completa pode ser construída a partir do clone, sem instalar Flutter no computador:
+
+```bash
+npm run docker:check
+npm run docker:up
+```
+
+Site: `http://localhost:8080`; aplicativo Flutter: `http://localhost:8080/relatorios/`; e-mails de teste: `http://localhost:8025`. `npm run docker:down` preserva o banco e as credenciais. Para a implantação, os scripts precisam apenas de Node.js e Docker Desktop; `npm ci` é necessário para executar os testes de integração.
+
+O [guia da entrega de 08/11](docs/infra/entrega-08-11.md) descreve os comandos Docker/Kubernetes, a relação com a apostila de microsserviços e a validação automatizada. As telas e as regras de negócio das entregas anteriores são reutilizadas.
 
 ### Execução completa com Kubernetes (Docker Desktop)
 
