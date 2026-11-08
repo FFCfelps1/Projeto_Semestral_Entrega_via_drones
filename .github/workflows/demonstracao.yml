@@ -70,6 +70,7 @@ jobs:
           include-hidden-files: true
           path: |
             .kubernetes-local/relatorios-*.png
+            .kubernetes-local/react-*.png
             .kubernetes-local/demo-results/
             .kubernetes-local/demo-report/
             .kubernetes-local/demo-access.log

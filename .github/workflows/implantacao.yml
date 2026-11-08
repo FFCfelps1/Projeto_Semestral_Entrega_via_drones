@@ -40,7 +40,7 @@ jobs:
           kubectl kustomize infra/kubernetes/application >/dev/null
       - name: Construir e testar Docker Compose
         run: |
-          npm run docker:up
+          DB_PASSWORD=outro-projeto MYSQL_ROOT_PASSWORD=outro-root JWT_SECRET=outro-jwt npm run docker:up
           npm run docker:down
           npm run docker:up -- --no-build
           npm run docker:down

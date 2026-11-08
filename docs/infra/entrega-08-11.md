@@ -72,6 +72,8 @@ As credenciais ficam em `.docker-local/secrets.env`, ignorado pelo Git. Preserve
 esse arquivo junto com o volume `skyswift_mysql-data`. Se o volume existir e o
 arquivo desaparecer, o script exige a recuperação das credenciais antes de subir.
 Compose e Kubernetes usam bancos e credenciais independentes.
+Variaveis `DB_PASSWORD`, `MYSQL_ROOT_PASSWORD` e `JWT_SECRET` de outro projeto no
+terminal nao substituem as credenciais persistidas pelo script Docker.
 
 Para mudar as portas no PowerShell, use `$env:APP_PORT = '8081'` e
 `$env:MAIL_PORT = '8026'` antes de `npm run docker:up`. No Git Bash/Unix, use
@@ -118,6 +120,12 @@ O workflow em `.github/workflows/implantacao.yml` usa um runner descartável,
 reaproveita no Kubernetes as imagens testadas no Compose e não publica imagens
 em registries nem altera ambientes externos. Os resultados de cada execução
 ficam na aba **Actions** do repositório.
+
+O workflow manual `Revisao completa do codigo` executa ESLint/build do React,
+analise e testes Dart/Flutter e os testes Node com o SDK Dart disponivel, sem
+ignorar os testes de equivalencia. A implantacao tambem verifica os handlers
+Vercel com MySQL e SMTP temporarios. `Demonstracao visual`, escolhendo a versao
+desejada, grava os testes de navegador React e Flutter com screenshots e videos.
 
 ## Limites do ambiente
 

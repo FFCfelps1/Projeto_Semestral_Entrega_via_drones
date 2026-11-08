@@ -3,9 +3,24 @@ const assert = require('node:assert/strict');
 const http = require('node:http');
 const { spawnSync } = require('node:child_process');
 const { findBash } = require('../scripts/run-bash.cjs');
+const { composeEnvironment } = require('../scripts/docker/environment.cjs');
 const { verifyDeployment } = require('./deployment-smoke.cjs');
 const services = ['barramento_eventos', 'entrega_via_drone', 'contato_email',
   'cadastro_usuario', 'gestao_de_pedidos', 'notificacoes'];
+
+test('Compose preserva credenciais do arquivo e permite personalizar portas', () => {
+  const environment = Object.freeze({ DB_PASSWORD: 'outro-projeto',
+    MYSQL_ROOT_PASSWORD: 'outro-root', JWT_SECRET: 'outro-jwt',
+    APP_PORT: '8081', MAIL_PORT: '8026', PATH: '/bin' });
+  assert.deepEqual(composeEnvironment(environment), {
+    APP_PORT: '8081', MAIL_PORT: '8026', PATH: '/bin',
+  });
+  assert.equal(environment.DB_PASSWORD, 'outro-projeto');
+});
+
+test('Compose trata nomes de variaveis sem diferenca de caixa no Windows', () => {
+  assert.deepEqual(composeEnvironment({ Db_Password: 'outro', jwt_secret: 'outro', Path: 'C:\\bin' }), { Path: 'C:\\bin' });
+});
 
 test('launcher preserva argumentos e funciona sem WSL', () => {
   const result = spawnSync(process.execPath, ['scripts/run-bash.cjs', '-c', 'printf "%s" "$1"', 'bash', 'argumento com espacos'], { encoding: 'utf8' });

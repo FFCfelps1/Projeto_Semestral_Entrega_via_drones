@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { randomBytes } = require('node:crypto');
 const { spawnSync } = require('node:child_process');
+const { composeEnvironment } = require('./environment.cjs');
 const root = path.resolve(__dirname, '../..');
 const state = path.join(root, '.docker-local');
 const credentials = path.join(state, 'secrets.env');
@@ -19,7 +20,8 @@ function docker(parameters, options) {
 }
 function compose(parameters, options = {}) {
   return docker(['compose', '--project-name', 'skyswift', '--project-directory', root,
-    '--env-file', credentials, '-f', path.join(root, 'compose.yaml'), ...parameters], options);
+    '--env-file', credentials, '-f', path.join(root, 'compose.yaml'), ...parameters],
+  { ...options, env: composeEnvironment(options.env || process.env) });
 }
 function initialize() {
   if (fs.existsSync(credentials)) return;

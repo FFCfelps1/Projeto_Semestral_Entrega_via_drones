@@ -1,5 +1,12 @@
 # Histórico de versões
 
+## 1.4.1-infra — 08/11/2026
+
+- Impede que senhas e segredo JWT de outro projeto no terminal substituam as credenciais persistidas do Docker Compose.
+- Acrescenta validação independente de React, Dart, Flutter e equivalência HTTP Node/Dart, além dos handlers Vercel.
+- Amplia a demonstração de navegador com login, criação, confirmação, histórico e cancelamento de pedido no React e renderização em celular.
+- Preserva o código da aplicação e os pacotes das entregas anteriores.
+
 ## 1.4.0-infra — 08/11/2026
 
 - Implanta a solução final usando os serviços e o aplicativo Flutter 1.3.0-mobile das entregas anteriores.
