@@ -61,6 +61,7 @@ jobs:
           npm run k8s:check
           npm run k8s:up -- --no-build
           npm run k8s:test
+          npm run test:vercel
           npm run k8s:test -- --lifecycle
       - name: Diagnostico de falhas
         if: failure()

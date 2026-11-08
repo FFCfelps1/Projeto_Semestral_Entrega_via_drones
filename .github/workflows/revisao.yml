@@ -1,0 +1,66 @@
+name: Revisao completa do codigo
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  react:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+      - run: npm ci --prefix front
+      - name: Analisar React
+        run: npm run lint
+      - name: Compilar React
+        if: ${{ !cancelled() }}
+        run: npm run build
+
+  dart-flutter-node:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Preparar SDK oficial e dependencias
+        run: |
+          git clone --depth 1 --branch 3.47.1 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+          export PATH="$RUNNER_TEMP/flutter/bin:$PATH"
+          flutter config --no-analytics
+          flutter precache --web
+          flutter --version
+          npm ci
+          (cd back/entrega_via_drone_dart && dart pub get --enforce-lockfile)
+          (cd front_mobile && flutter pub get --enforce-lockfile)
+      - name: Analisar microsservico Dart
+        run: dart analyze back/entrega_via_drone_dart
+      - name: Testar microsservico Dart
+        if: ${{ !cancelled() }}
+        working-directory: back/entrega_via_drone_dart
+        run: dart test --reporter expanded
+      - name: Analisar Flutter
+        if: ${{ !cancelled() }}
+        working-directory: front_mobile
+        run: flutter analyze --no-pub
+      - name: Testar telas e regras Flutter
+        if: ${{ !cancelled() }}
+        working-directory: front_mobile
+        run: flutter test --no-pub --reporter expanded
+      - name: Testar Node e equivalencia com Dart sem testes ignorados
+        if: ${{ !cancelled() }}
+        run: npm test
+      - name: Testar scripts da entrega
+        if: ${{ !cancelled() }}
+        run: npm run test:infra
