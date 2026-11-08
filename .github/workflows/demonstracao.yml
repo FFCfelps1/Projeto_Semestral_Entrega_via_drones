@@ -1,0 +1,78 @@
+name: Demonstracao visual
+
+on:
+  workflow_dispatch:
+    inputs:
+      versao:
+        description: Tag ou commit da entrega que sera demonstrada
+        required: true
+        default: v1.4.0-infra
+
+permissions:
+  contents: read
+
+jobs:
+  navegador:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.versao }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Preparar Docker e navegador
+        run: |
+          docker context create desktop-linux --docker host=unix:///var/run/docker.sock
+          curl --fail --location --retry 3 https://kind.sigs.k8s.io/dl/v0.33.0/kind-linux-amd64 -o /tmp/kind
+          chmod +x /tmp/kind
+          sudo mv /tmp/kind /usr/local/bin/kind
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Implantar a versao escolhida no Kubernetes
+        run: |
+          npm run k8s:build
+          kind create cluster --name docker-desktop --wait 180s
+          kubectl config rename-context kind-docker-desktop docker-desktop
+          tag="$(cat .kubernetes-local/image-tag)"
+          for service in barramento-eventos entrega-via-drone-dart contato-email cadastro-usuario gestao-de-pedidos notificacoes frontend; do
+            kind load docker-image "docker.io/library/skyswift-$service:$tag" --name docker-desktop
+          done
+          npm run k8s:up -- --no-build
+          npm run k8s:access > .kubernetes-local/demo-access.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl -sf http://127.0.0.1:8080/ready >/dev/null; then break; fi
+            sleep 1
+          done
+          npm run test:deployment
+      - name: Demonstrar login, filtros, CSV, temas e tela mobile
+        run: |
+          cat > .kubernetes-local/demo.config.cjs <<'JS'
+          const path = require('node:path');
+          const base = require('../playwright.config.cjs');
+          module.exports = {
+            ...base,
+            testDir: path.resolve('tests/browser'),
+            outputDir: path.resolve('.kubernetes-local/demo-results'),
+            reporter: [['list'], ['html', {outputFolder: path.resolve('.kubernetes-local/demo-report'), open: 'never'}]],
+            use: {...base.use, channel: 'chromium', video: 'on', trace: 'on'},
+          };
+          JS
+          npx playwright test --config .kubernetes-local/demo.config.cjs
+      - name: Guardar evidencias visuais
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demonstracao-visual
+          retention-days: 14
+          include-hidden-files: true
+          path: |
+            .kubernetes-local/relatorios-*.png
+            .kubernetes-local/demo-results/
+            .kubernetes-local/demo-report/
+            .kubernetes-local/demo-access.log
+      - name: Encerrar cluster temporario
+        if: always()
+        run: kind delete cluster --name docker-desktop || true
