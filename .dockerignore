@@ -15,3 +15,6 @@
 **/.env.*
 **/*.log
 front/dist
+**/.dart_tool
+**/.flutter-plugins-dependencies
+front_mobile/build
