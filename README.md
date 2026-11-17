@@ -20,7 +20,7 @@ Nome: Pedro Wilian Palumbo Bevilacqua RA: 23.01307-9
 
 Apresentação do projeto (25 min): arquitetura, as sete entregas e demonstração ao vivo do app. Os capítulos do vídeo levam direto à parte de cada integrante.
 
-▶️ [Assistir no YouTube](https://www.youtube.com/watch?v=wogW-QsG5fw)
+▶️ [Assistir no YouTube](https://youtu.be/YtMBBBEJPmc)
 
 Uma aplicação para gerenciamento de entregas via drones, com site React, aplicativo Flutter e microsserviços Node.js e Dart.
 
