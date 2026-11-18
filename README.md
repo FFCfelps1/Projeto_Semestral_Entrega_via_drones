@@ -18,7 +18,7 @@ Nome: Pedro Wilian Palumbo Bevilacqua RA: 23.01307-9
 
 ## 🎬 Vídeo da apresentação
 
-Apresentação do projeto (25 min): arquitetura, as sete entregas e demonstração ao vivo do app. Os capítulos do vídeo levam direto à parte de cada integrante.
+Apresentação do projeto (09m50s): arquitetura, as sete entregas e demonstração ao vivo do app. Os capítulos do vídeo levam direto à parte de cada integrante.
 
 ▶️ [Assistir no YouTube](https://youtu.be/YtMBBBEJPmc)
 
